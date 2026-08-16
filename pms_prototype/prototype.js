@@ -543,7 +543,6 @@ document.addEventListener('keydown', function(e) {
 
 // ── Master Shell Generator ──
 
-
 function patientShell(active) {
   const patientId = getActivePatientId();
   const patient = (window.HearIntelDB && window.HearIntelDB.getPatient(patientId)) || { name: 'Amaia O.', mrn: 'LCC-26-01248', age: 46, gender: 'Female' };
@@ -573,10 +572,75 @@ function patientShell(active) {
 
   const html = [
     '<aside class="sidebar">',
-      // Brand
-      '<div class="brand">
-        <div style="margin-bottom:4px;"><img src="logo-white.png" alt="HearIntel" style="height:24px;width:auto;display:block;"></div>
-        <div class="brand-sub">Assessment</div>',
+      '<div class="brand">',
+        '<div style="margin-bottom:6px;"><img src="logo-white.png" alt="HearIntel" style="height:26px;width:auto;display:block;"></div>',
+        '<div class="brand-sub">Practice Management</div>',
+      '</div>',
+      '<nav class="nav-group">',
+        '<div class="nav-section">Clinical Ops</div>',
+        '<a class="nav-item ' + (active === 'dashboard' ? 'active' : '') + '" href="00-dashboard.html" title="Dashboard">',
+          '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>',
+          '<span class="nav-label">Dashboard</span>',
+        '</a>',
+        '<a class="nav-item ' + (showPatientSub ? 'active' : '') + '" href="01-registry.html" title="Patients">',
+          '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>',
+          '<span class="nav-label">Patients</span>',
+        '</a>',
+        patientSub,
+        '<a class="nav-item ' + (active === 'screening' ? 'active' : '') + '" href="13-workspace-screening.html?patient=' + patientId + '" title="Hearing Screening">',
+          '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg></span>',
+          '<span class="nav-label">Screening</span>',
+        '</a>',
+        '<a class="nav-item ' + (active === 'media' ? 'active' : '') + '" href="10-media.html?patient=' + patientId + '" title="Clinical Media">',
+          '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/></svg></span>',
+          '<span class="nav-label">Clinical Media</span>',
+        '</a>',
+        '<a class="nav-item ' + (active === 'settings' ? 'active' : '') + '" href="11-settings.html" title="Settings">',
+          '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>',
+          '<span class="nav-label">Settings</span>',
+        '</a>',
+      '</nav>',
+      assessBlock ? '<div class="sidebar-divider"></div>' : '',
+      assessBlock,
+      '<div class="sidebar-divider"></div>',
+      '<div class="sidebar-footer" onclick="openPatientLookupModal()" title="Search or switch patient">',
+        '<div class="sidebar-footer-row">',
+          '<span class="sidebar-footer-name">' + patient.name + '</span>',
+          '<span class="sidebar-footer-switch">Switch</span>',
+        '</div>',
+        '<div class="sidebar-footer-meta">' + patient.age + 'y &middot; ' + patient.gender + ' &middot; ' + patient.mrn + '</div>',
+        '<div class="theme-switch-bar">',
+          '<button type="button" class="theme-btn ' + (currentTheme==='precision'?'active':'') + '" onclick="event.stopPropagation();setTheme(\'precision\')">Precision</button>',
+          '<button type="button" class="theme-btn ' + (currentTheme==='layered'?'active':'') + '" onclick="event.stopPropagation();setTheme(\'layered\')">Layered</button>',
+          '<button type="button" class="theme-btn ' + (currentTheme==='editorial'?'active':'') + '" onclick="event.stopPropagation();setTheme(\'editorial\')">Editorial</button>',
+        '</div>',
+      '</div>',
+    '</aside>'
+  ].join('');
+  return html;
+}
+
+function workspaceShell(active, content) {
+  const patientId = getActivePatientId();
+  const patient = (window.HearIntelDB && window.HearIntelDB.getPatient(patientId)) || { name: 'Amaia O.', mrn: 'LCC-26-01248', age: 46, gender: 'Female' };
+  const currentTheme = getActiveTheme();
+  const assessHref = '04-workspace-history.html?patient=' + patientId;
+
+  const steps = [
+    ['04-workspace-history.html?patient=' + patientId, 'History',          active === 'history'],
+    ['05-workspace-otoscopy.html?patient=' + patientId, 'Otoscopy',         active === 'otoscopy'],
+    ['06-workspace-pta.html?patient=' + patientId,      'Pure Tone (PTA)',  active === 'pta'],
+    ['07-workspace-immittance.html?patient=' + patientId,'Immittance',      active === 'immittance'],
+    ['08-workspace-speech.html?patient=' + patientId,   'Speech',           active === 'speech'],
+    ['12-workspace-electrophysiology.html?patient=' + patientId, 'E-Physiology', active === 'electrophysiology'],
+    ['09-conclusion.html?patient=' + patientId,         'Management',       active === 'conclusion'],
+  ];
+
+  const sidebarHtml = [
+    '<aside class="sidebar">',
+      '<div class="brand">',
+        '<div style="margin-bottom:6px;"><img src="logo-white.png" alt="HearIntel" style="height:26px;width:auto;display:block;"></div>',
+        '<div class="brand-sub">Assessment</div>',
       '</div>',
       '<nav class="nav-group">',
         '<div class="nav-section">Clinical Ops</div>',
