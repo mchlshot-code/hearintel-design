@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HearIntel — Professional Onboarding</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .auth-canvas {
+      width: 100vw;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #2B3035;
+      padding: 24px;
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 520px;
+      background: var(--white);
+      border-radius: var(--radius-md);
+      padding: 32px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.24);
+    }
+  </style>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+  <div class="auth-canvas">
+    <div class="auth-card">
+      <div style="margin-bottom:20px;">
+        <div class="brand-name" style="color:var(--text-primary);font-size:22px;">Hear<span style="color:var(--teal);">Intel</span></div>
+        <h1 style="font-size:18px;font-weight:700;margin-top:14px;color:var(--text-primary);">Professional Context & Workspace</h1>
+        <p style="font-size:13px;color:var(--text-secondary);margin-top:4px;">Define your clinical role and join your facility workspace.</p>
+      </div>
+
+      <form onsubmit="handleOnboardingSubmit(event)">
+        <div class="form-grid" style="grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;">
+          <div class="field" style="grid-column:1 / -1;">
+            <label for="onbRole">Clinical Role</label>
+            <select id="onbRole">
+              <option selected>Lead Audiologist (Au.D.)</option>
+              <option>Clinical Audiologist</option>
+              <option>Otolaryngologist / Specialist Surgeon</option>
+              <option>Hearing Care Professional (HCP)</option>
+              <option>Clinic Practice Administrator</option>
+            </select>
+          </div>
+          <div class="field" style="grid-column:1 / -1;">
+            <label for="onbFacility">Institution / Workspace</label>
+            <select id="onbFacility">
+              <option selected>Lagos Central Hearing Clinic (Default Facility)</option>
+              <option>LUTH Department of Otolaryngology</option>
+              <option>Abuja National Ear Centre</option>
+              <option>Create New Private Practice Workspace</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="onbPhone">Phone Number</label>
+            <input id="onbPhone" placeholder="+234 800 000 0000" value="+234 803 119 2840">
+          </div>
+          <div class="field">
+            <label for="onbLicence">Professional License / Reg (Optional)</label>
+            <input id="onbLicence" placeholder="e.g. AUD-NG-2026-081" value="AUD-NG-2026-081">
+          </div>
+        </div>
+
+        <button type="submit" class="btn primary" style="width:100%;min-height:38px;font-size:13.5px;font-weight:600;">Complete Setup & Enter PMS →</button>
+      </form>
+    </div>
+  </div>
+  <div class="toast"></div>
+  <script src="data.js"></script>
+  <script src="prototype.js"></script>
+  <script>
+    function handleOnboardingSubmit(event) {
+      event.preventDefault();
+      const role = document.getElementById('onbRole').value;
+      const facility = document.getElementById('onbFacility').value;
+      const phone = document.getElementById('onbPhone').value;
+      
+      localStorage.setItem('hearintel_clinician_role', role);
+      localStorage.setItem('hearintel_clinician_facility', facility);
+      localStorage.setItem('hearintel_clinician_phone', phone);
+
+      notify('Welcome to HearIntel PMS! Workspace initialized.');
+      setTimeout(() => location.href = '00-dashboard.html', 600);
+    }
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

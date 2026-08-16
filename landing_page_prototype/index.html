@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HearIntel — Clinical Infrastructure for Hearing Healthcare</title>
+  <meta name="description" content="HearIntel is a practice management system and hearing health registry for audiologists across Africa. Structured clinical records, connected data, and population-level insight.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<!-- ══════════════════════════════════════════
+     NAVIGATION
+══════════════════════════════════════════ -->
+<nav class="nav" id="nav" role="navigation" aria-label="Main navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="#hero" class="nav-brand" aria-label="HearIntel home">Hear<span>Intel</span></a>
+
+      <ul class="nav-links" role="list">
+        <li><a href="#product" onclick="navClose()">Product</a></li>
+        <li><a href="#trust" onclick="navClose()">Trust &amp; Compliance</a></li>
+        <li><a href="#pricing" onclick="navClose()">Pricing</a></li>
+      </ul>
+
+      <a href="#contact" class="btn btn-primary nav-cta" onclick="navClose()">Request a Demo</a>
+
+      <button class="nav-hamburger" id="navHamburger" aria-label="Open navigation menu" aria-expanded="false" onclick="navToggle()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile drawer -->
+<div class="nav-drawer" id="navDrawer" aria-hidden="true">
+  <a href="#product" onclick="navClose()">Product</a>
+  <a href="#trust" onclick="navClose()">Trust &amp; Compliance</a>
+  <a href="#pricing" onclick="navClose()">Pricing</a>
+  <a href="#contact" class="btn btn-primary" onclick="navClose()">Request a Demo</a>
+</div>
+
+
+<main id="main">
+
+<!-- ══════════════════════════════════════════
+     HERO
+══════════════════════════════════════════ -->
+<section id="hero" aria-label="Hero">
+  <div class="container">
+    <div class="hero-inner">
+
+      <div class="hero-text">
+        <p class="section-eyebrow light hero-reveal-1">Hearing Practice Management System</p>
+
+        <h1 class="hero-headline hero-reveal-2">
+          The clinical infrastructure for <em>hearing healthcare.</em>
+        </h1>
+
+        <p class="hero-description hero-reveal-3">
+          HearIntel is a practice management system and hearing health registry purpose-built for audiologists. Structured records, connected data, and population-level insight — in one platform.
+        </p>
+
+        <p class="hero-sub hero-reveal-3">
+          HPMS manages patient records and clinical assessments. The Hearing Health Registry transforms that data into evidence for research and public health.
+        </p>
+
+        <div class="hero-actions hero-reveal-4">
+          <a href="#contact" class="btn btn-primary">Request a Demo</a>
+          <a href="#product" class="btn btn-ghost-dark">Explore the Product</a>
+        </div>
+      </div>
+
+      <div class="hero-screenshot hero-screenshot-reveal">
+        <div class="hero-screenshot-frame">
+          <img src="screenshots/dashboard.png" alt="HearIntel clinical worklist — patient queue, recall status, and quick actions" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="screenshot-placeholder" style="display:none">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            <span>Dashboard screenshot</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     PROBLEM / OPPORTUNITY
+══════════════════════════════════════════ -->
+<section id="problem" class="section" aria-label="Problem and opportunity">
+  <div class="container">
+    <div class="reveal">
+      <p class="problem-stat" aria-label="34 million plus">34M+</p>
+      <p class="problem-stat-label">people in Africa live with disabling hearing loss</p>
+    </div>
+    <p class="problem-body reveal reveal-delay-1">
+      Most of them will never receive a structured clinical assessment. Not because audiologists don't exist — but because the systems that should support them don't. Patient records are fragmented across facilities, paper-based, or non-existent. There is no shared infrastructure to track outcomes, support recalls, or surface patterns at a population level.
+    </p>
+    <p class="problem-body reveal reveal-delay-2">
+      HearIntel is the layer that has been missing: a clinical system that manages individual patient care and simultaneously builds the data infrastructure that hearing health needs.
+    </p>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     PRODUCT
+══════════════════════════════════════════ -->
+<section id="product" class="section" aria-label="Product overview">
+  <div class="container">
+
+    <!-- HPMS -->
+    <div class="product-row">
+      <div class="product-text reveal">
+        <p class="section-eyebrow">HPMS</p>
+        <h2 class="section-headline">A complete clinical workspace for audiologists.</h2>
+        <p class="section-body">
+          Every tool an audiologist needs — patient management, diagnostic assessments, clinical documentation, and practice administration — in a single, structured system built for how audiology actually works.
+        </p>
+        <div class="capability-tags">
+          <span class="capability-tag">Patient Registry</span>
+          <span class="capability-tag">Audiograms (PTA)</span>
+          <span class="capability-tag">Tympanometry</span>
+          <span class="capability-tag">OAE Testing</span>
+          <span class="capability-tag">ABR / Electrophysiology</span>
+          <span class="capability-tag">Case History</span>
+          <span class="capability-tag">Hearing Screening</span>
+          <span class="capability-tag">Clinical Media</span>
+          <span class="capability-tag">Diagnosis &amp; Management</span>
+          <span class="capability-tag">Care Plans</span>
+        </div>
+        <a href="#contact" class="btn btn-ghost-light">Request a Demo</a>
+      </div>
+
+      <div class="reveal reveal-delay-2">
+        <div class="product-screenshot-wrap">
+          <img src="screenshots/audiogram.png" alt="Pure Tone Audiometry workspace showing right and left ear threshold curves on an audiogram" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="screenshot-placeholder" style="display:none;aspect-ratio:16/10">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12h2M20 12h2M12 2v2M12 20v2"/><circle cx="12" cy="12" r="4"/></svg>
+            <span>Audiogram screenshot</span>
+          </div>
+          <p class="product-screenshot-caption">Pure Tone Audiometry — right and left ear threshold curves, bone conduction, and masking.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-divider"></div>
+
+    <!-- Registry -->
+    <div class="product-row reverse">
+      <div class="product-text reveal">
+        <p class="section-eyebrow">Hearing Health Registry</p>
+        <h2 class="section-headline">Structured data that becomes population intelligence.</h2>
+        <p class="section-body">
+          Every consented clinical record in HearIntel can contribute to the Hearing Health Registry — a de-identified, cross-facility dataset that creates the evidence base for research, policy, and hearing health planning.
+        </p>
+        <div class="capability-tags">
+          <span class="capability-tag">Cross-facility Aggregation</span>
+          <span class="capability-tag">De-identified Data</span>
+          <span class="capability-tag">Research Access</span>
+          <span class="capability-tag">Population Insight</span>
+          <span class="capability-tag">Evidence Generation</span>
+          <span class="capability-tag">Health-system Intelligence</span>
+        </div>
+        <a href="#contact" class="btn btn-ghost-light">Request a Demo</a>
+      </div>
+
+      <div class="reveal reveal-delay-2">
+        <div class="product-screenshot-wrap">
+          <img src="screenshots/registry.png" alt="HearIntel patient registry table showing structured clinical records across the practice" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="screenshot-placeholder" style="display:none;aspect-ratio:16/10">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Patient registry screenshot</span>
+          </div>
+          <p class="product-screenshot-caption">Patient registry — structured records, status tracking, and intake workflow across the practice.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     CAPABILITIES
+══════════════════════════════════════════ -->
+<section id="capabilities" class="section" aria-label="Platform capabilities">
+  <div class="container">
+    <div class="capabilities-header reveal">
+      <p class="section-eyebrow">What HearIntel Enables</p>
+      <h2 class="section-headline">Not a feature grid. A clinical infrastructure.</h2>
+      <p class="section-body" style="margin-top:14px;">The value of HearIntel is not in the list of features — it is in what those features make possible at a clinical, organizational, and public health level.</p>
+    </div>
+
+    <div class="capabilities-grid">
+      <div class="capability-card reveal">
+        <h3 class="capability-card-title">Better Clinical Records</h3>
+        <p class="capability-card-body">Structured hearing-health records make clinical information easier to capture, retrieve, and manage. Every encounter is documented in a consistent format — accessible across visits, across years, and eventually across facilities with patient consent.</p>
+      </div>
+
+      <div class="capability-card reveal reveal-delay-1">
+        <h3 class="capability-card-title">Connected Data</h3>
+        <p class="capability-card-body">When a patient presents at a different facility, their history should travel with them — not start again from scratch. HearIntel connects records across facilities through consent-gated sharing, so clinical context is never lost.</p>
+      </div>
+
+      <div class="capability-card reveal reveal-delay-2">
+        <h3 class="capability-card-title">Research-Ready Information</h3>
+        <p class="capability-card-body">De-identified clinical data, aggregated across facilities, becomes a research asset. Appropriately governed access to the Hearing Health Registry enables the kind of evidence generation that hearing health in Africa currently lacks.</p>
+      </div>
+
+      <div class="capability-card reveal reveal-delay-3">
+        <h3 class="capability-card-title">Population Intelligence</h3>
+        <p class="capability-card-body">Individual clinical records, accumulated at scale, create the foundation for understanding hearing-health patterns — by region, by demographic, by type of loss. HearIntel turns routine clinical practice into population-level insight.</p>
+      </div>
+
+      <div class="capability-card reveal reveal-delay-4">
+        <h3 class="capability-card-title">Better Decisions</h3>
+        <p class="capability-card-body">Accumulated clinical data becomes evidence. Evidence supports better decisions — for individual patients, for clinical practice, for organizational planning, for research, and for public health policy.</p>
+      </div>
+    </div>
+
+    <div class="capabilities-cta reveal">
+      <a href="#contact" class="btn btn-primary">Request a Demo</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     TRUST & COMPLIANCE
+══════════════════════════════════════════ -->
+<section id="trust" aria-label="Trust and compliance">
+  <div class="container">
+    <div class="trust-inner">
+      <div class="reveal">
+        <p class="section-eyebrow light">Trust &amp; Compliance</p>
+        <h2 class="trust-headline">Health data protection by design, not by policy.</h2>
+        <p class="trust-sub">
+          HearIntel handles clinical records and registry data. The architecture reflects that responsibility — not as a compliance checkbox, but as a foundational requirement.
+        </p>
+        <p class="trust-sub">
+          These are not marketing claims. They are architectural decisions that shape every access path in the system.
+        </p>
+        <p class="trust-future">
+          As HearIntel's compliance architecture matures, this section will become a dedicated Trust Center with full documentation of data flows, access governance, and audit mechanisms.
+        </p>
+      </div>
+
+      <ul class="trust-principles reveal reveal-delay-1" aria-label="Architecture principles">
+        <li class="trust-principle">
+          <span class="trust-number">01</span>
+          <div class="trust-principle-text">
+            <strong>Consent-gated cross-facility access</strong>
+            A patient's record is only visible to another facility when the patient has actively consented — in person, or through a verifiable consent act. Subscription tier does not determine access to patient data.
+          </div>
+        </li>
+        <li class="trust-principle">
+          <span class="trust-number">02</span>
+          <div class="trust-principle-text">
+            <strong>De-identification before Registry entry</strong>
+            Clinical records are de-identified before any data reaches the Hearing Health Registry. The de-identification happens in the pipeline — not as a post-hoc filter.
+          </div>
+        </li>
+        <li class="trust-principle">
+          <span class="trust-number">03</span>
+          <div class="trust-principle-text">
+            <strong>No re-identification path from Registry data</strong>
+            There is no user-facing function that links a Registry record back to an identified HPMS patient. That path does not exist in the system by design.
+          </div>
+        </li>
+        <li class="trust-principle">
+          <span class="trust-number">04</span>
+          <div class="trust-principle-text">
+            <strong>Licence-verified clinical sign-off</strong>
+            Diagnosis, management plans, and care-plan authorization require a verified audiology licence. The system enforces this at the application layer, not through convention.
+          </div>
+        </li>
+        <li class="trust-principle">
+          <span class="trust-number">05</span>
+          <div class="trust-principle-text">
+            <strong>Server-verified session context on every request</strong>
+            Facility identity and role are resolved server-side from a verified session — never accepted from the request body. Cross-tenant access is structurally prevented, not policy-dependent.
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     CREDIBILITY
+══════════════════════════════════════════ -->
+<section id="credibility" class="section" aria-label="Credibility and evidence">
+  <div class="container">
+    <div class="credibility-inner">
+      <div class="credibility-text reveal">
+        <p class="section-eyebrow">Credibility</p>
+        <h2 class="section-headline">Real evidence. No manufactured proof.</h2>
+        <p class="section-body">
+          HearIntel is an early-stage product. The evidence presented here is accurate. Where something doesn't yet exist — a large customer base, published outcomes — it is not invented. As real evidence becomes available, it will appear here.
+        </p>
+      </div>
+
+      <div class="credibility-evidence">
+        <div class="evidence-card reveal">
+          <p class="evidence-card-label">Recognition</p>
+          <h3 class="evidence-card-title">OPay &ndash; Google Innovation Competition</h3>
+          <p class="evidence-card-body">HearIntel was submitted to the OPay&ndash;Google Innovation Competition as a health infrastructure product addressing hearing loss data gaps in Africa.</p>
+        </div>
+
+        <div class="evidence-card reveal reveal-delay-1">
+          <p class="evidence-card-label">Domain Expertise</p>
+          <h3 class="evidence-card-title">Built with Practicing Audiologists</h3>
+          <p class="evidence-card-body">HearIntel's clinical workflow, assessment structure, and terminology reflect direct involvement from qualified audiology practitioners. The product is designed for how audiology is actually practised — not for how it is described in documentation.</p>
+        </div>
+
+        <div class="rollout-notice reveal reveal-delay-2">
+          <p><strong>Phased, honest rollout.</strong> HearIntel is currently in pilot stage. We are not claiming a large installed base or published clinical outcomes that do not yet exist. This statement will be updated — with specifics — as deployment progresses.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     ROADMAP
+══════════════════════════════════════════ -->
+<section id="roadmap" class="section" aria-label="Product roadmap">
+  <div class="container">
+    <div class="roadmap-header reveal">
+      <p class="section-eyebrow">Roadmap</p>
+      <h2 class="section-headline">Where HearIntel is going.</h2>
+      <p class="section-body" style="margin-top:14px;">HearIntel is being built as infrastructure — not a product that ships once. The roadmap reflects that ambition without pretending that future capabilities already exist.</p>
+    </div>
+
+    <div class="roadmap-track">
+      <div class="roadmap-phase current reveal">
+        <div class="roadmap-dot current"><div class="roadmap-dot-inner"></div></div>
+        <div>
+          <p class="roadmap-phase-tag">Phase 1 — Current</p>
+          <h3 class="roadmap-phase-title">Pilot Deployment</h3>
+          <p class="roadmap-phase-body">Initial deployment and validation with early clinical partners. Establishing the foundational HPMS workflow and building toward the first Registry data contribution.</p>
+        </div>
+      </div>
+
+      <div class="roadmap-phase next reveal reveal-delay-1">
+        <div class="roadmap-dot next"><div class="roadmap-dot-inner"></div></div>
+        <div>
+          <p class="roadmap-phase-tag">Phase 2 — Next</p>
+          <h3 class="roadmap-phase-title">Multi-State Expansion</h3>
+          <p class="roadmap-phase-body">Expansion across additional facilities and states. Registry contributions begin to aggregate at scale. Research access pathways established with appropriate governance.</p>
+        </div>
+      </div>
+
+      <div class="roadmap-phase future reveal reveal-delay-2">
+        <div class="roadmap-dot future"><div class="roadmap-dot-inner"></div></div>
+        <div>
+          <p class="roadmap-phase-tag">Phase 3 — Future</p>
+          <h3 class="roadmap-phase-title">National &amp; Regional</h3>
+          <p class="roadmap-phase-body">Expansion toward broader national and regional hearing-health infrastructure. HearIntel becomes the data layer for population-level hearing health policy and evidence generation.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="roadmap-cta reveal">
+      <a href="#contact" class="btn btn-primary">Request a Demo</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     PRICING
+══════════════════════════════════════════ -->
+<section id="pricing" class="section" aria-label="Pricing plans">
+  <div class="container">
+    <div class="pricing-header reveal">
+      <p class="section-eyebrow">Pricing</p>
+      <h2 class="section-headline">Simple plans. No surprises.</h2>
+      <p class="section-body" style="margin-top:12px;">Pricing is confirmed at onboarding. All current figures are TBD — we will not display placeholder numbers as if they were confirmed.</p>
+    </div>
+
+    <!-- 3 self-service plans -->
+    <div class="pricing-grid">
+      <!-- Solo -->
+      <div class="pricing-card reveal">
+        <h3 class="pricing-plan-name">Solo Practitioner</h3>
+        <p class="pricing-plan-desc">For individual audiologists and private practitioners.</p>
+        <div class="pricing-price" aria-label="Pricing to be determined">TBD</div>
+        <ul class="pricing-features" aria-label="Plan features">
+          <li class="pricing-feature">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Full HPMS clinical workspace
+          </li>
+          <li class="pricing-feature">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Patient registry and records
+          </li>
+          <li class="pricing-feature">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            All diagnostic assessment modules
+          </li>
+          <li class="pricing-feature">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Clinical reporting
+          </li>
+          <li class="pricing-feature">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Single-facility Registry contribution
+          </li>
+        </ul>
+        <a href="#contact" class="btn btn-ghost-light" onclick="setContactPlan('solo')">Request a Demo</a>
+      </div>
+
+      <!-- Clinics -->
+      <div class="pricing-card reveal reveal-delay-1">
+        <h3 class="pricing-plan-name">Clinics &amp; Hearing Centers</h3>
+        <p class="pricing-plan-desc">For small-to-medium audiology facilities and hearing centers.</p>
+        <div class="pricing-price" aria-label="Pricing to be determined">TBD</div>
+        <ul class="pricing-features">
+          <li class="pricing-feature">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Everything in Solo
+          </li>
+          <li class="pricing-feature">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Multi-staff accounts
+          </li>
+          <li class="pricing-feature">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Role-based access control
+          </li>
+          <li class="pricing-feature">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Consent-gated cross-facility sharing
+          </li>
+          <li class="pricing-feature">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Priority support
+          </li>
+        </ul>
+        <a href="#contact" class="btn btn-primary" onclick="setContactPlan('clinic')">Request a Demo</a>
+      </div>
+
+      <!-- Hospital -->
+      <div class="pricing-card reveal reveal-delay-2">
+        <h3 class="pricing-plan-name">Hospital-Based Audiology</h3>
+        <p class="pricing-plan-desc">For hospital audiology departments and larger institutional buyers.</p>
+        <div class="pricing-price" aria-label="Pricing to be determined">TBD</div>
+        <ul class="pricing-features">
+          <li class="pricing-feature">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Everything in Clinic
+          </li>
+          <li class="pricing-feature">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Institutional onboarding support
+          </li>
+          <li class="pricing-feature">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Advanced audit and reporting
+          </li>
+          <li class="pricing-feature">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Registry aggregate reporting
+          </li>
+          <li class="pricing-feature">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Dedicated account management
+          </li>
+        </ul>
+        <a href="#contact" class="btn btn-ghost-light" onclick="setContactPlan('hospital')">Request a Demo</a>
+      </div>
+    </div>
+
+    <!-- Government & Research — full-width dark card -->
+    <div class="pricing-card-gov reveal">
+      <div>
+        <h3 class="pricing-plan-name">Government &amp; Research</h3>
+        <p class="pricing-plan-desc">For ministries of health, research institutions, and public health organizations accessing the Hearing Health Registry.</p>
+        <div class="pricing-price">Contact us</div>
+        <ul class="pricing-features">
+          <li class="pricing-feature">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Hearing Health Registry access
+          </li>
+          <li class="pricing-feature">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            De-identified aggregate data queries
+          </li>
+          <li class="pricing-feature">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Population-level reporting
+          </li>
+          <li class="pricing-feature">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Governed research access protocols
+          </li>
+        </ul>
+      </div>
+      <div>
+        <p style="font-family:var(--font-sans);font-size:14px;line-height:1.6;color:rgba(255,255,255,0.55);margin-bottom:24px;">This tier represents the Registry and institutional side of HearIntel. Engagement, scope, and governance are agreed directly — not through self-service onboarding.</p>
+        <a href="#contact" class="btn btn-primary" onclick="setContactPlan('government')">Request a Demo</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     CONTACT / REQUEST A DEMO
+══════════════════════════════════════════ -->
+<section id="contact" aria-label="Request a demo">
+  <div class="container">
+    <div class="contact-inner">
+
+      <div class="contact-text reveal">
+        <p class="section-eyebrow light">Request a Demo</p>
+        <h2 class="section-headline light">See HearIntel in the context of your practice.</h2>
+        <p class="section-body light">Every conversation starts with understanding your facility, your workflow, and what you're trying to solve. We'll show you the parts of HearIntel that are relevant to you.</p>
+        <p class="contact-note">This form is the single entry point for all enquiries — clinic demos, research access, government partnerships, and investor conversations.</p>
+      </div>
+
+      <div class="contact-form reveal reveal-delay-1">
+        <!-- Success state -->
+        <div class="form-success" id="formSuccess" aria-live="polite">
+          <div class="form-success-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <h3 class="form-success-title">Request received.</h3>
+          <p class="form-success-body">We will be in touch within two business days. Thank you for reaching out.</p>
+        </div>
+
+        <!-- Form -->
+        <form id="demoForm" novalidate>
+          <div class="form-field" id="field-role">
+            <label for="role">Role <span class="req">*</span></label>
+            <select id="role" name="role" required aria-required="true">
+              <option value="" disabled selected>Select your role</option>
+              <option value="clinic">Clinic / Provider</option>
+              <option value="researcher">Researcher</option>
+              <option value="government">Government / Ministry</option>
+              <option value="investor">Funder / Investor</option>
+              <option value="other">Other</option>
+            </select>
+            <p class="form-field-error" id="error-role">Please select your role.</p>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field" id="field-name">
+              <label for="name">Name <span class="req">*</span></label>
+              <input type="text" id="name" name="name" required aria-required="true" placeholder="Your full name" autocomplete="name">
+              <p class="form-field-error" id="error-name">Please enter your name.</p>
+            </div>
+            <div class="form-field" id="field-email">
+              <label for="email">Email <span class="req">*</span></label>
+              <input type="email" id="email" name="email" required aria-required="true" placeholder="you@organization.com" autocomplete="email">
+              <p class="form-field-error" id="error-email">Please enter a valid email address.</p>
+            </div>
+          </div>
+
+          <div class="form-field" id="field-organization">
+            <label for="organization">Organization <span class="req">*</span></label>
+            <input type="text" id="organization" name="organization" required aria-required="true" placeholder="Clinic, hospital, or institution name" autocomplete="organization">
+            <p class="form-field-error" id="error-organization">Please enter your organization.</p>
+          </div>
+
+          <div class="form-field">
+            <label for="message">Message <span style="font-size:10.5px;font-weight:400;color:rgba(255,255,255,0.30);margin-left:4px;">Optional</span></label>
+            <textarea id="message" name="message" placeholder="Tell us about your practice, your context, or what you are hoping to see."></textarea>
+          </div>
+
+          <div class="form-submit">
+            <button type="submit" class="btn btn-primary">Request a Demo</button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+</main>
+
+
+<!-- ══════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════ -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+
+      <!-- Brand -->
+      <div>
+        <div class="footer-brand-name">Hear<span>Intel</span></div>
+        <p class="footer-brand-desc">Clinical infrastructure for hearing healthcare in Africa.</p>
+      </div>
+
+      <!-- Product -->
+      <div>
+        <p class="footer-col-title">Product</p>
+        <ul class="footer-col-links">
+          <li><a href="#product">Product</a></li>
+          <li><a href="#trust">Trust &amp; Compliance</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+        </ul>
+      </div>
+
+      <!-- Legal -->
+      <div>
+        <p class="footer-col-title">Legal</p>
+        <ul class="footer-col-links">
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+        </ul>
+      </div>
+
+      <!-- Newsletter -->
+      <div>
+        <p class="footer-col-title">Stay Informed</p>
+        <p style="font-family:var(--font-sans);font-size:13px;color:rgba(255,255,255,0.42);line-height:1.5;margin-bottom:0;">Updates on HearIntel's rollout, features, and registry milestones.</p>
+        <div class="newsletter-form">
+          <input type="email" class="newsletter-input" placeholder="your@email.com" aria-label="Email for newsletter">
+          <button class="newsletter-btn" type="button" onclick="subscribeNewsletter(this)">Subscribe</button>
+        </div>
+        <p class="newsletter-note">No marketing. No third-party sharing. Unsubscribe any time.</p>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      <p class="footer-copyright">&copy; 2026 HearIntel. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════ -->
+<script>
+// ── Nav scroll + active ──
+var nav = document.getElementById('nav');
+var navSections = [];
+
+window.addEventListener('scroll', function() {
+  if (window.scrollY > 60) {
+    nav.classList.add('scrolled');
+  } else {
+    nav.classList.remove('scrolled');
+  }
+  updateActiveNav();
+}, { passive: true });
+
+function updateActiveNav() {
+  var links = document.querySelectorAll('.nav-links a');
+  var scrollPos = window.scrollY + 100;
+  var sections = ['product', 'trust', 'pricing'];
+  var current = '';
+  sections.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el && el.offsetTop <= scrollPos) current = id;
+  });
+  links.forEach(function(a) {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+}
+
+// ── Mobile nav ──
+function navToggle() {
+  var btn = document.getElementById('navHamburger');
+  var drawer = document.getElementById('navDrawer');
+  var open = btn.classList.toggle('open');
+  drawer.classList.toggle('open', open);
+  btn.setAttribute('aria-expanded', open);
+  drawer.setAttribute('aria-hidden', !open);
+}
+function navClose() {
+  var btn = document.getElementById('navHamburger');
+  var drawer = document.getElementById('navDrawer');
+  btn.classList.remove('open');
+  drawer.classList.remove('open');
+  btn.setAttribute('aria-expanded', 'false');
+  drawer.setAttribute('aria-hidden', 'true');
+}
+
+// ── Smooth scroll for anchor links ──
+document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+  a.addEventListener('click', function(e) {
+    var href = this.getAttribute('href');
+    if (href === '#') return;
+    var target = document.querySelector(href);
+    if (target) {
+      e.preventDefault();
+      var offset = document.getElementById('nav').offsetHeight;
+      var top = target.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top: top, behavior: 'smooth' });
+    }
+  });
+});
+
+// ── IntersectionObserver scroll reveal ──
+var revealObserver = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -32px 0px' });
+
+document.querySelectorAll('.reveal').forEach(function(el) {
+  revealObserver.observe(el);
+});
+
+// ── Pricing plan → contact pre-select ──
+function setContactPlan(plan) {
+  var roleMap = { solo: 'clinic', clinic: 'clinic', hospital: 'clinic', government: 'government' };
+  var roleEl = document.getElementById('role');
+  if (roleEl && roleMap[plan]) {
+    setTimeout(function() { roleEl.value = roleMap[plan]; }, 200);
+  }
+}
+
+// ── URL param pre-select (e.g. ?plan=clinic or ?role=researcher) ──
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var plan = params.get('plan');
+  var role = params.get('role');
+  var roleEl = document.getElementById('role');
+  if (!roleEl) return;
+  if (role) {
+    roleEl.value = role;
+  } else if (plan) {
+    var map = { solo: 'clinic', clinic: 'clinic', hospital: 'clinic', government: 'government', research: 'researcher' };
+    if (map[plan]) roleEl.value = map[plan];
+  }
+})();
+
+// ── Form validation + submission ──
+document.getElementById('demoForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  var valid = true;
+
+  function validateField(id, check, errorId) {
+    var el = document.getElementById(id);
+    var wrapper = document.getElementById('field-' + id);
+    var ok = check(el.value.trim());
+    if (wrapper) wrapper.classList.toggle('invalid', !ok);
+    if (el) el.classList.toggle('error', !ok);
+    if (!ok) valid = false;
+  }
+
+  validateField('role', function(v) { return v !== ''; }, 'error-role');
+  validateField('name', function(v) { return v.length >= 2; }, 'error-name');
+  validateField('email', function(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }, 'error-email');
+  validateField('organization', function(v) { return v.length >= 2; }, 'error-organization');
+
+  if (!valid) return;
+
+  // Success state (front-end only prototype)
+  this.style.display = 'none';
+  document.getElementById('formSuccess').classList.add('visible');
+});
+
+// Clear error on input
+['role', 'name', 'email', 'organization'].forEach(function(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('input', function() {
+    this.classList.remove('error');
+    var wrapper = document.getElementById('field-' + id);
+    if (wrapper) wrapper.classList.remove('invalid');
+  });
+});
+
+// ── Newsletter ──
+function subscribeNewsletter(btn) {
+  var input = btn.previousElementSibling;
+  if (!input || !input.value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value)) {
+    input.style.borderColor = '#DC2626';
+    return;
+  }
+  input.style.borderColor = '';
+  btn.textContent = 'Subscribed';
+  btn.disabled = true;
+  btn.style.background = '#059669';
+  input.value = '';
+}
+</script>
+
+</body>
+</html>

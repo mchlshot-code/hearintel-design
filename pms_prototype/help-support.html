@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HearIntel — Help & Clinical Support</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <div data-shell="settings"></div>
+    <main class="main">
+      <section class="page" style="max-width:960px;">
+        <header class="topbar">
+          <div>
+            <div class="eyebrow">Assistance & Documentation</div>
+            <h1 class="title">Help & Support</h1>
+            <p class="subtle">Audiological documentation guides, protocol standards, and technical assistance.</p>
+          </div>
+          <a class="btn" href="11-settings.html">← Back to Settings</a>
+        </header>
+
+        <div class="grid two" style="margin-bottom:24px;">
+          <!-- Knowledgebase Cards -->
+          <div class="surface" style="padding:18px;">
+            <h3 style="font-size:14px;font-weight:600;margin-bottom:8px;">Pure Tone Audiometry Guide</h3>
+            <p style="font-size:12.5px;color:var(--text-secondary);margin-bottom:12px;">Standard calibration rules, bone conduction masking protocols, and automated 4-frequency PTA derivations.</p>
+            <a class="btn" style="font-size:12px;min-height:28px;" href="#" onclick="notify('Clinical guide opened in new tab.');return false;">Read Protocol Guide →</a>
+          </div>
+
+          <div class="surface" style="padding:18px;">
+            <h3 style="font-size:14px;font-weight:600;margin-bottom:8px;">Care Plan & Longitudinal Recalls</h3>
+            <p style="font-size:12.5px;color:var(--text-secondary);margin-bottom:12px;">Managing hearing aid verification intervals, CI multidisciplinary team reviews, and surveillance schedules.</p>
+            <a class="btn" style="font-size:12px;min-height:28px;" href="#" onclick="notify('Care Plan workflow guide opened.');return false;">Read Workflow Guide →</a>
+          </div>
+        </div>
+
+        <!-- Contact Support Form -->
+        <div class="surface" style="padding:24px;">
+          <div class="panel-header" style="padding:0 0 14px 0;margin-bottom:16px;">
+            <div>
+              <h3 class="panel-title">Report an Issue or Contact Clinical Support</h3>
+              <p class="panel-subtitle">Direct line to the HearIntel clinical systems team.</p>
+            </div>
+            <span class="badge teal">Response within 2 hrs</span>
+          </div>
+
+          <form onsubmit="handleSupportSubmit(event)">
+            <div class="form-grid" style="margin-bottom:16px;">
+              <div class="field">
+                <label>Issue Topic</label>
+                <select id="supTopic">
+                  <option>Audiogram Plotted Values / Calculations</option>
+                  <option>Tympanometry Curve Export</option>
+                  <option>Care Plan Recall Synchronization</option>
+                  <option>General Support / Question</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Priority</label>
+                <select id="supPriority">
+                  <option>Routine Inquiry</option>
+                  <option>Urgent (Affecting Active Clinic)</option>
+                </select>
+              </div>
+              <div class="field" style="grid-column:1 / -1;">
+                <label>Message / Description</label>
+                <textarea id="supMsg" rows="3" required placeholder="Describe what occurred or what assistance you require..."></textarea>
+              </div>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:12px;color:var(--text-secondary);">HearIntel Clinical Build v2.4.0 (Secure Health Edition)</span>
+              <button type="submit" class="btn primary">Submit Support Ticket</button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div class="toast"></div>
+  <script src="data.js"></script>
+  <script src="prototype.js"></script>
+  <script>
+    function handleSupportSubmit(event) {
+      event.preventDefault();
+      const topic = document.getElementById('supTopic').value;
+      notify('Support ticket created for: ' + topic + '. Ticket #HI-9921');
+      document.getElementById('supMsg').value = '';
+    }
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

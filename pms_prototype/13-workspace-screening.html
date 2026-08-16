@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HearIntel — Hearing Health Screening</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .screen-grid { display:grid; grid-template-columns:1.25fr 1fr; gap:20px; align-items:start; margin-bottom:20px; }
+    .sweep-btn-group { display:flex; gap:10px; margin-top:6px; }
+    .sweep-tile { flex:1; border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 10px; text-align:center; background:var(--surface); cursor:pointer; transition:all 120ms ease; }
+    .sweep-tile:hover { border-color:var(--teal-400); background:var(--bg-subtle); }
+    .sweep-tile.heard { border-color:#16A34A; background:#F0FDF4; }
+    .sweep-tile.missed { border-color:#DC2626; background:#FEF2F2; }
+    .sweep-tile.untested { border-color:var(--border); background:var(--bg-subtle); }
+    .sweep-freq-title { font-size:13px; font-weight:700; font-family:monospace; color:var(--text-primary); margin-bottom:4px; }
+    .sweep-status-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-secondary); }
+    .sweep-tile.heard .sweep-status-label { color:#166534; }
+    .sweep-tile.missed .sweep-status-label { color:#991B1B; }
+    .hhie-row { display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--border-light); font-size:12px; gap:12px; }
+    .hhie-question { flex:1; line-height:1.4; }
+    .hhie-btn-group { display:flex; gap:4px; flex-shrink:0; }
+    .hhie-opt { font-size:11px; font-weight:600; padding:3px 8px; border:1px solid var(--border); border-radius:4px; background:var(--surface); cursor:pointer; white-space:nowrap; }
+    .hhie-opt.active { background:var(--text-primary); color:#FFFFFF; border-color:var(--text-primary); }
+    .protocol-section { display:none; }
+    .protocol-section.visible { display:block; }
+    .sts-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:10px; }
+    .sts-field { display:flex; flex-direction:column; gap:4px; }
+    .sts-field label { font-size:10.5px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.04em; }
+    .sts-field input { padding:6px 8px; border:1px solid var(--border); border-radius:var(--radius-sm); font-size:13px; font-family:monospace; width:100%; }
+    .oae-card { background:var(--bg-subtle); border:1px solid var(--border); border-radius:var(--radius); padding:14px; margin-top:10px; }
+  </style>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <div data-shell="screening"></div>
+    <main class="main">
+      <section class="page" style="max-width:1120px;">
+
+        <header class="topbar" style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);">
+          <div>
+            <div class="eyebrow" style="color:var(--brand-hover);font-weight:700;letter-spacing:0.06em;text-transform:uppercase;">Evidence-Based Triage and Screening</div>
+            <h1 class="title" style="font-size:22px;font-weight:800;letter-spacing:-0.02em;">Hearing Health Screening Suite</h1>
+            <p class="subtle" style="font-size:12.5px;color:var(--text-secondary);">Rapid pure tone sweep, otoscopic clearance, validated handicap index, and clinical triage disposition.</p>
+          </div>
+          <div class="actions" style="display:flex;align-items:center;gap:10px;">
+            <select id="screeningProtocolSelect" onchange="changeScreeningProtocol(this.value)" style="padding:6px 12px;font-size:12.5px;font-weight:600;border:1px solid var(--border);border-radius:var(--radius);">
+              <option value="adult" selected>Adult Protocol (25 dB HL)</option>
+              <option value="pediatric">Pediatric / School Protocol (20 dB HL)</option>
+              <option value="occupational">Occupational Protocol (OSHA STS)</option>
+              <option value="newborn">Newborn Protocol (UNHS A-ABR / OAE)</option>
+            </select>
+            <button type="button" class="btn" onclick="saveAndPrint()">Print Report</button>
+            <a class="btn" id="exitRecordBtn" href="02-profile.html">← Exit to Record</a>
+          </div>
+        </header>
+
+        <!-- Demographic Intake Form -->
+        <div class="surface" style="padding:18px 20px;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-card);margin-bottom:20px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border-light);">
+            <div>
+              <h2 style="font-size:13.5px;font-weight:700;text-transform:uppercase;color:var(--text-primary);margin:0;">Patient Demographic Information</h2>
+              <div style="font-size:11.5px;color:var(--text-secondary);margin-top:2px;">Pre-populate from registry or enter for walk-in screening</div>
+            </div>
+            <button type="button" class="btn" onclick="toggleDemoForm()" id="demoToggleBtn" style="font-size:12px;">Collapse</button>
+          </div>
+          <div id="demoFormBody">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;font-size:12.5px;">
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <label style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">Full Name</label>
+                <input type="text" id="demo_fullName" placeholder="First and Last Name" style="padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12.5px;font-family:inherit;">
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <label style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">Date of Birth</label>
+                <input type="date" id="demo_dob" oninput="calcDemoAge()" style="padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12.5px;font-family:inherit;">
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <label style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">Age (calculated)</label>
+                <input type="text" id="demo_age" readonly placeholder="Auto-calculated" style="padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12.5px;font-family:inherit;background:var(--bg-subtle);color:var(--text-secondary);">
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <label style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">Sex</label>
+                <select id="demo_sex" style="padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12.5px;font-family:inherit;">
+                  <option value="">Select</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other / Prefer not to say</option>
+                </select>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <label style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">Phone Number</label>
+                <input type="tel" id="demo_phone" placeholder="+234 800 000 0000" style="padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12.5px;font-family:inherit;">
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <label style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">Occupation / School</label>
+                <input type="text" id="demo_occupation" placeholder="e.g. Factory Worker, St. Mary's Primary" style="padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12.5px;font-family:inherit;">
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <label style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">Referral Source</label>
+                <select id="demo_referralSource" style="padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12.5px;font-family:inherit;">
+                  <option value="Self">Self / Walk-in</option>
+                  <option value="GP">General Practitioner</option>
+                  <option value="School">School Health Programme</option>
+                  <option value="Employer">Employer / Occupational Health</option>
+                  <option value="Specialist">Medical Specialist</option>
+                  <option value="Community">Community Outreach</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <label style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">Screening Date</label>
+                <input type="date" id="demo_screeningDate" style="padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12.5px;font-family:inherit;">
+              </div>
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <label style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">Screener / Clinician</label>
+                <input type="text" id="demo_clinician" placeholder="Clinician name and credentials" style="padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12.5px;font-family:inherit;">
+              </div>
+            </div>
+            <div style="margin-top:12px;display:flex;flex-direction:column;gap:4px;">
+              <label style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;">Reason for Screening / Chief Complaint</label>
+              <textarea id="demo_reason" rows="2" placeholder="e.g. Routine school screening, noise exposure monitoring, parental concern about hearing..." style="padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12.5px;font-family:inherit;resize:vertical;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="screen-grid">
+
+          <!-- LEFT COLUMN -->
+          <div style="display:flex;flex-direction:column;gap:18px;">
+
+            <!-- 1. Otoscopic Triage -->
+            <div class="surface" style="padding:18px 20px;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-card);">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border-light);">
+                <h2 style="font-size:13.5px;font-weight:700;text-transform:uppercase;color:var(--text-primary);margin:0;">1. Otoscopic & Physical Clearance</h2>
+                <span class="badge" id="otoTriageBadge">Cleared Bilaterally</span>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                <div>
+                  <label style="font-size:11px;font-weight:700;color:var(--right-ear);text-transform:uppercase;display:block;margin-bottom:4px;">Right Ear (AD) Canal & TM</label>
+                  <select id="otoTriageR" onchange="evaluateScreening()" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;">
+                    <option value="clear" selected>Clear / Intact TM</option>
+                    <option value="wax">Partial Cerumen (<50%)</option>
+                    <option value="occluded">Occluding Cerumen (Refer for Removal)</option>
+                    <option value="abnormal">Perforation / Inflammation</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size:11px;font-weight:700;color:var(--left-ear);text-transform:uppercase;display:block;margin-bottom:4px;">Left Ear (AS) Canal & TM</label>
+                  <select id="otoTriageL" onchange="evaluateScreening()" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;">
+                    <option value="clear" selected>Clear / Intact TM</option>
+                    <option value="wax">Partial Cerumen (<50%)</option>
+                    <option value="occluded">Occluding Cerumen (Refer for Removal)</option>
+                    <option value="abnormal">Perforation / Inflammation</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Pure Tone Sweep (Adult & Pediatric) -->
+            <div class="surface protocol-section visible" id="sweepSection" style="padding:18px 20px;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-card);">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border-light);">
+                <div>
+                  <h2 style="font-size:13.5px;font-weight:700;text-transform:uppercase;color:var(--text-primary);margin:0;">2. Pure Tone Sweep Screener</h2>
+                  <div style="font-size:11.5px;color:var(--text-secondary);margin-top:2px;" id="sweepIntensityLabel">Presentation Level: 25 dB HL · Adult 3-Frequency Battery</div>
+                </div>
+                <span class="badge" id="sweepOutcomeBadge" style="background:var(--bg-subtle);color:var(--text-secondary);border:1px solid var(--border);">Not Started</span>
+              </div>
+
+              <!-- Right Ear -->
+              <div style="margin-bottom:14px;">
+                <div style="font-size:12px;font-weight:700;color:var(--right-ear);text-transform:uppercase;margin-bottom:6px;">Right Ear (AD)</div>
+                <div class="sweep-btn-group" id="sweepGroupR">
+                  <div class="sweep-tile untested" id="sweep_r_500" onclick="toggleSweep('r', 500)" style="display:none;">
+                    <div class="sweep-freq-title">500 Hz</div>
+                    <div class="sweep-status-label">UNTESTED</div>
+                  </div>
+                  <div class="sweep-tile untested" id="sweep_r_1000" onclick="toggleSweep('r', 1000)">
+                    <div class="sweep-freq-title">1000 Hz</div>
+                    <div class="sweep-status-label">UNTESTED</div>
+                  </div>
+                  <div class="sweep-tile untested" id="sweep_r_2000" onclick="toggleSweep('r', 2000)">
+                    <div class="sweep-freq-title">2000 Hz</div>
+                    <div class="sweep-status-label">UNTESTED</div>
+                  </div>
+                  <div class="sweep-tile untested" id="sweep_r_4000" onclick="toggleSweep('r', 4000)">
+                    <div class="sweep-freq-title">4000 Hz</div>
+                    <div class="sweep-status-label">UNTESTED</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Left Ear -->
+              <div>
+                <div style="font-size:12px;font-weight:700;color:var(--left-ear);text-transform:uppercase;margin-bottom:6px;">Left Ear (AS)</div>
+                <div class="sweep-btn-group" id="sweepGroupL">
+                  <div class="sweep-tile untested" id="sweep_l_500" onclick="toggleSweep('l', 500)" style="display:none;">
+                    <div class="sweep-freq-title">500 Hz</div>
+                    <div class="sweep-status-label">UNTESTED</div>
+                  </div>
+                  <div class="sweep-tile untested" id="sweep_l_1000" onclick="toggleSweep('l', 1000)">
+                    <div class="sweep-freq-title">1000 Hz</div>
+                    <div class="sweep-status-label">UNTESTED</div>
+                  </div>
+                  <div class="sweep-tile untested" id="sweep_l_2000" onclick="toggleSweep('l', 2000)">
+                    <div class="sweep-freq-title">2000 Hz</div>
+                    <div class="sweep-status-label">UNTESTED</div>
+                  </div>
+                  <div class="sweep-tile untested" id="sweep_l_4000" onclick="toggleSweep('l', 4000)">
+                    <div class="sweep-freq-title">4000 Hz</div>
+                    <div class="sweep-status-label">UNTESTED</div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top:10px;font-size:11px;color:var(--text-tertiary);">Click each tile to mark Heard or Missed. Tap again to reset to Untested.</div>
+            </div>
+
+            <!-- 2b. Occupational STS Section -->
+            <div class="surface protocol-section" id="stsSection" style="padding:18px 20px;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-card);">
+              <div style="margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border-light);">
+                <h2 style="font-size:13.5px;font-weight:700;text-transform:uppercase;color:var(--text-primary);margin:0;">2. Standard Threshold Shift (STS) Check</h2>
+                <div style="font-size:11.5px;color:var(--text-secondary);margin-top:2px;">Average shift ≥10 dB at 2k, 3k, 4k Hz vs. baseline audiogram constitutes an OSHA STS event.</div>
+              </div>
+
+              <div style="font-size:12px;font-weight:700;color:var(--right-ear);text-transform:uppercase;margin-bottom:6px;">Right Ear (AD)</div>
+              <div class="sts-grid">
+                <div class="sts-field">
+                  <label>Baseline 2k Hz (dB HL)</label>
+                  <input type="number" id="sts_r_base_2k" placeholder="e.g. 25" oninput="evaluateScreening()">
+                </div>
+                <div class="sts-field">
+                  <label>Baseline 3k Hz (dB HL)</label>
+                  <input type="number" id="sts_r_base_3k" placeholder="e.g. 30" oninput="evaluateScreening()">
+                </div>
+                <div class="sts-field">
+                  <label>Baseline 4k Hz (dB HL)</label>
+                  <input type="number" id="sts_r_base_4k" placeholder="e.g. 35" oninput="evaluateScreening()">
+                </div>
+                <div class="sts-field">
+                  <label>Current 2k Hz (dB HL)</label>
+                  <input type="number" id="sts_r_curr_2k" placeholder="e.g. 35" oninput="evaluateScreening()">
+                </div>
+                <div class="sts-field">
+                  <label>Current 3k Hz (dB HL)</label>
+                  <input type="number" id="sts_r_curr_3k" placeholder="e.g. 40" oninput="evaluateScreening()">
+                </div>
+                <div class="sts-field">
+                  <label>Current 4k Hz (dB HL)</label>
+                  <input type="number" id="sts_r_curr_4k" placeholder="e.g. 48" oninput="evaluateScreening()">
+                </div>
+              </div>
+              <div style="font-size:12px;font-weight:700;color:var(--left-ear);text-transform:uppercase;margin:12px 0 6px;">Left Ear (AS)</div>
+              <div class="sts-grid">
+                <div class="sts-field">
+                  <label>Baseline 2k Hz (dB HL)</label>
+                  <input type="number" id="sts_l_base_2k" placeholder="e.g. 25" oninput="evaluateScreening()">
+                </div>
+                <div class="sts-field">
+                  <label>Baseline 3k Hz (dB HL)</label>
+                  <input type="number" id="sts_l_base_3k" placeholder="e.g. 30" oninput="evaluateScreening()">
+                </div>
+                <div class="sts-field">
+                  <label>Baseline 4k Hz (dB HL)</label>
+                  <input type="number" id="sts_l_base_4k" placeholder="e.g. 35" oninput="evaluateScreening()">
+                </div>
+                <div class="sts-field">
+                  <label>Current 2k Hz (dB HL)</label>
+                  <input type="number" id="sts_l_curr_2k" placeholder="e.g. 35" oninput="evaluateScreening()">
+                </div>
+                <div class="sts-field">
+                  <label>Current 3k Hz (dB HL)</label>
+                  <input type="number" id="sts_l_curr_3k" placeholder="e.g. 40" oninput="evaluateScreening()">
+                </div>
+                <div class="sts-field">
+                  <label>Current 4k Hz (dB HL)</label>
+                  <input type="number" id="sts_l_curr_4k" placeholder="e.g. 48" oninput="evaluateScreening()">
+                </div>
+              </div>
+              <div id="stsFlagBanner" style="display:none;margin-top:12px;padding:10px 12px;background:#FEF2F2;border:1px solid #DC2626;border-radius:var(--radius-sm);font-size:12.5px;color:#991B1B;font-weight:600;">OSHA STS Event Detected — Retest within 30 days and notify employer</div>
+            </div>
+
+            <!-- 2c. Newborn OAE / A-ABR Section -->
+            <div class="surface protocol-section" id="newbornSection" style="padding:18px 20px;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-card);">
+              <div style="margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border-light);">
+                <h2 style="font-size:13.5px;font-weight:700;text-transform:uppercase;color:var(--text-primary);margin:0;">2. OAE / A-ABR Newborn Screening</h2>
+                <div style="font-size:11.5px;color:var(--text-secondary);margin-top:2px;">UNHS 1-3-6 Benchmark — Screen before 1 month, confirm by 3 months, intervene by 6 months.</div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                <div>
+                  <label style="font-size:11px;font-weight:700;color:var(--right-ear);text-transform:uppercase;display:block;margin-bottom:6px;">Right Ear (AD) — TEOAE / A-ABR</label>
+                  <div style="display:flex;gap:8px;">
+                    <button type="button" class="hhie-opt active" id="oae_r_pass" onclick="setOAE('r','pass',this)">Pass</button>
+                    <button type="button" class="hhie-opt" id="oae_r_refer" onclick="setOAE('r','refer',this)">Refer</button>
+                    <button type="button" class="hhie-opt" id="oae_r_incomplete" onclick="setOAE('r','incomplete',this)">Incomplete</button>
+                  </div>
+                </div>
+                <div>
+                  <label style="font-size:11px;font-weight:700;color:var(--left-ear);text-transform:uppercase;display:block;margin-bottom:6px;">Left Ear (AS) — TEOAE / A-ABR</label>
+                  <div style="display:flex;gap:8px;">
+                    <button type="button" class="hhie-opt active" id="oae_l_pass" onclick="setOAE('l','pass',this)">Pass</button>
+                    <button type="button" class="hhie-opt" id="oae_l_refer" onclick="setOAE('l','refer',this)">Refer</button>
+                    <button type="button" class="hhie-opt" id="oae_l_incomplete" onclick="setOAE('l','incomplete',this)">Incomplete</button>
+                  </div>
+                </div>
+              </div>
+              <div class="oae-card" style="margin-top:14px;">
+                <div style="font-size:11.5px;font-weight:700;color:var(--text-secondary);margin-bottom:6px;">Equipment Report Upload (optional)</div>
+                <input type="file" accept="image/*,application/pdf" id="oaeUploadInput" onchange="handleOaeUpload(event)" style="font-size:12px;">
+              </div>
+            </div>
+
+          </div>
+
+          <!-- RIGHT COLUMN -->
+          <div style="display:flex;flex-direction:column;gap:18px;">
+
+            <!-- 3. HHIE-S Hearing Handicap Screener (10-item, score /40) -->
+            <div class="surface protocol-section visible" id="hhieSection" style="padding:18px 20px;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-card);">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border-light);">
+                <div>
+                  <h2 style="font-size:13.5px;font-weight:700;text-transform:uppercase;color:var(--text-primary);margin:0;">3. Hearing Handicap Inventory (HHIE-S)</h2>
+                  <div style="font-size:11.5px;color:var(--text-secondary);margin-top:2px;">10 validated items · Score 0–40 · Yes=4 · Sometimes=2 · No=0</div>
+                </div>
+                <span class="badge" id="hhieScoreBadge" style="font-family:monospace;">Score: — / 40</span>
+              </div>
+
+              <div id="hhieQuestions">
+                <!-- Injected by buildHhieQuestions() -->
+              </div>
+
+              <div style="margin-top:10px;padding:8px 10px;background:var(--bg-subtle);border-radius:var(--radius-sm);font-size:11.5px;color:var(--text-secondary);" id="hhieInterpretation">
+                Complete all questions above to see your interpretation.
+              </div>
+            </div>
+
+            <!-- 4. Disposition -->
+            <div class="surface" style="padding:18px 20px;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-card);">
+              <div style="font-size:11px;font-weight:700;color:var(--brand-hover);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">Automated Clinical Disposition</div>
+              <div style="font-size:15px;font-weight:700;color:var(--text-primary);margin-bottom:4px;" id="dispTitle">Awaiting Screening Data</div>
+              <div style="font-size:12.5px;color:var(--text-secondary);line-height:1.5;margin-bottom:14px;" id="dispDesc">Enter sweep results and HHIE-S responses above to generate the evidence-based clinical disposition.</div>
+
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <button type="button" class="btn primary" id="escalateBtn" onclick="escalateToFullAssessment()" style="justify-content:center;font-weight:700;font-size:13px;min-height:36px;">Escalate to Full Diagnostic Assessment</button>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                  <button type="button" class="btn" onclick="saveAndPrint()" style="font-size:12px;">Print Report</button>
+                  <button type="button" class="btn" onclick="openReferralModal(getActivePatientId())" style="font-size:12px;">↗ Refer Specialist</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast"></div>
+  <script src="data.js"></script>
+  <script src="prototype.js"></script>
+  <script>
+    // ── State ──────────────────────────────────────────────────────────────────
+    let currentProtocol = 'adult';
+    const sweepResults = {
+      r: { 500: null, 1000: null, 2000: null, 4000: null },
+      l: { 500: null, 1000: null, 2000: null, 4000: null }
+    };
+    const hhieScores = {};
+    const oaeResults = { r: 'pass', l: 'pass' };
+
+    // ── Validated HHIE-S 10-Item Question Set ──────────────────────────────────
+    const HHIE_QUESTIONS = [
+      { id: 1,  text: 'Does a hearing problem cause you to feel embarrassed when meeting new people?' },
+      { id: 2,  text: 'Does a hearing problem cause you to feel frustrated when talking to members of your family?' },
+      { id: 3,  text: 'Do you have difficulty hearing when someone speaks in a whisper?' },
+      { id: 4,  text: 'Do you feel handicapped by a hearing problem?' },
+      { id: 5,  text: 'Does a hearing problem cause you difficulty when visiting friends, relatives, or neighbours?' },
+      { id: 6,  text: 'Does a hearing problem cause you to attend religious services less often than you would like?' },
+      { id: 7,  text: 'Does a hearing problem cause you to have arguments with family members?' },
+      { id: 8,  text: 'Does a hearing problem cause you difficulty when listening to TV or radio?' },
+      { id: 9,  text: 'Do you feel that any difficulty with your hearing limits or hampers your personal or social life?' },
+      { id: 10, text: 'Does a hearing problem cause you difficulty when in a restaurant with relatives or friends?' }
+    ];
+
+    function buildHhieQuestions() {
+      const container = document.getElementById('hhieQuestions');
+      if (!container) return;
+      container.innerHTML = HHIE_QUESTIONS.map(q => `
+        <div class="hhie-row">
+          <div class="hhie-question">${q.id}. ${q.text}</div>
+          <div class="hhie-btn-group">
+            <button type="button" class="hhie-opt" onclick="setHhie(${q.id}, 4, this)">Yes (4)</button>
+            <button type="button" class="hhie-opt" onclick="setHhie(${q.id}, 2, this)">Sometimes (2)</button>
+            <button type="button" class="hhie-opt" onclick="setHhie(${q.id}, 0, this)">No (0)</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function setHhie(qNum, score, btn) {
+      hhieScores[qNum] = score;
+      const parent = btn.parentElement;
+      parent.querySelectorAll('.hhie-opt').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      evaluateScreening();
+    }
+
+    // ── Demographic Helpers ───────────────────────────────────────────────────
+    let demoPanelOpen = true;
+    function toggleDemoForm() {
+      demoPanelOpen = !demoPanelOpen;
+      const body = document.getElementById('demoFormBody');
+      if (body) body.style.display = demoPanelOpen ? '' : 'none';
+      const btn = document.getElementById('demoToggleBtn');
+      if (btn) btn.textContent = demoPanelOpen ? 'Collapse' : 'Expand';
+    }
+
+    function calcDemoAge() {
+      const dobInput = document.getElementById('demo_dob');
+      if (!dobInput || !dobInput.value) return;
+      const dobVal = dobInput.value;
+      const diff = new Date() - new Date(dobVal);
+      if (isNaN(diff) || diff < 0) return;
+      const years = Math.floor(diff / (365.25 * 24 * 3600 * 1000));
+      const ageInput = document.getElementById('demo_age');
+      if (ageInput) ageInput.value = years + ' yrs';
+    }
+
+    function getDemographics() {
+      return {
+        fullName:       (document.getElementById('demo_fullName') || {}).value || '',
+        dob:            (document.getElementById('demo_dob') || {}).value || '',
+        age:            (document.getElementById('demo_age') || {}).value || '',
+        sex:            (document.getElementById('demo_sex') || {}).value || '',
+        phone:          (document.getElementById('demo_phone') || {}).value || '',
+        occupation:     (document.getElementById('demo_occupation') || {}).value || '',
+        referralSource: (document.getElementById('demo_referralSource') || {}).value || 'Self',
+        screeningDate:  (document.getElementById('demo_screeningDate') || {}).value || '',
+        clinician:      (document.getElementById('demo_clinician') || {}).value || '',
+        reason:         (document.getElementById('demo_reason') || {}).value || ''
+      };
+    }
+
+    // Global variable accessible by prototype.js report generator
+    let screeningDemographics = {};
+
+    function openScreeningReport() {
+      screeningDemographics = getDemographics();
+      evaluateScreening();
+      if (typeof openReportModal === 'function') {
+        openReportModal(getActivePatientId(), 'screening');
+      }
+    }
+
+    function saveAndPrint() {
+      openScreeningReport();
+    }
+
+    // ── Sweep Toggle: null → true → false → null ──────────────────────────────
+    function toggleSweep(ear, freq) {
+      const current = sweepResults[ear][freq];
+      sweepResults[ear][freq] = current === null ? true : current === true ? false : null;
+      const isHeard = sweepResults[ear][freq];
+      const tile = document.getElementById(`sweep_${ear}_${freq}`);
+      if (tile) {
+        if (isHeard === null) {
+          tile.className = 'sweep-tile untested';
+          tile.querySelector('.sweep-status-label').textContent = 'UNTESTED';
+        } else if (isHeard) {
+          tile.className = 'sweep-tile heard';
+          tile.querySelector('.sweep-status-label').textContent = 'HEARD';
+        } else {
+          tile.className = 'sweep-tile missed';
+          tile.querySelector('.sweep-status-label').textContent = 'MISSED';
+        }
+      }
+      evaluateScreening();
+    }
+
+    // ── OAE Pass/Refer (Newborn) ───────────────────────────────────────────────
+    function setOAE(ear, result, btn) {
+      oaeResults[ear] = result;
+      const btns = btn.parentElement.querySelectorAll('.hhie-opt');
+      btns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      evaluateScreening();
+    }
+
+    function handleOaeUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      if (typeof notify === 'function') {
+        notify(`OAE equipment report attached: ${file.name}`);
+      }
+    }
+
+    // ── Protocol Switching ─────────────────────────────────────────────────────
+    function changeScreeningProtocol(protocol) {
+      currentProtocol = protocol;
+
+      // Reset sweep state
+      Object.keys(sweepResults.r).forEach(f => { sweepResults.r[f] = null; sweepResults.l[f] = null; });
+      ['r_500','r_1000','r_2000','r_4000','l_500','l_1000','l_2000','l_4000'].forEach(id => {
+        const tile = document.getElementById('sweep_' + id);
+        if (tile) { tile.className = 'sweep-tile untested'; tile.querySelector('.sweep-status-label').textContent = 'UNTESTED'; }
+      });
+
+      // Toggle protocol sections
+      const sweepSection = document.getElementById('sweepSection');
+      const stsSection = document.getElementById('stsSection');
+      const newbornSection = document.getElementById('newbornSection');
+      const hhieSection = document.getElementById('hhieSection');
+
+      if (sweepSection) sweepSection.classList.remove('visible');
+      if (stsSection) stsSection.classList.remove('visible');
+      if (newbornSection) newbornSection.classList.remove('visible');
+
+      // Show/hide 500 Hz tile
+      ['r_500','l_500'].forEach(id => {
+        const el = document.getElementById('sweep_' + id);
+        if (el) el.style.display = (protocol === 'pediatric') ? '' : 'none';
+      });
+
+      const labelEl = document.getElementById('sweepIntensityLabel');
+
+      if (protocol === 'adult') {
+        if (sweepSection) sweepSection.classList.add('visible');
+        if (hhieSection) hhieSection.classList.add('visible');
+        if (labelEl) labelEl.textContent = 'Presentation Level: 25 dB HL · Adult 3-Frequency Battery';
+      } else if (protocol === 'pediatric') {
+        if (sweepSection) sweepSection.classList.add('visible');
+        if (hhieSection) hhieSection.classList.remove('visible');
+        if (labelEl) labelEl.textContent = 'Presentation Level: 20 dB HL · Pediatric 4-Frequency Battery (500–4k Hz)';
+      } else if (protocol === 'occupational') {
+        if (stsSection) stsSection.classList.add('visible');
+        if (hhieSection) hhieSection.classList.remove('visible');
+      } else if (protocol === 'newborn') {
+        if (newbornSection) newbornSection.classList.add('visible');
+        if (hhieSection) hhieSection.classList.remove('visible');
+      }
+
+      evaluateScreening();
+      if (typeof notify === 'function') {
+        notify('Switched to ' + protocol.charAt(0).toUpperCase() + protocol.slice(1) + ' protocol');
+      }
+    }
+
+    // ── Compute STS Delta ──────────────────────────────────────────────────────
+    function computeSts(ear) {
+      const freqs = [2, 3, 4];
+      const vals = freqs.map(f => {
+        const base = parseFloat(document.getElementById(`sts_${ear}_base_${f}k`)?.value);
+        const curr = parseFloat(document.getElementById(`sts_${ear}_curr_${f}k`)?.value);
+        if (isNaN(base) || isNaN(curr)) return null;
+        return curr - base;
+      });
+      if (vals.some(v => v === null)) return null;
+      return vals.reduce((a, b) => a + b, 0) / 3;
+    }
+
+    // ── Master Evaluate ───────────────────────────────────────────────────────
+    function evaluateScreening() {
+      const dispTitle = document.getElementById('dispTitle');
+      const dispDesc = document.getElementById('dispDesc');
+      const outcomeBadge = document.getElementById('sweepOutcomeBadge');
+      const otoREl = document.getElementById('otoTriageR');
+      const otoLEl = document.getElementById('otoTriageL');
+      const otoR = otoREl ? otoREl.value : 'clear';
+      const otoL = otoLEl ? otoLEl.value : 'clear';
+      const otoClear = otoR === 'clear' && otoL === 'clear';
+
+      const otoTriageBadge = document.getElementById('otoTriageBadge');
+      if (otoTriageBadge) {
+        otoTriageBadge.textContent = otoClear ? 'Cleared Bilaterally' : 'Clearance Concern';
+        otoTriageBadge.className = otoClear ? 'badge' : 'badge danger';
+      }
+
+      let outcome = 'pass';
+      let reasons = [];
+
+      if (!otoClear) {
+        reasons.push('otoscopic clearance concern (' + (otoR !== 'clear' ? 'Right' : '') + (otoL !== 'clear' ? (otoR !== 'clear' ? ' & ' : '') + 'Left' : '') + ')');
+        outcome = 'refer';
+      }
+
+      // HHIE-S evaluation (adult only)
+      if (currentProtocol === 'adult') {
+        const answeredQs = Object.keys(hhieScores).length;
+        const totalHhie = Object.values(hhieScores).reduce((a, b) => a + b, 0);
+        const hhieBadge = document.getElementById('hhieScoreBadge');
+
+        if (answeredQs > 0) {
+          if (hhieBadge) hhieBadge.textContent = `Score: ${totalHhie} / 40`;
+          let interp = '';
+          if (totalHhie <= 8) {
+            interp = 'Score 0–8: No significant hearing handicap identified.';
+          } else if (totalHhie <= 24) {
+            interp = 'Score 10–24: Mild-to-moderate hearing handicap — diagnostic follow-up recommended.';
+            outcome = 'refer';
+            reasons.push(`elevated HHIE-S score (${totalHhie}/40 — Mild-to-Moderate Handicap)`);
+          } else {
+            interp = 'Score 26–40: Significant hearing handicap — urgent diagnostic referral indicated.';
+            outcome = 'refer';
+            reasons.push(`high HHIE-S score (${totalHhie}/40 — Significant Handicap)`);
+          }
+          const interpEl = document.getElementById('hhieInterpretation');
+          if (interpEl) interpEl.textContent = interp;
+        } else {
+          if (hhieBadge) hhieBadge.textContent = 'Score: — / 40';
+          const interpEl = document.getElementById('hhieInterpretation');
+          if (interpEl) interpEl.textContent = 'Complete all 10 questions above to see your interpretation.';
+        }
+      }
+
+      // Sweep evaluation (adult & pediatric)
+      if (currentProtocol === 'adult' || currentProtocol === 'pediatric') {
+        const activeFreqs = currentProtocol === 'pediatric' ? [500, 1000, 2000, 4000] : [1000, 2000, 4000];
+        const testedR = activeFreqs.filter(f => sweepResults.r[f] !== null);
+        const testedL = activeFreqs.filter(f => sweepResults.l[f] !== null);
+        const missedR = activeFreqs.filter(f => sweepResults.r[f] === false);
+        const missedL = activeFreqs.filter(f => sweepResults.l[f] === false);
+
+        if (testedR.length > 0 || testedL.length > 0) {
+          if (missedR.length > 0 || missedL.length > 0) {
+            outcome = 'refer';
+            if (missedR.length > 0) reasons.push(`missed ${missedR.map(f => f + 'Hz').join(', ')} Right ear`);
+            if (missedL.length > 0) reasons.push(`missed ${missedL.map(f => f + 'Hz').join(', ')} Left ear`);
+            if (outcomeBadge) {
+              outcomeBadge.textContent = 'REFER';
+              outcomeBadge.style.background = '#FEF2F2';
+              outcomeBadge.style.color = '#991B1B';
+              outcomeBadge.style.border = '1px solid #DC2626';
+            }
+          } else {
+            if (outcomeBadge) {
+              outcomeBadge.textContent = 'PASS';
+              outcomeBadge.style.background = '#F0FDF4';
+              outcomeBadge.style.color = '#166534';
+              outcomeBadge.style.border = '1px solid #16A34A';
+            }
+          }
+        } else {
+          if (outcomeBadge) {
+            outcomeBadge.textContent = 'Not Started';
+            outcomeBadge.style.background = 'var(--bg-subtle)';
+            outcomeBadge.style.color = 'var(--text-secondary)';
+            outcomeBadge.style.border = '1px solid var(--border)';
+          }
+        }
+      }
+
+      // Occupational STS evaluation
+      if (currentProtocol === 'occupational') {
+        const stsR = computeSts('r');
+        const stsL = computeSts('l');
+        const banner = document.getElementById('stsFlagBanner');
+        if (stsR !== null || stsL !== null) {
+          const stsFlag = (stsR !== null && stsR >= 10) || (stsL !== null && stsL >= 10);
+          if (stsFlag) {
+            outcome = 'refer';
+            reasons.push('OSHA Standard Threshold Shift event detected (≥10 dB average shift at 2k-3k-4k Hz)');
+            if (banner) banner.style.display = 'block';
+          } else {
+            if (banner) banner.style.display = 'none';
+          }
+        }
+      }
+
+      // Newborn OAE evaluation
+      if (currentProtocol === 'newborn') {
+        if (oaeResults.r === 'refer' || oaeResults.l === 'refer') {
+          outcome = 'refer';
+          reasons.push('OAE/A-ABR refer result — diagnostic ABR before 3 months required');
+        }
+      }
+
+      // ── Set disposition ──
+      const rescreenText = {
+        adult: 'Routine rescreening in 5 years (or annually if aged ≥65).',
+        pediatric: 'Annual school hearing surveillance.',
+        occupational: 'Annual mandatory occupational audiometric monitoring.',
+        newborn: 'Follow UNHS 1-3-6 milestone: confirm hearing by 3 months, intervene by 6 months.'
+      };
+
+      if (dispTitle && dispDesc) {
+        if (outcome === 'pass') {
+          dispTitle.textContent = 'Hearing Screening Passed';
+          dispTitle.style.color = '#15803D';
+          dispDesc.textContent = 'All screening criteria met. ' + (rescreenText[currentProtocol] || '');
+        } else {
+          dispTitle.textContent = 'Diagnostic Referral Indicated';
+          dispTitle.style.color = '#B91C1C';
+          dispDesc.textContent = reasons.length > 0
+            ? `Referral indicated: ${reasons.join('; ')}. Full Diagnostic Audiological Assessment recommended.`
+            : 'Screening criteria not met. Full Diagnostic Audiological Assessment recommended.';
+        }
+      }
+
+      // Auto-save to patient record
+      if (window.HearIntelDB && window.HearIntelDB.saveScreeningRecord) {
+        const totalHhie = Object.values(hhieScores).reduce((a, b) => a + b, 0);
+        window.HearIntelDB.saveScreeningRecord(getActivePatientId(), {
+          outcome,
+          protocol: currentProtocol,
+          hhieScore: totalHhie,
+          hhieMax: 40,
+          sweepResults: JSON.parse(JSON.stringify(sweepResults)),
+          stsFlag: currentProtocol === 'occupational' && reasons.some(r => r.includes('OSHA'))
+        });
+      }
+    }
+
+    function escalateToFullAssessment() {
+      window.location.href = '04-workspace-history.html?patient=' + getActivePatientId();
+    }
+
+    // ── DOMContentLoaded Initialization ───────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', function() {
+      // 1. Build HHIE Questions immediately
+      buildHhieQuestions();
+
+      // 2. Pre-fill demographic form from active patient record
+      const pid = (typeof getActivePatientId === 'function') ? getActivePatientId() : 'amaia';
+      const exitBtn = document.getElementById('exitRecordBtn');
+      if (exitBtn) exitBtn.href = '02-profile.html?patient=' + pid;
+
+      const activePt = (window.HearIntelDB && typeof window.HearIntelDB.getPatient === 'function') 
+        ? window.HearIntelDB.getPatient(pid) 
+        : null;
+
+      if (activePt) {
+        const nameEl = document.getElementById('demo_fullName');
+        if (nameEl && activePt.name) nameEl.value = activePt.name;
+        
+        const dobEl = document.getElementById('demo_dob');
+        if (dobEl && activePt.dob) {
+          dobEl.value = activePt.dob;
+          calcDemoAge();
+        } else if (activePt.age) {
+          const ageEl = document.getElementById('demo_age');
+          if (ageEl) ageEl.value = activePt.age + ' yrs';
+        }
+        
+        const sexEl = document.getElementById('demo_sex');
+        if (sexEl && activePt.gender) sexEl.value = activePt.gender;
+        
+        const phoneEl = document.getElementById('demo_phone');
+        if (phoneEl && activePt.phone) phoneEl.value = activePt.phone;
+      }
+
+      const sdEl = document.getElementById('demo_screeningDate');
+      if (sdEl) sdEl.value = new Date().toISOString().split('T')[0];
+
+      const clinEl = document.getElementById('demo_clinician');
+      if (clinEl && !clinEl.value) clinEl.value = 'Dr. Chika Okafor, Au.D.';
+
+      // 3. Run initial evaluation
+      evaluateScreening();
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

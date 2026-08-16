@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HearIntel — Speech Audiometry & Tinnitus Battery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .speech-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+      align-items: start;
+    }
+    .card-box {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      box-shadow: var(--shadow-card);
+    }
+    .tab-bar {
+      display: flex;
+      gap: 4px;
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 8px;
+      margin-bottom: 14px;
+    }
+    .tab-nav-btn {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 6px 14px;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 100ms ease;
+    }
+    .tab-nav-btn:hover {
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+    }
+    .tab-nav-btn.active {
+      background: var(--teal-500);
+      color: #FFFFFF;
+      border-color: var(--brand);
+      font-weight: 600;
+    }
+    
+    /* PI Curve SVG */
+    .pi-svg-wrap {
+      position: relative;
+      width: 100%;
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .pi-svg-wrap svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    
+    /* Tables */
+    .speech-table input, .speech-table select {
+      width: 100%;
+      padding: 4px 6px;
+      font-size: 13px;
+      font-family: monospace;
+      font-weight: 600;
+      text-align: center;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xs);
+      background: #FFFFFF;
+      color: var(--text-primary);
+    }
+    
+    /* Tinnitus specific */
+    .thi-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .thi-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 10px;
+      background: var(--bg-subtle);
+      border-radius: var(--radius-xs);
+      font-size: 12px;
+    }
+  </style>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+  <div class="workspace-shell" data-workspace-page="speech">
+    <div class="surface" style="padding:24px;">
+      
+            <!-- Header -->
+      <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center;padding:0 0 16px 0;margin-bottom:24px;border-bottom:1px solid var(--border-light);">
+        <h1 class="panel-title" style="font-size:18.5px;font-weight:700;color:var(--text-primary);margin:0;">Speech Audiometry & Tinnitus Battery</h1>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="badge" id="speechHeaderBadge">WRS: 88% R / 76% L</span>
+          <button type="button" class="btn" style="min-height:30px;font-size:12px;padding:0 12px;font-weight:600;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-subtle);" onclick="openReportModal(getActivePatientId(), 'speech')">📄 Export Report</button>
+        </div>
+      </div>
+
+<div class="tab-bar">
+        <button type="button" class="tab-nav-btn active" id="tabBtnSpeech" onclick="switchTab('speech')">Speech Recognition & Discrimination</button>
+        <button type="button" class="tab-nav-btn" id="tabBtnNoise" onclick="switchTab('noise')">Speech-in-Noise (QuickSIN)</button>
+        <button type="button" class="tab-nav-btn" id="tabBtnTinnitus" onclick="switchTab('tinnitus')">Tinnitus Psychoacoustics & THI</button>
+      </div>
+
+      <!-- ── TAB 1: SPEECH RECOGNITION & DISCRIMINATION ── -->
+      <div id="sectionSpeech">
+        
+        <!-- Speech Parameters Matrix -->
+        <div class="table-container speech-table" style="margin-bottom:20px;">
+          <table>
+            <thead>
+              <tr>
+                <th>Ear</th>
+                <th>SRT (dB HL)</th>
+                <th>PTA Cross-Check</th>
+                <th>WRS (PBmax @ 35dB SL)</th>
+                <th>WRS @ 90 dB (Rollover)</th>
+                <th>Rollover Index (R)</th>
+                <th>MCL (Comfort)</th>
+                <th>UCL (Discomfort)</th>
+                <th>Dynamic Range</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong style="color:var(--right-ear);">Right Ear (AD)</strong></td>
+                <td><input type="number" id="adSrtInput" value="30" step="5" oninput="calculateSpeechIndices()"></td>
+                <td><span class="badge" id="adConcordBadge">Concordant (0 dB gap)</span></td>
+                <td><input type="number" id="adWrsInput" value="88" step="4" oninput="calculateSpeechIndices()"></td>
+                <td><input type="number" id="adWrs90Input" value="84" step="4" oninput="calculateSpeechIndices()"></td>
+                <td><span class="badge" id="adRolloverBadge">0.05 (Normal)</span></td>
+                <td><input type="number" id="adMclInput" value="65" step="5" oninput="calculateSpeechIndices()"></td>
+                <td><input type="number" id="adUclInput" value="95" step="5" oninput="calculateSpeechIndices()"></td>
+                <td><strong id="adDynRange" style="font-family:monospace;">65 dB (Normal)</strong></td>
+              </tr>
+              <tr>
+                <td><strong style="color:var(--left-ear);">Left Ear (AS)</strong></td>
+                <td><input type="number" id="asSrtInput" value="35" step="5" oninput="calculateSpeechIndices()"></td>
+                <td><span class="badge" id="asConcordBadge">Concordant (1 dB gap)</span></td>
+                <td><input type="number" id="asWrsInput" value="76" step="4" oninput="calculateSpeechIndices()"></td>
+                <td><input type="number" id="asWrs90Input" value="68" step="4" oninput="calculateSpeechIndices()"></td>
+                <td><span class="badge" id="asRolloverBadge">0.11 (Normal)</span></td>
+                <td><input type="number" id="asMclInput" value="70" step="5" oninput="calculateSpeechIndices()"></td>
+                <td><input type="number" id="asUclInput" value="95" step="5" oninput="calculateSpeechIndices()"></td>
+                <td><strong id="asDynRange" style="font-family:monospace;">60 dB (Normal)</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="speech-grid">
+          <!-- PI Curve SVG -->
+          <div class="card-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <h3 style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--text-secondary);letter-spacing:0.04em;">Performance-Intensity (PI-PB) Curve</h3>
+              <span style="font-size:11.5px;color:var(--text-secondary);">
+                <strong style="color:var(--right-ear);">● Right (AD)</strong> &nbsp;|&nbsp;
+                <strong style="color:var(--left-ear);">▲ Left (AS)</strong> &nbsp;|&nbsp;
+                <span style="color:#94A3B8;">- - Normal</span>
+              </span>
+            </div>
+            <div class="pi-svg-wrap">
+              <svg viewBox="0 0 460 220" id="piCurveSvg"></svg>
+            </div>
+            <div style="font-size:11px;color:var(--text-tertiary);margin-top:6px;display:flex;justify-content:space-between;">
+              <span>Presentation Intensity: 0 to 100 dB HL</span>
+              <span>Rollover threshold: R &gt; 0.40 (Retrocochlear)</span>
+            </div>
+          </div>
+
+          <!-- Diagnostic Speech Summary Card -->
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div class="surface" style="padding:16px 18px;background:var(--bg-subtle);">
+              <h4 style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--text-secondary);margin-bottom:8px;">Evidence-Based Cross-Checks</h4>
+              <div style="font-size:13px;line-height:1.6;">
+                <div>PTA-SRT Cross-Check: <strong id="crossCheckStatus">✓ Validated Bilaterally (&le;6 dB)</strong></div>
+                <div>Rollover Evaluation: <strong id="rolloverStatus">✓ No Significant Rollover (R &le; 0.40)</strong></div>
+                <div>Right Ear Word Recognition: <strong>88% (Good Clarity in Quiet)</strong></div>
+                <div>Left Ear Word Recognition: <strong>76% (Moderate Phonemic Difficulty)</strong></div>
+              </div>
+            </div>
+
+            <div class="alert-strip" id="speechClinicalAdviceAlert" style="margin:0;">
+              <strong>Amplification Prognosis:</strong> Excellent speech audibility expected in right ear. Left ear benefits from frequency lowering and binaural directional processing.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── TAB 2: SPEECH-IN-NOISE (QUICKSIN) ── -->
+      <div id="sectionNoise" style="display:none;">
+        <div class="speech-grid">
+          
+          <div class="card-box">
+            <h3 style="font-size:13px;font-weight:700;color:var(--text-primary);text-transform:uppercase;margin-bottom:12px;">QuickSIN Test Battery (IEEE Sentences in 4-Talker Babble)</h3>
+            <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div>
+                  <label style="font-size:11.5px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Presentation Level (dB HL)</label>
+                  <input type="number" id="quickSinLevel" value="70" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-family:monospace;font-size:13px;">
+                </div>
+                <div>
+                  <label style="font-size:11.5px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Total Words Correct (out of 30)</label>
+                  <input type="number" id="quickSinWords" value="21" min="0" max="30" oninput="calculateQuickSin()" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-family:monospace;font-size:13px;">
+                </div>
+              </div>
+
+              <div style="padding:12px 14px;background:var(--bg-subtle);border-radius:var(--radius);border:1px solid var(--border-light);margin-top:6px;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                  <span>Calculated SNR-50:</span>
+                  <strong id="sinSnr50" style="font-family:monospace;">4.5 dB SNR</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                  <span>SNR Loss Score (25.5 - Total):</span>
+                  <strong id="sinSnrLoss" style="font-family:monospace;">+4.5 dB SNR Loss</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                  <span>Severity Classification:</span>
+                  <span class="badge" id="sinSeverityBadge">Mild SNR Loss (3-7 dB)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div class="surface" style="padding:16px 18px;background:var(--bg-subtle);">
+              <h4 style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--text-secondary);margin-bottom:8px;">Technology & Assistive Recommendations</h4>
+              <div style="font-size:13px;line-height:1.55;">
+                <p style="margin-bottom:8px;"><strong>Mild SNR Loss (+4.5 dB):</strong> Patient understands well in quiet but experiences moderate difficulty in restaurants, group conferences, and worship centers.</p>
+                <ul style="margin:0 0 0 16px;padding:0;color:var(--text-secondary);">
+                  <li>Adaptive directional multi-microphone processing indicated.</li>
+                  <li>Binaural spatial noise cancellation protocol.</li>
+                  <li>Remote wireless microphone (e.g. PartnerMic / Roger) recommended for complex group settings.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── TAB 3: TINNITUS PSYCHOACOUSTICS & THI ── -->
+      <div id="sectionTinnitus" style="display:none;">
+        <div class="speech-grid">
+          
+          <!-- Psychoacoustic Matching -->
+          <div class="card-box">
+            <h3 style="font-size:13px;font-weight:700;color:var(--text-primary);text-transform:uppercase;margin-bottom:12px;">Psychoacoustic Tinnitus Characterization</h3>
+            
+            <div style="display:flex;flex-direction:column;gap:12px;font-size:13px;">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div>
+                  <label style="font-size:11.5px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Laterality</label>
+                  <select id="tinLaterality" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;">
+                    <option selected>Bilateral (Symmetric)</option>
+                    <option>Unilateral Right Only</option>
+                    <option>Unilateral Left Only</option>
+                    <option>Centralized in Head</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size:11.5px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Perceived Pitch Match</label>
+                  <select id="tinPitch" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;">
+                    <option>2000 Hz Narrowband Noise</option>
+                    <option>3000 Hz Pure Tone</option>
+                    <option selected>4000 Hz High-Pitch Pure Tone</option>
+                    <option>6000 Hz Narrowband Hiss</option>
+                    <option>8000 Hz Whistle / Cicada</option>
+                    <option>Broadband White Noise</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div>
+                  <label style="font-size:11.5px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Loudness Match (dB SL)</label>
+                  <input type="number" id="tinLoudness" value="6" step="1" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-family:monospace;font-size:13px;">
+                  <span style="font-size:11px;color:var(--text-tertiary);">Sensation level above threshold</span>
+                </div>
+                <div>
+                  <label style="font-size:11.5px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Minimum Masking Level (MML)</label>
+                  <input type="number" id="tinMml" value="48" step="2" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-family:monospace;font-size:13px;">
+                  <span style="font-size:11px;color:var(--text-tertiary);">dB HL Broadband Noise</span>
+                </div>
+              </div>
+
+              <div>
+                <label style="font-size:11.5px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Residual Inhibition (60s at MML + 10dB)</label>
+                <select id="tinResidual" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;">
+                  <option selected>Partial Suppression (Tinnitus reduced for ~90 seconds)</option>
+                  <option>Complete Suppression (Total relief for ~60 seconds)</option>
+                  <option>Negative (No change in percept)</option>
+                  <option>Rebound (Temporary louder percept)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tinnitus Handicap Inventory (THI) Screener -->
+          <div class="card-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <h3 style="font-size:13px;font-weight:700;color:var(--text-primary);text-transform:uppercase;">Tinnitus Handicap Screener (THI)</h3>
+              <span class="badge" id="thiScoreBadge">Score: 28 / 100 (Grade 2 Mild)</span>
+            </div>
+
+            <div class="thi-grid">
+              <div class="thi-item">
+                <span>Difficult to concentrate?</span>
+                <select class="thi-select" onchange="calculateThi()"><option value="4">Yes (4)</option><option value="2" selected>Some (2)</option><option value="0">No (0)</option></select>
+              </div>
+              <div class="thi-item">
+                <span>Hard to hear people?</span>
+                <select class="thi-select" onchange="calculateThi()"><option value="4" selected>Yes (4)</option><option value="2">Some (2)</option><option value="0">No (0)</option></select>
+              </div>
+              <div class="thi-item">
+                <span>Does it make you angry?</span>
+                <select class="thi-select" onchange="calculateThi()"><option value="4">Yes (4)</option><option value="2">Some (2)</option><option value="0" selected>No (0)</option></select>
+              </div>
+              <div class="thi-item">
+                <span>Hard to fall asleep?</span>
+                <select class="thi-select" onchange="calculateThi()"><option value="4">Yes (4)</option><option value="2" selected>Some (2)</option><option value="0">No (0)</option></select>
+              </div>
+              <div class="thi-item">
+                <span>Interferes with social life?</span>
+                <select class="thi-select" onchange="calculateThi()"><option value="4">Yes (4)</option><option value="2" selected>Some (2)</option><option value="0">No (0)</option></select>
+              </div>
+              <div class="thi-item">
+                <span>Feel out of control?</span>
+                <select class="thi-select" onchange="calculateThi()"><option value="4">Yes (4)</option><option value="2">Some (2)</option><option value="0" selected>No (0)</option></select>
+              </div>
+            </div>
+
+            <div style="padding:10px 12px;background:var(--bg-subtle);border-radius:var(--radius);border:1px solid var(--border-light);margin-top:12px;font-size:12px;line-height:1.45;">
+              <strong>Management Pathway:</strong> Sound enrichment via hearing aid amplification + fractal relaxation sound generator indicated. Sleep hygiene counseling recommended.
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Section 4: Universal Optional Assessment Findings & Notes Form -->
+      <div class="impression-card" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-top:20px;margin-bottom:16px;box-shadow:var(--shadow-card);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div>
+            <strong style="font-size:13.5px;color:var(--text-primary);">Assessment Findings & Speech / Tinnitus Notes</strong>
+            <span style="font-size:11px;color:var(--text-tertiary);font-weight:500;">(Optional — Auto-synthesizes from test findings)</span>
+          </div>
+          <button class="btn" style="min-height:26px;font-size:11.5px;padding:0 8px;" onclick="resetImpressionDraft()">Reset to Auto-Draft</button>
+        </div>
+        <textarea id="speechImpressionText" rows="3" style="width:100%;padding:10px 12px;font-size:13px;line-height:1.5;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-subtle);color:var(--text-primary);font-family:inherit;box-shadow:inset 0 1px 2px rgba(0,0,0,0.02);"></textarea>
+      </div>
+
+      <!-- Step Navigation Footer -->
+      <div class="footer-nav">
+        <a class="btn" id="prevStepBtn" href="07-workspace-immittance.html?patient=amaia">← Previous: Immittance</a>
+        <a class="btn primary" id="nextStepBtn" href="12-workspace-electrophysiology.html?patient=amaia">Next: Electrophysiology →</a>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="toast"></div>
+  <script src="data.js"></script>
+  <script src="prototype.js"></script>
+  <script>
+    // Tab Switching
+    function switchTab(tabId) {
+      document.getElementById('sectionSpeech').style.display = (tabId === 'speech') ? 'block' : 'none';
+      document.getElementById('sectionNoise').style.display = (tabId === 'noise') ? 'block' : 'none';
+      document.getElementById('sectionTinnitus').style.display = (tabId === 'tinnitus') ? 'block' : 'none';
+
+      document.getElementById('tabBtnSpeech').className = 'tab-nav-btn' + (tabId === 'speech' ? ' active' : '');
+      document.getElementById('tabBtnNoise').className = 'tab-nav-btn' + (tabId === 'noise' ? ' active' : '');
+      document.getElementById('tabBtnTinnitus').className = 'tab-nav-btn' + (tabId === 'tinnitus' ? ' active' : '');
+    }
+
+    // ── Performance-Intensity (PI-PB) Curve Vector Rendering ──
+    function drawPiCurve() {
+      const svg = document.getElementById('piCurveSvg');
+      if (!svg) return;
+
+      const SVG_W = 460, SVG_H = 220;
+      const PAD_L = 40, PAD_R = 20, PAD_T = 20, PAD_B = 30;
+      const PLOT_W = SVG_W - PAD_L - PAD_R;
+      const PLOT_H = SVG_H - PAD_T - PAD_B;
+
+      const getX = db => PAD_L + (db / 100) * PLOT_W;
+      const getY = pct => PAD_T + ((100 - pct) / 100) * PLOT_H;
+
+      let html = `<rect width="${SVG_W}" height="${SVG_H}" fill="#FFFFFF"/>`;
+
+      // Horizontal grid lines (0%, 20%, 40%, 60%, 80%, 100%)
+      for (let pct = 0; pct <= 100; pct += 20) {
+        const y = getY(pct);
+        html += `<line x1="${PAD_L}" y1="${y}" x2="${SVG_W - PAD_R}" y2="${y}" stroke="#F1F5F9" stroke-width="1"/>`;
+        html += `<text x="${PAD_L - 6}" y="${y + 3.5}" text-anchor="end" font-size="9" font-family="monospace" fill="#64748B">${pct}%</text>`;
+      }
+
+      // Vertical grid lines (0, 20, 40, 60, 80, 100 dB HL)
+      for (let db = 0; db <= 100; db += 20) {
+        const x = getX(db);
+        html += `<line x1="${x}" y1="${PAD_T}" x2="${x}" y2="${SVG_H - PAD_B}" stroke="#F1F5F9" stroke-width="1"/>`;
+        html += `<text x="${x}" y="${SVG_H - PAD_B + 14}" text-anchor="middle" font-size="9" font-family="monospace" fill="#64748B">${db}</text>`;
+      }
+
+      // Normal Sigmoidal Curve (Dashed Gray)
+      let normPts = [];
+      for (let db = 0; db <= 100; db += 5) {
+        // Standard normal sigmoidal psychometric function centered at 20 dB
+        const pct = 100 / (1 + Math.exp(-(db - 20) / 6));
+        normPts.push(`${getX(db)},${getY(pct)}`);
+      }
+      html += `<polyline points="${normPts.join(' ')}" fill="none" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+
+      // Right Ear Curve (Red)
+      const srtR = parseFloat(document.getElementById('adSrtInput').value) || 30;
+      const wrsR = parseFloat(document.getElementById('adWrsInput').value) || 88;
+      const wrsR90 = parseFloat(document.getElementById('adWrs90Input').value) || 84;
+      let rPts = [];
+      for (let db = 0; db <= 100; db += 5) {
+        let pct = wrsR / (1 + Math.exp(-(db - srtR) / 7));
+        if (db > 75) {
+          pct = pct - (pct - wrsR90) * ((db - 75) / 25);
+        }
+        rPts.push(`${getX(db)},${getY(Math.max(0, pct))}`);
+      }
+      html += `<polyline points="${rPts.join(' ')}" fill="none" stroke="#DC2626" stroke-width="2.2" stroke-linecap="round"/>`;
+
+      // Left Ear Curve (Blue)
+      const srtL = parseFloat(document.getElementById('asSrtInput').value) || 35;
+      const wrsL = parseFloat(document.getElementById('asWrsInput').value) || 76;
+      const wrsL90 = parseFloat(document.getElementById('asWrs90Input').value) || 68;
+      let lPts = [];
+      for (let db = 0; db <= 100; db += 5) {
+        let pct = wrsL / (1 + Math.exp(-(db - srtL) / 8));
+        if (db > 75) {
+          pct = pct - (pct - wrsL90) * ((db - 75) / 25);
+        }
+        lPts.push(`${getX(db)},${getY(Math.max(0, pct))}`);
+      }
+      html += `<polyline points="${lPts.join(' ')}" fill="none" stroke="#2563EB" stroke-width="2.2" stroke-linecap="round"/>`;
+
+      // Plot point markers
+      html += `<circle cx="${getX(srtR + 35)}" cy="${getY(wrsR)}" r="4.5" fill="#FFFFFF" stroke="#DC2626" stroke-width="2"/>`;
+      html += `<circle cx="${getX(90)}" cy="${getY(wrsR90)}" r="4.5" fill="#FFFFFF" stroke="#DC2626" stroke-width="2"/>`;
+      html += `<rect x="${getX(srtL + 35) - 4}" y="${getY(wrsL) - 4}" width="8" height="8" fill="#FFFFFF" stroke="#2563EB" stroke-width="2"/>`;
+      html += `<rect x="${getX(90) - 4}" y="${getY(wrsL90) - 4}" width="8" height="8" fill="#FFFFFF" stroke="#2563EB" stroke-width="2"/>`;
+
+      svg.innerHTML = html;
+    }
+
+    // ── Calculate Speech Indices ──
+    function calculateSpeechIndices() {
+      const patientId = getActivePatientId();
+      const patient = window.HearIntelDB ? window.HearIntelDB.getPatient(patientId) : null;
+      const ptaR = patient ? Math.round(patient.ptaRight || 30) : 30;
+      const ptaL = patient ? Math.round(patient.ptaLeft || 36) : 36;
+
+      const srtR = Math.round(parseFloat(document.getElementById('adSrtInput').value) || 0);
+      const srtL = Math.round(parseFloat(document.getElementById('asSrtInput').value) || 0);
+      const wrsR = Math.round(parseFloat(document.getElementById('adWrsInput').value) || 0);
+      const wrsL = Math.round(parseFloat(document.getElementById('asWrsInput').value) || 0);
+      const wrsR90 = Math.round(parseFloat(document.getElementById('adWrs90Input').value) || 0);
+      const wrsL90 = Math.round(parseFloat(document.getElementById('asWrs90Input').value) || 0);
+
+      // 1. PTA-SRT Concordance
+      const diffR = Math.abs(ptaR - srtR);
+      const diffL = Math.abs(ptaL - srtL);
+      document.getElementById('adConcordBadge').textContent = `${diffR <= 6 ? 'Concordant' : 'Discrepancy'} (${diffR} dB gap)`;
+      document.getElementById('asConcordBadge').textContent = `${diffL <= 6 ? 'Concordant' : 'Discrepancy'} (${diffL} dB gap)`;
+
+      // 2. Rollover Index: R = (PBmax - PBmin) / PBmax
+      const rolR = wrsR > 0 ? ((wrsR - wrsR90) / wrsR).toFixed(2) : '0.00';
+      const rolL = wrsL > 0 ? ((wrsL - wrsL90) / wrsL).toFixed(2) : '0.00';
+      const isRolR = parseFloat(rolR) > 0.40;
+      const isRolL = parseFloat(rolL) > 0.40;
+
+      document.getElementById('adRolloverBadge').textContent = `${rolR} (${isRolR ? 'Significant Rollover' : 'Normal'})`;
+      document.getElementById('asRolloverBadge').textContent = `${rolL} (${isRolL ? 'Significant Rollover' : 'Normal'})`;
+
+      // 3. Dynamic Range (UCL - SRT)
+      const uclR = Math.round(parseFloat(document.getElementById('adUclInput').value) || 95);
+      const uclL = Math.round(parseFloat(document.getElementById('asUclInput').value) || 95);
+      const drR = uclR - srtR;
+      const drL = uclL - srtL;
+      document.getElementById('adDynRange').textContent = `${drR} dB (${drR < 45 ? 'Reduced / Recruitment' : 'Normal'})`;
+      document.getElementById('asDynRange').textContent = `${drL} dB (${drL < 45 ? 'Reduced / Recruitment' : 'Normal'})`;
+
+      document.getElementById('speechHeaderBadge').textContent = `WRS: ${wrsR}% R / ${wrsL}% L`;
+
+      drawPiCurve();
+      updateSynthesizedImpression();
+    }
+
+    // ── QuickSIN Calculation ──
+    function calculateQuickSin() {
+      const words = parseInt(document.getElementById('quickSinWords').value, 10) || 0;
+      // Formula: SNR Loss = 25.5 - Total Correct Words
+      const snrLoss = Math.round((25.5 - words) * 10) / 10;
+      document.getElementById('sinSnrLoss').textContent = (snrLoss >= 0 ? '+' : '') + snrLoss + ' dB SNR Loss';
+      document.getElementById('sinSnr50').textContent = snrLoss + ' dB SNR';
+
+      let sev = 'Normal (0-2 dB)';
+      if (snrLoss > 14) sev = 'Severe SNR Loss (>14 dB)';
+      else if (snrLoss > 7) sev = 'Moderate SNR Loss (7-14 dB)';
+      else if (snrLoss > 2) sev = 'Mild SNR Loss (3-7 dB)';
+      document.getElementById('sinSeverityBadge').textContent = sev;
+
+      updateSynthesizedImpression();
+    }
+
+    // ── THI Score Calculation ──
+    function calculateThi() {
+      const selects = document.querySelectorAll('.thi-select');
+      let total = 0;
+      selects.forEach(s => { total += parseInt(s.value, 10) || 0; });
+
+      // Extrapolate 6-question screener to 100-point scale (total * 4.16)
+      const score = Math.min(100, Math.round(total * 4.16));
+      let grade = 'Grade 1 (Slight: 0-16)';
+      if (score > 76) grade = 'Grade 5 (Catastrophic: 78-100)';
+      else if (score > 56) grade = 'Grade 4 (Severe: 58-76)';
+      else if (score > 36) grade = 'Grade 3 (Moderate: 38-56)';
+      else if (score > 16) grade = 'Grade 2 (Mild: 18-36)';
+
+      document.getElementById('thiScoreBadge').textContent = `Score: ${score} / 100 (${grade})`;
+      updateSynthesizedImpression();
+    }
+
+    // ── Auto-Synthesized Impression ──
+    function updateSynthesizedImpression() {
+      const wrsR = document.getElementById('adWrsInput').value;
+      const wrsL = document.getElementById('asWrsInput').value;
+      const snrLoss = document.getElementById('sinSnrLoss').textContent;
+      const tinPitch = document.getElementById('tinPitch').value;
+      const tinMml = document.getElementById('tinMml').value;
+
+      const narrative = `Bilateral speech recognition thresholds concordant with pure tone averages. Word recognition in quiet demonstrates ${wrsR}% WRS (Right AD) and ${wrsL}% WRS (Left AS). QuickSIN confirms ${snrLoss}, predicting benefit from directional microphone technology. Psychoacoustic tinnitus evaluation identifies ${tinPitch} with minimum masking level at ${tinMml} dB HL; sound therapy and amplification integration advised.`;
+
+      const textarea = document.getElementById('speechImpressionText');
+      if (!textarea.dataset.userEdited) {
+        textarea.value = narrative;
+      }
+    }
+
+    function resetImpressionDraft() {
+      const textarea = document.getElementById('speechImpressionText');
+      delete textarea.dataset.userEdited;
+      updateSynthesizedImpression();
+      notify('Impression notes reset to auto-synthesized draft.');
+    }
+
+    document.getElementById('speechImpressionText').addEventListener('input', function() {
+      this.dataset.userEdited = 'true';
+    });
+
+    // ── Init ──
+    document.addEventListener('DOMContentLoaded', function() {
+      const pid = getActivePatientId();
+      document.getElementById('prevStepBtn').href = '07-workspace-immittance.html?patient=' + pid;
+      document.getElementById('nextStepBtn').href = '12-workspace-electrophysiology.html?patient=' + pid;
+
+      calculateSpeechIndices();
+      calculateQuickSin();
+      calculateThi();
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

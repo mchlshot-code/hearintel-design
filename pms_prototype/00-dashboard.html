@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HearIntel — Clinical Worklist</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .dash-filter-bar { display:flex; gap:6px; margin-bottom:16px; }
+    .filter-pill { border:1px solid var(--border); background:var(--surface); border-radius:99px; padding:4px 12px; font-size:12px; font-weight:500; color:var(--text-secondary); cursor:pointer; transition:all 120ms ease; white-space:nowrap; }
+    .filter-pill.active { background:var(--brand-subtle); border-color:var(--brand-border); color:var(--brand-hover); font-weight:600; }
+    
+    .stat-row { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--border); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; margin-bottom:20px; box-shadow:var(--shadow-card); }
+    .stat-cell { padding:16px 20px; background:var(--surface); cursor:pointer; transition:background 140ms ease; position:relative; }
+    .stat-cell:hover { background:var(--bg-subtle); }
+    .stat-cell.active { background:var(--brand-subtle); }
+    .stat-cell.active::before { content:''; position:absolute; left:0; top:0; bottom:0; width:2.5px; background:var(--brand); }
+    .stat-label { font-size:10px; font-weight:700; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.09em; margin-bottom:6px; font-family:'DM Sans',sans-serif; }
+    .stat-value { font-size:32px; font-weight:700; letter-spacing:-0.04em; font-variant-numeric:tabular-nums; font-family:'JetBrains Mono',monospace; line-height:1; }
+    .stat-note { font-size:11px; color:var(--text-tertiary); margin-top:5px; font-family:'DM Sans',sans-serif; }
+    .signal-item { display:flex; justify-content:space-between; align-items:flex-start; padding:10px 0; border-bottom:1px solid var(--border-light); }
+    .signal-item:last-child { border-bottom:none; }
+  </style>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <div data-shell="dashboard"></div>
+    <main class="main">
+      <section class="page">
+
+        <header class="topbar">
+          <div>
+            <div class="eyebrow" style="display:flex;align-items:center;gap:8px;">
+              Lagos Central Hearing Clinic
+              <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:var(--brand-hover);">
+                <span class="pulse-dot"></span> Live
+              </span>
+            </div>
+            <h1 class="title">Clinical Worklist</h1>
+            <p class="subtle">Today's active encounters, overdue recalls, and safety flags.</p>
+          </div>
+          <div style="display:flex;align-items:flex-end;gap:16px;">
+            <div style="text-align:right;">
+              <div id="dashClock" style="font-size:19px;font-weight:700;letter-spacing:-0.03em;color:var(--text-primary);font-variant-numeric:tabular-nums;"></div>
+              <div id="dashDate" style="font-size:11px;color:var(--text-tertiary);margin-top:1px;"></div>
+            </div>
+            <div class="actions" style="display:flex;gap:8px;">
+              <a class="btn primary" href="13-workspace-screening.html?patient=amaia" style="display:flex;align-items:center;gap:6px;">Start Screening</a>
+              <button class="btn" onclick="openNewPatientModal()">+ New Patient</button>
+              <a class="btn" href="01-registry.html">Patient Registry</a>
+            </div>
+          </div>
+        </header>
+
+        <div class="stat-row">
+          <div class="stat-cell active" id="statAll" onclick="filterQueue('all')">
+            <div class="stat-label">Today's Queue</div>
+            <div class="stat-value" id="kpiScheduled">6</div>
+            <div class="stat-note">All active encounters</div>
+          </div>
+          <div class="stat-cell" id="statIncomplete" onclick="filterQueue('incomplete')">
+            <div class="stat-label">Incomplete</div>
+            <div class="stat-value"  id="kpiIncomplete">2</div>
+            <div class="stat-note">Drafts awaiting sign-off</div>
+          </div>
+          <div class="stat-cell" id="statRecalls" onclick="filterQueue('recalls')">
+            <div class="stat-label">Recalls Due</div>
+            <div class="stat-value"  id="kpiRecalls">3</div>
+            <div class="stat-note">Care Plan follow-ups</div>
+          </div>
+          <div class="stat-cell" id="statSafety" onclick="filterQueue('safety')">
+            <div class="stat-label">Safety Alerts</div>
+            <div class="stat-value"  id="kpiAlerts">2</div>
+            <div class="stat-note">Referral flags &amp; asymmetry</div>
+          </div>
+        </div>
+
+        <div class="grid sidebar-layout">
+          <section class="surface">
+            <div class="panel-header">
+              <div>
+                <h2 class="panel-title" id="queueTitle">All Patients — Today</h2>
+                <p class="panel-subtitle" id="queueSubtitle">Click any row to open the full patient record.</p>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div class="dash-filter-bar" style="margin:0;">
+                  <span class="filter-pill active" id="pill-all" onclick="filterQueue('all')">All</span>
+                  <span class="filter-pill" id="pill-incomplete" onclick="filterQueue('incomplete')">Incomplete</span>
+                  <span class="filter-pill" id="pill-recalls" onclick="filterQueue('recalls')">Recalls Due</span>
+                  <span class="filter-pill " id="pill-safety" onclick="filterQueue('safety')">Safety Alerts</span>
+                </div>
+                <input type="text" id="dashSearchInput" placeholder="Filter by name or MRN..."
+                  style="padding:5px 10px;font-size:12.5px;border:1px solid var(--border);border-radius:var(--radius);min-width:180px;"
+                  oninput="filterDashboardTable()">
+              </div>
+            </div>
+            <div class="table-container" style="border:none;">
+              <table id="dashQueueTable">
+                <thead>
+                  <tr>
+                    <th>Patient</th>
+                    <th>Age / Sex</th>
+                    <th>Primary Complaint / Diagnosis</th>
+                    <th>Status</th>
+                    <th>Pathway</th>
+                    <th style="text-align:right;"></th>
+                  </tr>
+                </thead>
+                <tbody id="dashQueueBody"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <aside style="display:flex;flex-direction:column;gap:16px;">
+            <section class="surface">
+              <div class="panel-header">
+                <div><h2 class="panel-title">Clinical Signals</h2><p class="panel-subtitle">Longitudinal quality indicators</p></div>
+              </div>
+              <div style="padding:14px 18px;">
+                <div class="signal-item">
+                  <div><strong style="font-size:13px;">Recall Compliance</strong><div style="font-size:11.5px;color:var(--text-secondary);margin-top:1px;">88% of scheduled follow-ups on time</div></div>
+                  <span class="badge success">88%</span>
+                </div>
+                <div class="signal-item">
+                  <div><strong style="font-size:13px;">Pending Referral Reports</strong><div style="font-size:11.5px;color:var(--text-secondary);margin-top:1px;">2 asymmetric / CI cases awaiting consult</div></div>
+                  <span class="badge warning">2</span>
+                </div>
+                <div class="signal-item">
+                  <div><strong style="font-size:13px;">Assessments This Month</strong><div style="font-size:11.5px;color:var(--text-secondary);margin-top:1px;">18 diagnostic encounters logged</div></div>
+                  <span class="badge teal">18</span>
+                </div>
+              </div>
+            </section>
+            <section class="surface">
+              <div class="panel-header"><div><h2 class="panel-title">Quick Actions</h2></div></div>
+              <div style="padding:14px 18px;display:flex;flex-direction:column;gap:8px;">
+                <button class="btn primary" style="width:100%;" onclick="openNewPatientModal()">+ Register New Patient</button>
+                <a class="btn" style="width:100%;" href="01-registry.html">Patient Registry Search</a>
+                <a class="btn" style="width:100%;" href="10-media.html?patient=amaia">Clinical Media Repository</a>
+              </div>
+            </section>
+          </aside>
+        </div>
+
+      </section>
+    </main>
+  </div>
+  <div class="toast"></div>
+  <script src="data.js"></script>
+  <script src="prototype.js"></script>
+  <script>
+    var currentFilter = 'all';
+
+    function renderDashboard() {
+      if (!window.HearIntelDB) return;
+      var patients = window.HearIntelDB.getAllPatients();
+      var counts = {
+        all: patients.length,
+        incomplete: patients.filter(function(p){ return p.statusType==='warning'||p.status.includes('Progress'); }).length,
+        recalls: patients.filter(function(p){ return p.nextRecall&&p.nextRecall!=='Pending'; }).length,
+        safety: patients.filter(function(p){ return p.statusType==='danger'||(p.alerts&&p.alerts.length>0); }).length
+      };
+      document.getElementById('kpiScheduled').textContent = counts.all;
+      document.getElementById('kpiIncomplete').textContent = counts.incomplete;
+      document.getElementById('kpiRecalls').textContent = counts.recalls;
+      document.getElementById('kpiAlerts').textContent = counts.safety;
+
+      var filtered = patients.filter(function(p){
+        if(currentFilter==='incomplete') return p.statusType==='warning'||p.status.includes('Progress');
+        if(currentFilter==='recalls') return p.nextRecall&&p.nextRecall!=='Pending';
+        if(currentFilter==='safety') return p.statusType==='danger'||(p.alerts&&p.alerts.length>0);
+        return true;
+      });
+
+      var tbody = document.getElementById('dashQueueBody');
+      tbody.innerHTML = filtered.map(function(p){
+        var isSafety = p.statusType==='danger'||(p.alerts&&p.alerts.length>0);
+        var rowBorder = isSafety ? 'border-left:3px solid #DC2626;' : '';
+        return '<tr style="cursor:pointer;'+rowBorder+'" onclick="location.href=\'02-profile.html?patient='+p.id+'\'">'          +'<td><strong>'+p.name+'</strong><div style="font-size:11px;color:var(--text-secondary);font-family:monospace;">'+p.mrn+'</div></td>'          +'<td style="font-size:12.5px;color:var(--text-secondary);">'+p.age+'y &middot; '+p.gender.charAt(0)+'</td>'          +'<td style="font-size:12.5px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+p.primaryDiagnosis+'</td>'          +'<td><span class="badge '+(p.statusType||'neutral')+'">'+ p.status+'</span></td>'          +'<td style="font-size:12px;color:var(--text-secondary);">'+(p.pathwayLabel||'Routine')+'</td>'          +'<td style="text-align:right;" onclick="event.stopPropagation();"><a class="btn primary" style="min-height:26px;padding:0 10px;font-size:11.5px;" href="02-profile.html?patient='+p.id+'">Open</a></td>'          +'</tr>';
+      }).join('');
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state">'          +'<div class="empty-state-icon">&#9776;</div>'          +'<div class="empty-state-title">No patients match this filter</div>'          +'<div class="empty-state-body">Try a different filter or add a new patient to the registry.</div>'          +'</div></td></tr>';
+      }
+    }
+
+    function filterQueue(filter) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-pill').forEach(function(p){ p.classList.remove('active'); });
+      var pill = document.getElementById('pill-'+filter);
+      if(pill) pill.classList.add('active');
+      document.querySelectorAll('.stat-cell').forEach(function(c){ c.classList.remove('active'); });
+      var map = {all:'statAll',incomplete:'statIncomplete',recalls:'statRecalls',safety:'statSafety'};
+      var cell = document.getElementById(map[filter]);
+      if(cell) cell.classList.add('active');
+      renderDashboard();
+    }
+
+    function filterDashboardTable() {
+      var q = document.getElementById('dashSearchInput').value.toLowerCase();
+      document.querySelectorAll('#dashQueueBody tr').forEach(function(r){
+        r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      renderDashboard();
+      function updateClock() {
+        var now = new Date();
+        var h = now.getHours().toString().padStart(2,'0');
+        var m = now.getMinutes().toString().padStart(2,'0');
+        var s = now.getSeconds().toString().padStart(2,'0');
+        var clockEl = document.getElementById('dashClock');
+        var dateEl  = document.getElementById('dashDate');
+        if (clockEl) clockEl.textContent = h + ':' + m + ':' + s;
+        if (dateEl) dateEl.textContent = now.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+      }
+      updateClock();
+      setInterval(updateClock, 1000);
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

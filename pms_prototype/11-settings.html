@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HearIntel — Practice & User Settings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .settings-layout {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 24px;
+      align-items: flex-start;
+    }
+    .settings-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 8px;
+    }
+    .settings-nav-btn {
+      border: none;
+      background: transparent;
+      padding: 9px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      border-radius: var(--radius-sm);
+      text-align: left;
+      cursor: pointer;
+      transition: all 120ms ease;
+    }
+    .settings-nav-btn:hover {
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+    }
+    .settings-nav-btn.active {
+      background: var(--brand-subtle);
+      color: var(--teal-dark);
+      font-weight: 600;
+    }
+    .settings-pane {
+      display: none;
+    }
+    .settings-pane.active {
+      display: block;
+    }
+  </style>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <div data-shell="settings"></div>
+    <main class="main">
+      <section class="page">
+        <header class="topbar">
+          <div>
+            <div class="eyebrow">Configuration & Preferences</div>
+            <h1 class="title">Settings</h1>
+            <p class="subtle">Manage clinician profile, security credentials, clinical protocol defaults, workspace members, and privacy governance.</p>
+          </div>
+          <div class="actions">
+            <a class="btn" href="help-support.html">Help & Documentation</a>
+            <button class="btn primary" onclick="notify('All settings updated.')">Save Changes</button>
+          </div>
+        </header>
+
+        <div class="settings-layout">
+          <!-- Left Settings Menu -->
+          <nav class="settings-nav">
+            <button type="button" class="settings-nav-btn active" onclick="switchSettingsSection(this, 'profile')">Clinician Profile</button>
+            <button type="button" class="settings-nav-btn" onclick="switchSettingsSection(this, 'account')">Account & Security</button>
+            <button type="button" class="settings-nav-btn" onclick="switchSettingsSection(this, 'clinical')">Clinical Preferences</button>
+            <button type="button" class="settings-nav-btn" onclick="switchSettingsSection(this, 'notifications')">Notifications</button>
+            <button type="button" class="settings-nav-btn" onclick="switchSettingsSection(this, 'workspace')">Institution & Team</button>
+            <button type="button" class="settings-nav-btn" onclick="switchSettingsSection(this, 'privacy')">Privacy & Data</button>
+            <button type="button" class="settings-nav-btn" onclick="switchSettingsSection(this, 'appearance')">Appearance</button>
+          </nav>
+
+          <!-- Right Content Panes -->
+          <div class="settings-content">
+            
+            <!-- SECTION 1: PROFILE -->
+            <div class="surface settings-pane active" id="pane-profile" style="padding:24px;">
+              <div class="panel-header" style="padding:0 0 14px 0;margin-bottom:18px;">
+                <div>
+                  <h2 class="panel-title">Clinician Profile</h2>
+                  <p class="panel-subtitle">Your personal practitioner credentials and contact information.</p>
+                </div>
+                <span class="badge success">Verified Practitioner</span>
+              </div>
+
+              <form onsubmit="handleProfileSave(event)">
+                <div class="form-grid" style="margin-bottom:20px;">
+                  <div class="field">
+                    <label for="setProfName">Full Name</label>
+                    <input id="setProfName" value="Dr. Chika Okafor">
+                  </div>
+                  <div class="field">
+                    <label for="setProfTitle">Professional Title</label>
+                    <input id="setProfTitle" value="Lead Clinical Audiologist, Au.D.">
+                  </div>
+                  <div class="field">
+                    <label for="setProfEmail">Email Address</label>
+                    <input id="setProfEmail" value="chika.okafor@lagoshearing.org">
+                  </div>
+                  <div class="field">
+                    <label for="setProfPhone">Phone Number</label>
+                    <input id="setProfPhone" value="+234 803 119 2840">
+                  </div>
+                  <div class="field">
+                    <label for="setProfLicence">Professional License / Registration</label>
+                    <input id="setProfLicence" value="AUD-NG-2026-081">
+                  </div>
+                  <div class="field">
+                    <label for="setProfDept">Department</label>
+                    <input id="setProfDept" value="Audiology & Vestibular Sciences">
+                  </div>
+                </div>
+                <button type="submit" class="btn primary">Save Profile</button>
+              </form>
+            </div>
+
+            <!-- SECTION 2: ACCOUNT & SECURITY -->
+            <div class="surface settings-pane" id="pane-account" style="padding:24px;">
+              <div class="panel-header" style="padding:0 0 14px 0;margin-bottom:18px;">
+                <div>
+                  <h2 class="panel-title">Account & Security</h2>
+                  <p class="panel-subtitle">Authentication credentials, two-factor verification, and active sessions.</p>
+                </div>
+                <span class="badge teal">2FA Active</span>
+              </div>
+
+              <div style="margin-bottom:20px;">
+                <h3 style="font-size:13px;font-weight:600;margin-bottom:10px;">Change Password</h3>
+                <div class="form-grid">
+                  <div class="field"><label>Current Password</label><input type="password" value="••••••••••••"></div>
+                  <div class="field"><label>New Password</label><input type="password" placeholder="Min. 8 characters"></div>
+                </div>
+              </div>
+
+              <div style="margin-bottom:20px;border-top:1px solid var(--border-light);padding-top:16px;">
+                <h3 style="font-size:13px;font-weight:600;margin-bottom:10px;">Two-Factor Authentication (2FA)</h3>
+                <label class="check-item" style="margin-bottom:6px;"><input type="checkbox" checked onchange="notify('2FA status updated.')"> Require authenticator app security code on new device sign-in</label>
+                <div style="font-size:12px;color:var(--text-secondary);">Last verified with Authenticator App on 20 May 2026.</div>
+              </div>
+
+              <div style="margin-bottom:20px;border-top:1px solid var(--border-light);padding-top:16px;">
+                <h3 style="font-size:13px;font-weight:600;margin-bottom:10px;">Active Device Sessions</h3>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg-subtle);border-radius:var(--radius);border:1px solid var(--border);">
+                  <div>
+                    <strong style="font-size:13px;">Windows Clinic Workstation (Booth 1)</strong>
+                    <div style="font-size:11.5px;color:var(--text-secondary);">Current active session · Lagos Central Clinic</div>
+                  </div>
+                  <span class="badge success">Active Now</span>
+                </div>
+                <button class="btn" style="margin-top:10px;font-size:12px;" onclick="notify('Signed out of 2 other background sessions.')">Sign out of all other sessions</button>
+              </div>
+
+              <div style="border-top:1px solid var(--border-light);padding-top:16px;">
+                <h3 style="font-size:13px;font-weight:600;color:var(--danger);margin-bottom:6px;">Account Deactivation</h3>
+                <p style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;">Deactivating your account disables clinical access. Patient records remain securely archived at your institution.</p>
+                <button class="btn" style="color:var(--danger);border-color:var(--danger);" onclick="if(confirm('Request account deactivation?')) notify('Deactivation request logged with facility administrator.');">Request Account Deactivation</button>
+              </div>
+            </div>
+
+            <!-- SECTION 3: CLINICAL PREFERENCES -->
+            <div class="surface settings-pane" id="pane-clinical" style="padding:24px;">
+              <div class="panel-header" style="padding:0 0 14px 0;margin-bottom:18px;">
+                <div>
+                  <h2 class="panel-title">Clinical Preferences</h2>
+                  <p class="panel-subtitle">Configure diagnostic threshold alerts, units, and audiological visualization defaults.</p>
+                </div>
+              </div>
+
+              <h3 style="font-size:13px;font-weight:600;margin-bottom:12px;">Diagnostic Protocol Rules</h3>
+              <div class="check-grid" style="margin-bottom:20px;">
+                <label class="check-item"><input type="checkbox" checked onchange="notify('Preference saved.')"> Flag Pure Tone Asymmetry (>15 dB at 2+ adjacent frequencies)</label>
+                <label class="check-item"><input type="checkbox" checked onchange="notify('Preference saved.')"> Automatically generate Care Plan follow-up recall on assessment completion</label>
+                <label class="check-item"><input type="checkbox" checked onchange="notify('Preference saved.')"> Require case history intake before PTA threshold matrix unlock</label>
+                <label class="check-item"><input type="checkbox" checked onchange="notify('Preference saved.')"> Enforce Real-Ear Measurement (REM) verification on Hearing Aid pathway</label>
+                <label class="check-item"><input type="checkbox" checked onchange="notify('Preference saved.')"> Show shaded speech banana area on diagnostic audiogram</label>
+              </div>
+
+              <h3 style="font-size:13px;font-weight:600;margin-bottom:12px;border-top:1px solid var(--border-light);padding-top:16px;">Units & Default Landing Page</h3>
+              <div class="form-grid">
+                <div class="field">
+                  <label>Hearing Level Unit</label>
+                  <select><option selected>dB HL (ANSI / ISO Standard)</option><option>dB SPL</option></select>
+                </div>
+                <div class="field">
+                  <label>Default Startup Screen</label>
+                  <select><option selected>Clinical Worklist (00-dashboard.html)</option><option>Patient Registry (01-registry.html)</option></select>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 4: NOTIFICATIONS -->
+            <div class="surface settings-pane" id="pane-notifications" style="padding:24px;">
+              <div class="panel-header" style="padding:0 0 14px 0;margin-bottom:18px;">
+                <div>
+                  <h2 class="panel-title">Notification Preferences</h2>
+                  <p class="panel-subtitle">Control clinical alert triggers, recall reminders, and daily worklist digests.</p>
+                </div>
+              </div>
+
+              <div class="check-grid" style="grid-template-columns:1fr;gap:12px;">
+                <label class="check-item"><input type="checkbox" checked onchange="notify('Notification updated.')"> In-app toast alerts for upcoming scheduled Care Plan recalls (48 hrs prior)</label>
+                <label class="check-item"><input type="checkbox" checked onchange="notify('Notification updated.')"> Immediate alert banner when asymmetric threshold drop or safety flag is recorded</label>
+                <label class="check-item"><input type="checkbox" checked onchange="notify('Notification updated.')"> Incomplete assessment draft reminders for current clinic session</label>
+                <label class="check-item"><input type="checkbox" onchange="notify('Notification updated.')"> Daily morning summary email of scheduled clinical appointments</label>
+              </div>
+            </div>
+
+            <!-- SECTION 5: INSTITUTION & TEAM -->
+            <div class="surface settings-pane" id="pane-workspace" style="padding:24px;">
+              <div class="panel-header" style="padding:0 0 14px 0;margin-bottom:18px;">
+                <div>
+                  <h2 class="panel-title">Institution & Team Workspace</h2>
+                  <p class="panel-subtitle">Facility parameters and authorized clinical staff.</p>
+                </div>
+                <button class="btn primary" style="font-size:12px;" onclick="notify('Invite practitioner dialog opened.');">+ Invite Member</button>
+              </div>
+
+              <div class="form-grid" style="margin-bottom:20px;">
+                <div class="field"><label>Facility Name</label><input value="Lagos Central Hearing Clinic"></div>
+                <div class="field"><label>Primary Suite / Booth</label><input value="Booth 1 (Sound-Treated Diagnostic Suite)"></div>
+              </div>
+
+              <h3 style="font-size:13px;font-weight:600;margin-bottom:10px;">Clinical Team Members (3)</h3>
+              <div class="table-container" style="border:none;margin-bottom:16px;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Role</th>
+                      <th>License</th>
+                      <th>Access Level</th>
+                      <th style="text-align:right;"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Dr. Chika Okafor</strong><div style="font-size:11px;color:var(--text-secondary);">chika.okafor@lagoshearing.org</div></td>
+                      <td>Lead Audiologist</td>
+                      <td>AUD-NG-2026-081</td>
+                      <td><span class="badge success">Administrator</span></td>
+                      <td style="text-align:right;color:var(--text-secondary);font-size:11.5px;">Current User</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Amina Bello</strong><div style="font-size:11px;color:var(--text-secondary);">amina.b@lagoshearing.org</div></td>
+                      <td>Clinical Audiologist</td>
+                      <td>AUD-NG-2025-114</td>
+                      <td><span class="badge teal">Clinician</span></td>
+                      <td style="text-align:right;"><button class="btn ghost" style="font-size:11px;" onclick="notify('Permissions opened.')">Manage</button></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Kelechi Musa</strong><div style="font-size:11px;color:var(--text-secondary);">kelechi.m@lagoshearing.org</div></td>
+                      <td>Hearing Care Professional</td>
+                      <td>HCP-NG-2024-009</td>
+                      <td><span class="badge teal">Clinician</span></td>
+                      <td style="text-align:right;"><button class="btn ghost" style="font-size:11px;" onclick="notify('Permissions opened.')">Manage</button></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- SECTION 6: PRIVACY & DATA -->
+            <div class="surface settings-pane" id="pane-privacy" style="padding:24px;">
+              <div class="panel-header" style="padding:0 0 14px 0;margin-bottom:18px;">
+                <div>
+                  <h2 class="panel-title">Privacy & Clinical Data Governance</h2>
+                  <p class="panel-subtitle">Data export, patient confidentiality preferences, and security compliance.</p>
+                </div>
+                <span class="badge success">Encrypted at Rest</span>
+              </div>
+
+              <div style="margin-bottom:20px;">
+                <h3 style="font-size:13px;font-weight:600;margin-bottom:8px;">Clinical Data Export</h3>
+                <p style="font-size:12.5px;color:var(--text-secondary);margin-bottom:12px;">Export longitudinal audiological data, pure tone curves, and Care Plan outcomes in interoperable JSON/CSV format.</p>
+                <div style="display:flex;gap:8px;">
+                  <button class="btn" onclick="notify('Downloading facility clinical dataset (JSON)...')">Export Clinic Dataset (JSON)</button>
+                  <button class="btn" onclick="notify('Downloading patient registry summary (CSV)...')">Export Patient Summary (CSV)</button>
+                </div>
+              </div>
+
+              <div style="border-top:1px solid var(--border-light);padding-top:16px;">
+                <h3 style="font-size:13px;font-weight:600;margin-bottom:8px;">Patient Consent Verification</h3>
+                <label class="check-item"><input type="checkbox" checked onchange="notify('Consent rule updated.')"> Enforce explicit digital consent recording before pure tone testing</label>
+              </div>
+            </div>
+
+            <!-- SECTION 7: APPEARANCE -->
+            <div class="surface settings-pane" id="pane-appearance" style="padding:24px;">
+              <div class="panel-header" style="padding:0 0 14px 0;margin-bottom:18px;">
+                <div>
+                  <h2 class="panel-title">Appearance & Theme</h2>
+                  <p class="panel-subtitle">Customize interface density and theme preferences.</p>
+                </div>
+              </div>
+
+              <div class="form-grid" style="grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
+                <div class="field">
+                  <label>Color Theme</label>
+                  <select onchange="notify('Theme set to ' + this.value);">
+                    <option selected>Clinical Light (Standard High-Contrast)</option>
+                    <option>Dark Mode (Sound Booth Environment)</option>
+                    <option>System Default</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>Interface Density</label>
+                  <select onchange="notify('Density updated.');">
+                    <option selected>High-Density Tabular (Standard)</option>
+                    <option>Comfortable (Spacious)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div class="toast"></div>
+  <script src="data.js"></script>
+  <script src="prototype.js"></script>
+  <script>
+    function switchSettingsSection(button, sectionId) {
+      document.querySelectorAll('.settings-nav-btn').forEach(b => b.classList.remove('active'));
+      button.classList.add('active');
+
+      document.querySelectorAll('.settings-pane').forEach(p => p.classList.remove('active'));
+      const pane = document.getElementById('pane-' + sectionId);
+      if (pane) pane.classList.add('active');
+    }
+
+    function handleProfileSave(event) {
+      event.preventDefault();
+      const name = document.getElementById('setProfName').value;
+      const title = document.getElementById('setProfTitle').value;
+      const email = document.getElementById('setProfEmail').value;
+      
+      localStorage.setItem('hearintel_reg_name', name);
+      notify('Clinician profile saved: ' + name + ' (' + title + ')');
+    }
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

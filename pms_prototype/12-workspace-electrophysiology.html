@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HearIntel — Electrophysiological Assessments</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .ephys-tab-bar {
+      display: flex;
+      gap: 6px;
+      border-bottom: 2px solid var(--border-light);
+      margin-bottom: 20px;
+    }
+    .ephys-tab-btn {
+      border: none;
+      background: transparent;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 120ms ease;
+    }
+    .ephys-tab-btn:hover {
+      color: var(--text-primary);
+    }
+    .ephys-tab-btn.active {
+      color: var(--brand-hover);
+      border-bottom-color: var(--brand);
+    }
+
+    .ephys-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 20px;
+      align-items: start;
+      margin-bottom: 20px;
+    }
+
+    .dropzone-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .upload-area {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-subtle);
+      padding: 24px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 150ms ease;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .upload-area:hover {
+      border-color: var(--brand);
+      background: var(--teal-50);
+    }
+    .upload-preview-img {
+      max-width: 100%;
+      max-height: 180px;
+      border-radius: var(--radius-xs);
+      object-fit: contain;
+      box-shadow: var(--shadow-subtle);
+    }
+
+    .pattern-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+  </style>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+  <div class="workspace-shell" data-workspace-page="electrophysiology">
+    <div class="surface" style="padding:24px;">
+      
+      <!-- Header -->
+      <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center;padding:0 0 16px 0;margin-bottom:20px;border-bottom:1px solid var(--border-light);">
+        <div>
+          <h1 class="panel-title" style="font-size:18.5px;font-weight:700;color:var(--text-primary);margin:0;">Electrophysiological Diagnostic Battery</h1>
+          <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">Digital equipment trace capture, diagnostic pattern classification, and assessment findings.</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="badge" id="ephysStatusBadge">✓ Results Documented</span>
+          <button type="button" class="btn" style="min-height:30px;font-size:12px;padding:0 12px;font-weight:600;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-subtle);" onclick="openReportModal(getActivePatientId(), 'electrophysiology')">📄 Export Report</button>
+        </div>
+      </div>
+
+      <!-- Module Navigation Tabs -->
+      <div class="ephys-tab-bar">
+        <button type="button" class="ephys-tab-btn active" id="tabBtnAbr" onclick="switchEphysTab('abr')">1. Auditory Brainstem Response (ABR / BERA)</button>
+        <button type="button" class="ephys-tab-btn" id="tabBtnOae" onclick="switchEphysTab('oae')">2. Otoacoustic Emissions (DPOAE / TEOAE)</button>
+        <button type="button" class="ephys-tab-btn" id="tabBtnAssr" onclick="switchEphysTab('assr')">3. Auditory Steady-State Response (ASSR)</button>
+        <button type="button" class="ephys-tab-btn" id="tabBtnVemp" onclick="switchEphysTab('vemp')">4. ECochG & Vestibular Potentials (VEMP)</button>
+      </div>
+
+      <!-- ── TAB 1: ABR / BERA ── -->
+      <div id="sectionAbr">
+        <div class="ephys-grid">
+          
+          <!-- Upload Dropzone -->
+          <div class="dropzone-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <strong style="font-size:13px;color:var(--text-primary);text-transform:uppercase;">Equipment Trace / PDF Report Upload</strong>
+              <span style="font-size:11px;color:var(--text-secondary);">Eclipse / SmartEP / Bio-logic</span>
+            </div>
+
+            <input type="file" id="abrFileInput" accept="image/*,application/pdf" style="display:none;" onchange="handleFileUpload(event, 'ABR Equipment Report')">
+            <div class="upload-area" id="abrDropArea" onclick="document.getElementById('abrFileInput').click()">
+              <div id="abrPreviewContainer">
+                <div style="font-size:32px;margin-bottom:8px;">📄</div>
+                <strong style="font-size:13px;color:var(--text-primary);display:block;">Click to Upload or Drag & Drop Equipment Report</strong>
+                <span style="font-size:11.5px;color:var(--text-secondary);margin-top:4px;display:block;">Supports Raw Waveform PNG, JPG, or Multipage Equipment PDF</span>
+                <span style="font-size:10.5px;color:var(--brand-hover);font-weight:600;margin-top:8px;display:inline-block;background:var(--teal-50);padding:3px 8px;border-radius:4px;">Eclipse_ABR_FullTrace_80dB.pdf (Attached)</span>
+              </div>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;">
+              <button type="button" class="btn" style="font-size:12px;min-height:28px;" onclick="document.getElementById('abrFileInput').click()">Choose File...</button>
+              <span style="font-size:11.5px;color:var(--text-secondary);">Auto-saved to Patient Media</span>
+            </div>
+          </div>
+
+          <!-- Result Pattern & Summary Fields -->
+          <div class="pattern-card">
+            <div>
+              <label style="font-size:11.5px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em;display:block;margin-bottom:5px;">ABR Diagnostic Result Pattern</label>
+              <select id="abrPatternSelect" onchange="updateAbrFindings()" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-weight:600;color:var(--text-primary);">
+                <option value="normal" selected>Normal Morphology & Latencies (I-V &le; 4.5ms, IT5 &le; 0.3ms)</option>
+                <option value="cochlear">Cochlear SNHL (Prolonged absolute Wave V with normal I-V interval)</option>
+                <option value="retrocochlear">Retrocochlear Delay / Asymmetry (Prolonged I-V > 4.5ms or IT5 &ge; 0.4ms)</option>
+                <option value="ansd">Auditory Neuropathy Spectrum (Desynchronized/Absent Waves with CM)</option>
+                <option value="conductive">Conductive Delay (Equal shift in Waves I, III, V)</option>
+              </select>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div>
+                <label style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:4px;">Wave V Latency (80 dB)</label>
+                <input type="text" id="abrWaveV" value="5.62 ms (R) / 5.68 ms (L)" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;font-family:monospace;font-weight:600;" oninput="updateAbrFindings()">
+              </div>
+              <div>
+                <label style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:4px;">Estimated Threshold (ePTA)</label>
+                <input type="text" id="abrThreshold" value="30 dB eHL (R) / 35 dB eHL (L)" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;font-family:monospace;font-weight:600;" oninput="updateAbrFindings()">
+              </div>
+            </div>
+
+            <div style="padding:10px 12px;background:var(--bg-subtle);border-radius:var(--radius-sm);border:1px solid var(--border-light);font-size:12px;line-height:1.45;">
+              <strong style="color:var(--brand-hover);display:block;margin-bottom:2px;">Pattern Summary:</strong>
+              <span id="abrPatternNotes">Robust, repeatable Wave I, III, and V morphologies bilaterally with normal central conduction time (I-V: 4.00 ms) and symmetric Wave V latencies (IT5: 0.06 ms). Rules out retrocochlear 8th nerve pathology.</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── TAB 2: DPOAE / TEOAE ── -->
+      <div id="sectionOae" style="display:none;">
+        <div class="ephys-grid">
+          
+          <div class="dropzone-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <strong style="font-size:13px;color:var(--text-primary);text-transform:uppercase;">DPOAE DP-Gram / Spectral Report Upload</strong>
+              <span style="font-size:11px;color:var(--text-secondary);">Otometrics / Madsen / Interacoustics</span>
+            </div>
+
+            <input type="file" id="oaeFileInput" accept="image/*,application/pdf" style="display:none;" onchange="handleFileUpload(event, 'DPOAE Equipment Report')">
+            <div class="upload-area" onclick="document.getElementById('oaeFileInput').click()">
+              <div id="oaePreviewContainer">
+                <div style="font-size:32px;margin-bottom:8px;">📊</div>
+                <strong style="font-size:13px;color:var(--text-primary);display:block;">Upload DPOAE / TEOAE DP-Gram Trace</strong>
+                <span style="font-size:11.5px;color:var(--text-secondary);margin-top:4px;display:block;">Drop hardware export image or PDF</span>
+                <span style="font-size:10.5px;color:var(--brand-hover);font-weight:600;margin-top:8px;display:inline-block;background:var(--teal-50);padding:3px 8px;border-radius:4px;">DPGram_1k_8k_Spectrum.pdf (Attached)</span>
+              </div>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;">
+              <button type="button" class="btn" style="font-size:12px;min-height:28px;" onclick="document.getElementById('oaeFileInput').click()">Choose File...</button>
+              <span style="font-size:11.5px;color:var(--text-secondary);">Auto-saved to Patient Media</span>
+            </div>
+          </div>
+
+          <div class="pattern-card">
+            <div>
+              <label style="font-size:11.5px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em;display:block;margin-bottom:5px;">OAE Diagnostic Result Pattern</label>
+              <select id="oaePatternSelect" onchange="updateOaeFindings()" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-weight:600;color:var(--text-primary);">
+                <option value="rolloff" selected>High-Frequency Roll-off (Pass 1k-3k Hz, Refer >3k Hz)</option>
+                <option value="pass">Pass Bilaterally (Robust Outer Hair Cell Function across 1k-8k Hz)</option>
+                <option value="refer">Refer / Absent Broadly (Severe Outer Hair Cell Dysfunction)</option>
+                <option value="unilateral">Unilateral Asymmetry (Pass Right, Absent Left)</option>
+              </select>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div>
+                <label style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:4px;">Right Ear (AD) Status</label>
+                <input type="text" id="oaeStatusR" value="Pass (1k-3k Hz) / SNR > 20 dB" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;font-weight:600;" oninput="updateOaeFindings()">
+              </div>
+              <div>
+                <label style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:4px;">Left Ear (AS) Status</label>
+                <input type="text" id="oaeStatusL" value="Pass (1k-2k Hz), Refer >2k Hz" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;font-weight:600;" oninput="updateOaeFindings()">
+              </div>
+            </div>
+
+            <div style="padding:10px 12px;background:var(--bg-subtle);border-radius:var(--radius-sm);border:1px solid var(--border-light);font-size:12px;line-height:1.45;">
+              <strong style="color:var(--brand-hover);display:block;margin-bottom:2px;">Pattern Summary:</strong>
+              <span id="oaePatternNotes">Preserved outer hair cell micromechanics in low-to-mid frequencies with high-frequency attenuation, concordant with sensory sloping hearing loss.</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── TAB 3: ASSR ── -->
+      <div id="sectionAssr" style="display:none;">
+        <div class="ephys-grid">
+          
+          <div class="dropzone-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <strong style="font-size:13px;color:var(--text-primary);text-transform:uppercase;">ASSR Polar Plot & Vector Report Upload</strong>
+              <span style="font-size:11px;color:var(--text-secondary);">Eclipse / GSI Audera</span>
+            </div>
+
+            <input type="file" id="assrFileInput" accept="image/*,application/pdf" style="display:none;" onchange="handleFileUpload(event, 'ASSR Equipment Report')">
+            <div class="upload-area" onclick="document.getElementById('assrFileInput').click()">
+              <div id="assrPreviewContainer">
+                <div style="font-size:32px;margin-bottom:8px;">📈</div>
+                <strong style="font-size:13px;color:var(--text-primary);display:block;">Upload ASSR Multi-Frequency Report</strong>
+                <span style="font-size:11.5px;color:var(--text-secondary);margin-top:4px;display:block;">Objective 80 Hz Phase-Coherence Vector Analysis</span>
+                <span style="font-size:10.5px;color:var(--brand-hover);font-weight:600;margin-top:8px;display:inline-block;background:var(--teal-50);padding:3px 8px;border-radius:4px;">ASSR_Estimated_Audiogram.pdf (Attached)</span>
+              </div>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;">
+              <button type="button" class="btn" style="font-size:12px;min-height:28px;" onclick="document.getElementById('assrFileInput').click()">Choose File...</button>
+              <span style="font-size:11.5px;color:var(--text-secondary);">Auto-saved to Patient Media</span>
+            </div>
+          </div>
+
+          <div class="pattern-card">
+            <div>
+              <label style="font-size:11.5px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em;display:block;margin-bottom:5px;">ASSR Diagnostic Result Pattern</label>
+              <select id="assrPatternSelect" onchange="updateAssrFindings()" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-weight:600;color:var(--text-primary);">
+                <option value="concordant" selected>Concordant Sensory Threshold Profile (Sloping SNHL)</option>
+                <option value="normal">Normal Objective Thresholds (&le;20 dB eHL all octaves)</option>
+                <option value="severe">Severe-to-Profound Threshold Profile</option>
+              </select>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div>
+                <label style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:4px;">Right Estimated PTA</label>
+                <input type="text" id="assrPtaR" value="33 dB eHL (Mild SNHL)" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;font-family:monospace;font-weight:600;" oninput="updateAssrFindings()">
+              </div>
+              <div>
+                <label style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:4px;">Left Estimated PTA</label>
+                <input type="text" id="assrPtaL" value="36 dB eHL (Mild-Mod SNHL)" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;font-family:monospace;font-weight:600;" oninput="updateAssrFindings()">
+              </div>
+            </div>
+
+            <div style="padding:10px 12px;background:var(--bg-subtle);border-radius:var(--radius-sm);border:1px solid var(--border-light);font-size:12px;line-height:1.45;">
+              <strong style="color:var(--brand-hover);display:block;margin-bottom:2px;">Pattern Summary:</strong>
+              <span id="assrPatternNotes">Objective ASSR estimated thresholds show high concordance with behavioral pure tone audiometry, confirming sensory threshold configuration for hearing aid fitting targets.</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── TAB 4: ECOCHG & VEMP ── -->
+      <div id="sectionVemp" style="display:none;">
+        <div class="ephys-grid">
+          
+          <div class="dropzone-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <strong style="font-size:13px;color:var(--text-primary);text-transform:uppercase;">ECochG / VEMP Traces Upload</strong>
+              <span style="font-size:11px;color:var(--text-secondary);">Bio-logic / Interacoustics</span>
+            </div>
+
+            <input type="file" id="vempFileInput" accept="image/*,application/pdf" style="display:none;" onchange="handleFileUpload(event, 'ECochG/VEMP Equipment Report')">
+            <div class="upload-area" onclick="document.getElementById('vempFileInput').click()">
+              <div id="vempPreviewContainer">
+                <div style="font-size:32px;margin-bottom:8px;">⚡</div>
+                <strong style="font-size:13px;color:var(--text-primary);display:block;">Upload ECochG / VEMP Waveform Traces</strong>
+                <span style="font-size:11.5px;color:var(--text-secondary);margin-top:4px;display:block;">SP/AP Amplitude & cVEMP/oVEMP EMG Traces</span>
+                <span style="font-size:10.5px;color:var(--brand-hover);font-weight:600;margin-top:8px;display:inline-block;background:var(--teal-50);padding:3px 8px;border-radius:4px;">ECochG_SPAP_Analysis.pdf (Attached)</span>
+              </div>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;">
+              <button type="button" class="btn" style="font-size:12px;min-height:28px;" onclick="document.getElementById('vempFileInput').click()">Choose File...</button>
+              <span style="font-size:11.5px;color:var(--text-secondary);">Auto-saved to Patient Media</span>
+            </div>
+          </div>
+
+          <div class="pattern-card">
+            <div>
+              <label style="font-size:11.5px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em;display:block;margin-bottom:5px;">ECochG & Vestibular Result Pattern</label>
+              <select id="vempPatternSelect" onchange="updateVempFindings()" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-weight:600;color:var(--text-primary);">
+                <option value="normal" selected>Normal ECochG & Symmetric VEMP (SP/AP &lt; 0.40, Asymmetry &lt; 35%)</option>
+                <option value="hydrops">Endolymphatic Hydrops / Meniere's Pattern (Elevated SP/AP &ge; 0.45)</option>
+                <option value="sscd">Superior Canal Dehiscence (Enhanced cVEMP amplitude / low threshold)</option>
+                <option value="vestibular_loss">Unilateral Vestibular Loss (Absent/Attenuated VEMP)</option>
+              </select>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div>
+                <label style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:4px;">ECochG SP/AP Ratio</label>
+                <input type="text" id="vempSpAp" value="0.28 (Normal <0.40)" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;font-family:monospace;font-weight:600;" oninput="updateVempFindings()">
+              </div>
+              <div>
+                <label style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:4px;">cVEMP Saccular Asymmetry</label>
+                <input type="text" id="vempAsym" value="12% (Symmetric WNL)" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;font-family:monospace;font-weight:600;" oninput="updateVempFindings()">
+              </div>
+            </div>
+
+            <div style="padding:10px 12px;background:var(--bg-subtle);border-radius:var(--radius-sm);border:1px solid var(--border-light);font-size:12px;line-height:1.45;">
+              <strong style="color:var(--brand-hover);display:block;margin-bottom:2px;">Pattern Summary:</strong>
+              <span id="vempPatternNotes">Normal SP/AP ratio confirms absence of active endolymphatic hydrops. Symmetrical cVEMP and oVEMP responses confirm intact otolith-vestibular pathways.</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Assessment Findings Form (Renamed from Clinical Impression) -->
+      <div class="impression-card" style="margin-top:16px;margin-bottom:18px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 22px;box-shadow:var(--shadow-card);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div>
+            <strong style="font-size:14px;color:var(--text-primary);">Assessment Findings & Summary Notes</strong>
+            <span style="font-size:11.5px;color:var(--text-tertiary);font-weight:500;margin-left:6px;">(Auto-synthesizes from selected patterns and uploads)</span>
+          </div>
+          <button type="button" class="btn" style="min-height:28px;font-size:12px;padding:0 10px;font-weight:600;" onclick="notify('Assessment findings saved to patient record.')">Save Findings</button>
+        </div>
+        <textarea id="assessmentFindingsText" rows="3" style="width:100%;padding:11px 14px;font-size:13px;line-height:1.55;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-subtle);color:var(--text-primary);font-family:inherit;box-shadow:inset 0 1px 2px rgba(0,0,0,0.02);">Auditory Brainstem Response (ABR) demonstrates robust, repeatable Wave I, III, and V morphologies bilaterally with normal central conduction time (I-V: 4.00 ms) and symmetric Wave V latencies (IT5: 0.06 ms), ruling out retrocochlear 8th nerve pathology. DPOAEs confirm high-frequency outer hair cell attenuation concordant with sensory sloping SNHL. ANSD criteria negative. Equipment trace and reports archived to Patient Media.</textarea>
+      </div>
+
+      <!-- Step Navigation Footer -->
+      <div class="footer-nav" style="display:flex;justify-content:space-between;align-items:center;padding-top:16px;border-top:1px solid var(--border-light);">
+        <a class="btn" id="btnPrev" href="08-workspace-speech.html?patient=amaia">← Previous: Speech & Tinnitus</a>
+        <a class="btn primary" id="btnNext" href="09-conclusion.html?patient=amaia">Next: Diagnosis & Management →</a>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="toast"></div>
+  <script src="data.js"></script>
+  <script src="prototype.js"></script>
+  <script>
+    function switchEphysTab(tabId) {
+      document.getElementById('sectionAbr').style.display = (tabId === 'abr') ? 'block' : 'none';
+      document.getElementById('sectionOae').style.display = (tabId === 'oae') ? 'block' : 'none';
+      document.getElementById('sectionAssr').style.display = (tabId === 'assr') ? 'block' : 'none';
+      document.getElementById('sectionVemp').style.display = (tabId === 'vemp') ? 'block' : 'none';
+
+      document.getElementById('tabBtnAbr').className = 'ephys-tab-btn' + (tabId === 'abr' ? ' active' : '');
+      document.getElementById('tabBtnOae').className = 'ephys-tab-btn' + (tabId === 'oae' ? ' active' : '');
+      document.getElementById('tabBtnAssr').className = 'ephys-tab-btn' + (tabId === 'assr' ? ' active' : '');
+      document.getElementById('tabBtnVemp').className = 'ephys-tab-btn' + (tabId === 'vemp' ? ' active' : '');
+    }
+
+    function handleFileUpload(event, slotType) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const pid = getActivePatientId();
+      const sizeStr = (file.size / 1024).toFixed(0) + ' KB';
+
+      if (window.HearIntelDB && window.HearIntelDB.saveSlotMedia) {
+        window.HearIntelDB.saveSlotMedia(pid, slotType || 'Electrophysiology Report', {
+          name: file.name,
+          size: sizeStr,
+          tag: 'Hardware Equipment Trace'
+        });
+      }
+      notify(`Replaced ${slotType}: ${file.name} (${sizeStr}). Saved to Patient Media.`);
+    }
+
+    function updateAbrFindings() {
+      const pattern = document.getElementById('abrPatternSelect').value;
+      const notes = document.getElementById('abrPatternNotes');
+      const textarea = document.getElementById('assessmentFindingsText');
+
+      if (pattern === 'normal') {
+        notes.textContent = 'Robust, repeatable Wave I, III, and V morphologies bilaterally with normal central conduction time (I-V: 4.00 ms) and symmetric Wave V latencies (IT5: 0.06 ms). Rules out retrocochlear 8th nerve pathology.';
+      } else if (pattern === 'cochlear') {
+        notes.textContent = 'Elevated Wave V threshold concordant with pure tone audiometry; normal I-V interpeak interval confirms sensory cochlear etiology.';
+      } else if (pattern === 'retrocochlear') {
+        notes.textContent = 'Prolonged I-V interpeak latency (>4.5 ms) or significant interaural Wave V asymmetry (IT5 >= 0.4 ms). Specialist referral / MRI indicated.';
+      } else if (pattern === 'ansd') {
+        notes.textContent = 'Desynchronized / absent ABR waveforms in the presence of preserved cochlear microphonic / robust DPOAEs. Consistent with Auditory Neuropathy Spectrum Disorder (ANSD).';
+      }
+
+      textarea.value = `Auditory Brainstem Response (ABR) assessment findings: ${notes.textContent} Digital equipment reports archived to Patient Media.`;
+    }
+
+    function updateOaeFindings() {
+      const pattern = document.getElementById('oaePatternSelect').value;
+      const notes = document.getElementById('oaePatternNotes');
+      if (pattern === 'rolloff') {
+        notes.textContent = 'Preserved outer hair cell micromechanics in low-to-mid frequencies with high-frequency attenuation, concordant with sensory sloping hearing loss.';
+      } else if (pattern === 'pass') {
+        notes.textContent = 'Robust DPOAE emissions across all tested frequencies (1 kHz to 8 kHz, SNR >= 6 dB), confirming normal outer hair cell function.';
+      } else if (pattern === 'refer') {
+        notes.textContent = 'Absent DPOAE emissions across all frequencies, indicating significant bilateral outer hair cell damage.';
+      }
+    }
+
+    function updateAssrFindings() {
+      const pattern = document.getElementById('assrPatternSelect').value;
+      const notes = document.getElementById('assrPatternNotes');
+      if (pattern === 'concordant') {
+        notes.textContent = 'Objective ASSR estimated thresholds show high concordance with behavioral pure tone audiometry, confirming sensory threshold configuration for hearing aid fitting targets.';
+      }
+    }
+
+    function updateVempFindings() {
+      const pattern = document.getElementById('vempPatternSelect').value;
+      const notes = document.getElementById('vempPatternNotes');
+      if (pattern === 'normal') {
+        notes.textContent = 'Normal SP/AP ratio confirms absence of active endolymphatic hydrops. Symmetrical cVEMP and oVEMP responses confirm intact otolith-vestibular pathways.';
+      } else if (pattern === 'hydrops') {
+        notes.textContent = 'Elevated SP/AP ratio (>=0.45) indicative of endolymphatic hydrops / Meniere’s disease.';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const pid = getActivePatientId();
+      document.getElementById('btnPrev').href = '08-workspace-speech.html?patient=' + pid;
+      document.getElementById('btnNext').href = '09-conclusion.html?patient=' + pid;
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HearIntel — Diagnosis & Clinical Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .pathway-master-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    @media (max-width: 1200px) {
+      .pathway-master-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    .pathway-card {
+      padding: 13px 15px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      text-align: left;
+      cursor: pointer;
+      box-shadow: var(--shadow-subtle);
+      transition: all 120ms ease;
+    }
+    .pathway-card:hover {
+      border-color: #CBD5E1;
+      background: var(--bg-subtle);
+    }
+    .pathway-card.active {
+      border-color: var(--brand);
+      background: var(--brand-subtle);
+      box-shadow: inset 0 0 0 1px var(--brand);
+    }
+    .pathway-card strong {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 3px;
+    }
+    .pathway-card span {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+      display: block;
+    }
+    .pathway-form {
+      display: none;
+    }
+    .pathway-form.active {
+      display: block;
+    }
+  </style>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+  <div class="workspace-shell" data-workspace-page="conclusion">
+    <div class="surface" style="padding:24px;">
+      
+            <!-- Header -->
+      <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center;padding:0 0 16px 0;margin-bottom:24px;border-bottom:1px solid var(--border-light);">
+        <h1 class="panel-title" style="font-size:18.5px;font-weight:700;color:var(--text-primary);margin:0;">Diagnosis & Clinical Management</h1>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="badge" id="conclusionStatusBadge">Active Care Plan</span>
+          <button type="button" class="btn" style="min-height:30px;font-size:12px;padding:0 12px;font-weight:600;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-subtle);" onclick="openReportModal(getActivePatientId(), 'management')"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>Export Report</button>
+        </div>
+      </div>
+
+<h3 class="section-title">1. Universal Diagnostic Classification (ICD-10 / WHO)</h3>
+      
+      <div class="form-grid" style="margin-bottom:20px;">
+        <div class="field">
+          <label for="primaryDiagnosis">Primary Audiological Diagnosis *</label>
+          <select id="primaryDiagnosis" onchange="onDiagnosisChange(this.value)">
+            <option value="snhl_bilateral" selected>Bilateral Sensorineural Hearing Loss, Mild-to-Moderate (ICD-10 H90.3)</option>
+            <option value="conductive_bilateral">Conductive Hearing Loss, Middle Ear Pathology (ICD-10 H90.0)</option>
+            <option value="mixed_bilateral">Mixed Hearing Loss, Bilateral (ICD-10 H90.6)</option>
+            <option value="asymmetric_snhl">Asymmetric Sensorineural Loss — Specialist Referral Indicated (ICD-10 H90.4)</option>
+            <option value="sudden_snhl">Sudden Sensorineural Hearing Loss (ICD-10 H91.2 - Urgent Medical Protocol)</option>
+            <option value="tinnitus_disorder">Subjective Tinnitus Disorder with Normal/Mild Loss (ICD-10 H93.1)</option>
+            <option value="hyperacusis">Hyperacusis & Decreased Sound Tolerance (ICD-10 H93.25)</option>
+            <option value="capd">Central Auditory Processing Disorder (ICD-10 H93.29)</option>
+            <option value="normal_hearing">Normal Hearing Bilaterally (WNL / Hearing Conservation Protocol)</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="severityLaterality">Severity, Laterality & Configuration</label>
+          <select id="severityLaterality">
+            <option selected>Bilateral Mild-to-Moderate Sloping (30 dB R / 36 dB L)</option>
+            <option>Bilateral Moderate Sloping (48 dB R / 52 dB L)</option>
+            <option>Bilateral Severe-to-Profound (78 dB R / 85 dB L)</option>
+            <option>Unilateral Right Hearing Loss</option>
+            <option>Unilateral Left Hearing Loss</option>
+            <option>Bilateral High-Frequency Precipitous Loss</option>
+            <option>Symmetrical Normal Thresholds WNL (&le;20 dB)</option>
+          </select>
+        </div>
+
+        <div class="field" style="grid-column:1 / -1;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <label for="interpretation">Comprehensive Clinical Findings Synthesis</label>
+            <button type="button" class="btn" style="min-height:24px;font-size:11px;padding:0 8px;" onclick="autoSynthesizeNarrative()">Re-generate Synthesis</button>
+          </div>
+          <textarea id="interpretation" rows="3" style="width:100%;padding:10px 12px;font-size:13px;line-height:1.5;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-subtle);color:var(--text-primary);font-family:inherit;">Bilateral mild-to-moderate sloping sensorineural hearing loss. Immittance confirms normal middle ear compliance and pressure bilaterally (Type A). Speech audiometry shows 88% WRS (Right) and 76% WRS (Left) with mild SNR loss (+4.5 dB). Findings support bilateral digital amplification, directional processing, and aural rehabilitation.</textarea>
+        </div>
+      </div>
+
+      <!-- ── SECTION 2: UNIVERSAL MULTI-PATHWAY SELECTION (7 PATHWAYS) ── -->
+      <h3 class="section-title">2. Structured Clinical Management Pathway Selection</h3>
+      
+      <div class="pathway-master-grid">
+        <button type="button" class="pathway-card active" data-pathway="ha" onclick="showPathway('ha')">
+          <strong>1. Hearing Aid (HA / CROS)</strong>
+          <span>Bilateral fitting, REM verification & 3-week follow-up.</span>
+        </button>
+
+        <button type="button" class="pathway-card" data-pathway="ci" onclick="showPathway('ci')">
+          <strong>2. Implantable Technology</strong>
+          <span>Cochlear implant / BAHA candidacy evaluation & MDT sign-off.</span>
+        </button>
+
+        <button type="button" class="pathway-card" data-pathway="referral" onclick="showPathway('referral')">
+          <strong>3. Specialist Referral</strong>
+          <span>Medical / surgical referral for middle ear or retrocochlear rule-out.</span>
+        </button>
+
+        <button type="button" class="pathway-card" data-pathway="tinnitus" onclick="showPathway('tinnitus')">
+          <strong>4. Tinnitus & Hyperacusis</strong>
+          <span>Sound enrichment, combination devices, TRT & sleep counseling.</span>
+        </button>
+
+        <button type="button" class="pathway-card" data-pathway="aural-rehab" onclick="showPathway('aural-rehab')">
+          <strong>5. Aural Rehabilitation</strong>
+          <span>Auditory brain training, speech reading & remote mic ALDs.</span>
+        </button>
+
+        <button type="button" class="pathway-card" data-pathway="pediatric" onclick="showPathway('pediatric')">
+          <strong>6. Pediatric / Educational</strong>
+          <span>Prescriptive Targets pediatric targets, RECD verification, school FM/DM systems.</span>
+        </button>
+
+        <button type="button" class="pathway-card" data-pathway="surveillance" onclick="showPathway('surveillance')">
+          <strong>7. Surveillance / Conservation</strong>
+          <span>Hearing conservation, custom noise protection, 12-month recheck.</span>
+        </button>
+
+        <button type="button" class="pathway-card" data-pathway="custom" onclick="showPathway('custom')">
+          <strong>8. Custom Care Plan</strong>
+          <span>Specialized multidisciplinary protocol tailored to clinical need.</span>
+        </button>
+      </div>
+
+      <!-- ── PATHWAY CONFIGURATION FORMS ── -->
+
+      <!-- 1. Hearing Aid Pathway -->
+      <div class="pathway-form active" data-pathway-form="ha">
+        <div class="surface" style="padding:16px 18px;background:var(--bg-subtle);margin-bottom:18px;">
+          <h4 style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--text-primary);">Hearing Aid (HA) Pathway & Device Configuration</h4>
+          
+          <div class="grid two" style="margin-bottom:14px;">
+            <div class="surface" style="padding:14px;background:#FFFFFF;">
+              <h5 style="margin:0 0 10px;color:var(--right-ear);font-size:13px;font-weight:700;">Right Ear Device (AD)</h5>
+              <div class="field" style="margin-bottom:8px;"><label>Make & Model</label><input id="haRightModel" value="Oticon Real 1 miniRITE R"></div>
+              <div class="field" style="margin-bottom:8px;"><label>Style</label><select><option selected>RIC (Receiver-in-Canal)</option><option>BTE (Behind-the-Ear)</option><option>ITE / ITC</option><option>CIC / IIC</option><option>CROS Transmitter</option></select></div>
+              <div class="field"><label>Coupling / Earpiece</label><select><option selected>Open Bass Dome (8mm)</option><option>Custom Micro Mold (Select-A-Vent)</option><option>Power Dome</option></select></div>
+            </div>
+
+            <div class="surface" style="padding:14px;background:#FFFFFF;">
+              <h5 style="margin:0 0 10px;color:var(--left-ear);font-size:13px;font-weight:700;">Left Ear Device (AS)</h5>
+              <div class="field" style="margin-bottom:8px;"><label>Make & Model</label><input id="haLeftModel" value="Oticon Real 1 miniRITE R"></div>
+              <div class="field" style="margin-bottom:8px;"><label>Style</label><select><option selected>RIC (Receiver-in-Canal)</option><option>BTE (Behind-the-Ear)</option><option>ITE / ITC</option><option>CIC / IIC</option><option>BiCROS Receiver</option></select></div>
+              <div class="field"><label>Coupling / Earpiece</label><select><option selected>Open Bass Dome (8mm)</option><option>Custom Micro Mold (Select-A-Vent)</option><option>Power Dome</option></select></div>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label>Prescriptive Fitting Target & Verification</label>
+              <select>
+                <option selected>Real-Ear Measurement (REM) Target Match: NAL-NL2 (&plusmn;3 dB)</option>
+                <option>Prescriptive Targets Adult Target Match</option>
+                <option>Live Speech Mapping (Audioscan Verifit2)</option>
+                <option>Sound Field Functional Gain Verification</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Primary Fitting Feature Set</label>
+              <select>
+                <option selected>Spatial Sound / Binaural Noise Management + Adaptive Directionality</option>
+                <option>Frequency Lowering / Speech Rescue Active</option>
+                <option>Tinnitus SoundSupport Notch Therapy Enabled</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Implantable Technology Pathway -->
+      <div class="pathway-form" data-pathway-form="ci">
+        <div class="surface" style="padding:16px 18px;background:var(--bg-subtle);margin-bottom:18px;">
+          <h4 style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--text-primary);">Implantable Auditory Technology Protocol</h4>
+          <div class="form-grid">
+            <div class="field">
+              <label>Implant Device Category</label>
+              <select>
+                <option selected>Cochlear Implant (CI) — Severe-to-Profound Candidacy</option>
+                <option>Bone Conduction Implant / BAHA (Conductive/Mixed or SSD)</option>
+                <option>Middle Ear Implant (Vibrant Soundbridge)</option>
+                <option>Auditory Brainstem Implant (ABI)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Candidacy Testing & MDT Status</label>
+              <select>
+                <option selected>Pre-implant CNC/AzBio Sentence Testing in Quiet & Noise Completed</option>
+                <option>High-Resolution CT / MRI Petrous Bone Clearance Pending</option>
+                <option>Multidisciplinary Team (MDT) Surgical Conference Scheduled</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Specialist Referral Pathway -->
+      <div class="pathway-form" data-pathway-form="referral">
+        <div class="surface" style="padding:16px 18px;background:var(--bg-subtle);margin-bottom:18px;">
+          <h4 style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--text-primary);">Medical / Surgical Specialist Referral Protocol</h4>
+          <div class="form-grid">
+            <div class="field">
+              <label>Referral Indication & Destination</label>
+              <select>
+                <option selected>Otolaryngology / Specialist Clinic (LUTH) — Asymmetry & Rule-out</option>
+                <option>Otology / Neurotology Service — Middle Ear Exploration / Stapedectomy</option>
+                <option>Vestibular & Balance Assessment Unit</option>
+                <option>Neurology Consult — Retrocochlear Investigation</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Urgency & Documentation Package</label>
+              <select>
+                <option selected>Urgent (< 2 weeks) — Full Diagnostic Audiogram & Letter Attached</option>
+                <option>Routine Clinic Review</option>
+                <option>Immediate / Same-Day Evaluation</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Tinnitus & Hyperacusis Pathway -->
+      <div class="pathway-form" data-pathway-form="tinnitus">
+        <div class="surface" style="padding:16px 18px;background:var(--bg-subtle);margin-bottom:18px;">
+          <h4 style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--text-primary);">Tinnitus & Hyperacusis Management Protocol</h4>
+          <div class="form-grid">
+            <div class="field">
+              <label>Acoustic Therapy Strategy</label>
+              <select>
+                <option selected>Combination Hearing Device + Fractal Relaxation Tones</option>
+                <option>Broadband Sound Enrichment / Bedside Masker</option>
+                <option>Notch Therapy (Targeted at Pitch Match Frequency)</option>
+                <option>Progressive Tinnitus Retraining Therapy (TRT)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Psychological & Counseling Component</label>
+              <select>
+                <option selected>CBT-Informed Tinnitus Habituation & Sleep Hygiene Protocol</option>
+                <option>Hyperacusis Desensitization Acoustic Hierarchy</option>
+                <option>Mindfulness & Relaxation Counseling</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Aural Rehabilitation Pathway -->
+      <div class="pathway-form" data-pathway-form="aural-rehab">
+        <div class="surface" style="padding:16px 18px;background:var(--bg-subtle);margin-bottom:18px;">
+          <h4 style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--text-primary);">Aural Rehabilitation & Assistive Listening Protocol</h4>
+          <div class="form-grid">
+            <div class="field">
+              <label>Communication Strategies & Training</label>
+              <select>
+                <option selected>Clear Speech & Speech-Reading Training (6-Week Module)</option>
+                <option>Auditory Brain Training App Protocol (LACE / Amptify)</option>
+                <option>Frequent Communication Partner Counseling Session</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Assistive Listening Technology (ALDs)</label>
+              <select>
+                <option selected>Wireless Remote Microphone (Roger / PartnerMic)</option>
+                <option>TV Audio Streamer & Smartphone Direct Bluetooth Audio</option>
+                <option>Telecoil & Hearing Loop Systems for Public Venues</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Pediatric / Educational Pathway -->
+      <div class="pathway-form" data-pathway-form="pediatric">
+        <div class="surface" style="padding:16px 18px;background:var(--bg-subtle);margin-bottom:18px;">
+          <h4 style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--text-primary);">Pediatric & Educational Audiology Protocol</h4>
+          <div class="form-grid">
+            <div class="field">
+              <label>Prescriptive Target & Verification</label>
+              <select>
+                <option selected>Prescriptive Targets Pediatric with Real-Ear-to-Coupler Difference (RECD)</option>
+                <option>VRA / Visual Reinforcement Audiometry Surveillance</option>
+                <option>Conditioned Play Audiometry (CPA) 3-Month Follow-up</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Educational Support & Classroom Accommodations</label>
+              <select>
+                <option selected>Personal Classroom FM/DM System + Teacher In-service</option>
+                <option>Preferential Seating & Acoustic Ceiling Treatment</option>
+                <option>IEP / 504 Hearing Plan Formal Sign-off</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. Surveillance / Conservation Pathway -->
+      <div class="pathway-form" data-pathway-form="surveillance">
+        <div class="surface" style="padding:16px 18px;background:var(--bg-subtle);margin-bottom:18px;">
+          <h4 style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--text-primary);">Auditory Surveillance & Hearing Conservation Protocol</h4>
+          <div class="form-grid">
+            <div class="field">
+              <label>Surveillance Protocol</label>
+              <select>
+                <option selected>Annual Audiometric Threshold Surveillance (12 Months)</option>
+                <option>Occupational Noise Exposure Monitoring (OSHA / NIOSH Action Level)</option>
+                <option>Ototoxic Drug Monitoring Protocol (Baseline + Weekly)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Hearing Protection Strategy</label>
+              <select>
+                <option selected>Custom Musicians / High-Fidelity Attenuating Earplugs (-15 dB)</option>
+                <option>Industrial Custom Molded High-Noise Earplugs (-25 dB NRR)</option>
+                <option>Swim Plugs (Middle Ear Protection)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8. Custom Pathway -->
+      <div class="pathway-form" data-pathway-form="custom">
+        <div class="surface" style="padding:16px 18px;background:var(--bg-subtle);margin-bottom:18px;">
+          <h4 style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--text-primary);">Custom Multidisciplinary Protocol</h4>
+          <div class="form-grid">
+            <div class="field">
+              <label>Care Plan Title</label>
+              <input id="customCpTitle" value="Comprehensive Audiological Follow-up">
+            </div>
+            <div class="field">
+              <label>Action Protocol Notes</label>
+              <input id="customCpNotes" value="Multidisciplinary clinical review and diagnostic reassessment.">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECTION 3: CARE PLAN FORMULATION & RECALL SCHEDULE ── -->
+      <h3 class="section-title">3. Scheduled Care Plan Recall & Action Protocol</h3>
+      
+      <div class="surface" style="padding:18px 20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:24px;">
+        <div class="form-grid">
+          <div class="field">
+            <label>Recall Schedule Interval *</label>
+            <select id="recallIntervalSelect" onchange="updateRecallDate(this.value)">
+              <option value="21" selected>3 Weeks (Post-Fit Verification & Aural Rehab #1: 26 Aug 2026)</option>
+              <option value="14">2 Weeks (Acute Medical / Post-Treatment Follow-up)</option>
+              <option value="90">3 Months (Tinnitus / Pediatric / Device Review)</option>
+              <option value="180">6 Months (Mid-Year Acoustic Check & Clean)</option>
+              <option value="365">12 Months (Annual Comprehensive Audiological Re-evaluation)</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Specific Recall Date *</label>
+            <input type="date" id="targetRecallDate" style="font-family:monospace;font-size:13.5px;padding:8px 12px;">
+          </div>
+
+          <div class="field" style="grid-column:1 / -1;">
+            <label>Scheduled Recall Objective & Action Items *</label>
+            <input type="text" id="targetRecallReason" value="3-Week Hearing Aid Real-Ear Verification & Aural Rehabilitation Review" style="font-size:13.5px;padding:8px 12px;">
+          </div>
+        </div>
+      </div>
+
+      <!-- Step Navigation Footer -->
+      <div class="footer-nav">
+        <a class="btn" id="prevStepBtn" href="12-workspace-electrophysiology.html?patient=amaia">← Previous: Electrophysiology</a>
+        <button class="btn primary" style="font-size:13.5px;padding:0 22px;font-weight:600;" onclick="finalizeEncounter()">Finalize Assessment & Update Patient Record →</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="toast"></div>
+  <script src="data.js"></script>
+  <script src="prototype.js"></script>
+  <script>
+    let activePathway = 'ha';
+
+    function showPathway(key) {
+      activePathway = key;
+      document.querySelectorAll('.pathway-card').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.pathway === key);
+      });
+      document.querySelectorAll('.pathway-form').forEach(form => {
+        form.classList.toggle('active', form.dataset.pathwayForm === key);
+      });
+
+      // Update default recall objective based on pathway
+      const objectives = {
+        'ha': '3-Week Hearing Aid Real-Ear Verification & Aural Rehabilitation Review',
+        'ci': 'Cochlear Implant MDT Surgical Sign-off & Audiological Counseling',
+        'referral': 'Referral Clinic Follow-up & Retrocochlear Investigation Report Review',
+        'tinnitus': '6-Week Tinnitus Habituation & Sound Therapy Verification',
+        'aural-rehab': 'Aural Rehabilitation Session #2 & Communication Strategy Check',
+        'pediatric': '3-Month Pediatric Auditory Development & FM System Check',
+        'surveillance': '12-Month Annual Hearing Conservation & Threshold Surveillance',
+        'custom': 'Custom Multidisciplinary Follow-up Session'
+      };
+      if (objectives[key]) {
+        document.getElementById('targetRecallReason').value = objectives[key];
+      }
+    }
+
+    function onDiagnosisChange(val) {
+      // Auto-suggest pathway based on diagnosis
+      if (val.includes('snhl_bilateral')) showPathway('ha');
+      else if (val.includes('asymmetric_snhl') || val.includes('sudden_snhl') || val.includes('conductive_bilateral')) showPathway('referral');
+      else if (val.includes('tinnitus_disorder') || val.includes('hyperacusis')) showPathway('tinnitus');
+      else if (val.includes('normal_hearing')) showPathway('surveillance');
+      else if (val.includes('capd')) showPathway('aural-rehab');
+    }
+
+    function updateRecallDate(daysStr) {
+      const days = parseInt(daysStr, 10) || 21;
+      const target = new Date();
+      target.setDate(target.getDate() + days);
+      const dateStr = target.toISOString().split('T')[0];
+      document.getElementById('targetRecallDate').value = dateStr;
+    }
+
+    function autoSynthesizeNarrative() {
+      const pid = getActivePatientId();
+      const p = window.HearIntelDB ? window.HearIntelDB.getPatient(pid) : null;
+      const ptaR = p ? Math.round(p.ptaRight || 30) : 30;
+      const ptaL = p ? Math.round(p.ptaLeft || 36) : 36;
+      const diag = document.getElementById('primaryDiagnosis').options[document.getElementById('primaryDiagnosis').selectedIndex].text;
+
+      const synth = `${diag}. Pure tone thresholds confirm 4-frequency PTA of ${ptaR} dB HL (Right AD) and ${ptaL} dB HL (Left AS). Middle ear immittance confirms bilateral Type A status with preserved acoustic stapedial reflexes. Speech intelligibility demonstrates bilateral concordance with excellent clarity in quiet and mild SNR loss in noise. Comprehensive care plan initiated on the selected clinical management pathway.`;
+      document.getElementById('interpretation').value = synth;
+      notify('Diagnostic narrative synthesized from patient battery.');
+    }
+
+    function finalizeEncounter() {
+      const pid = getActivePatientId();
+      const patient = window.HearIntelDB ? window.HearIntelDB.getPatient(pid) : null;
+
+      const diagSelect = document.getElementById('primaryDiagnosis');
+      const diagText = diagSelect.options[diagSelect.selectedIndex].text;
+      const interpretation = document.getElementById('interpretation').value;
+      const recallDate = document.getElementById('targetRecallDate').value || '2026-08-26';
+      const recallReason = document.getElementById('targetRecallReason').value || 'Scheduled Review';
+
+      // Format human-readable recall date
+      const parts = recallDate.split('-');
+      const formattedRecall = parts.length === 3
+        ? parts[2] + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(parts[1],10)-1] + ' ' + parts[0]
+        : '26 Aug 2026';
+
+      if (patient) {
+        patient.primaryDiagnosis = diagText;
+        patient.status = 'Active Care Plan';
+        patient.statusType = 'neutral';
+        patient.nextRecall = formattedRecall;
+        patient.recallReason = recallReason;
+        patient.pathway = activePathway;
+        patient.pathwayLabel = activePathway.toUpperCase();
+        patient.lastEncounter = 'Today';
+
+        // Add assessment to history
+        if (!patient.assessments) patient.assessments = [];
+        patient.assessments.unshift({
+          id: 'enc-' + Date.now(),
+          number: patient.assessments.length + 1,
+          date: 'Today',
+          type: 'Comprehensive Diagnostic Audiology',
+          clinician: 'Dr. Chika Okafor, Au.D.',
+          status: 'Completed',
+          ptaRight: patient.ptaRight || 30,
+          ptaLeft: patient.ptaLeft || 36,
+          diagnosis: diagText
+        });
+
+        // Add care plan thread
+        if (!patient.carePlan) patient.carePlan = [];
+        patient.carePlan.unshift({
+          id: 'cp-' + Date.now(),
+          title: 'Management Pathway: ' + document.querySelector(`[data-pathway="${activePathway}"] strong`).textContent,
+          category: 'Management Pathway',
+          status: 'Active',
+          badgeClass: 'neutral',
+          details: interpretation,
+          nextStep: 'Scheduled Recall on ' + formattedRecall + ' (' + recallReason + ')'
+        });
+
+        window.HearIntelDB.savePatient(patient);
+      }
+
+      notify('Assessment finalized! Patient record and care plan updated.');
+      setTimeout(function() {
+        window.location.href = '02-profile.html?patient=' + pid;
+      }, 400);
+    }
+
+    // ── Init ──
+    document.addEventListener('DOMContentLoaded', function() {
+      const pid = getActivePatientId();
+      document.getElementById('prevStepBtn').href = '12-workspace-electrophysiology.html?patient=' + pid;
+
+      updateRecallDate('21');
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

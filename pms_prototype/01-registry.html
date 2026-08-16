@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HearIntel -- Patient Registry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .registry-search-wrap { position:relative; margin-bottom:14px; }
+    .registry-search-icon { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--text-tertiary); font-size:14px; pointer-events:none; }
+    .registry-kbd-hint { position:absolute; right:12px; top:50%; transform:translateY(-50%); display:flex; gap:3px; align-items:center; }
+    .registry-kbd { background:var(--bg-subtle); border:1px solid var(--border); border-radius:4px; padding:1px 5px; font-size:10px; font-weight:600; color:var(--text-secondary); font-family:monospace; }
+    .registry-search-input { width:100%; padding:11px 16px 11px 38px; font-size:13.5px; border:1px solid var(--border); border-radius:var(--radius); background:var(--surface); color:var(--text-primary); box-shadow:var(--shadow-card); transition:border-color 140ms ease,box-shadow 140ms ease; }
+    .registry-search-input:focus { outline:none; border-color:var(--brand); box-shadow:0 0 0 3px var(--focus-ring); }
+    .registry-hint { font-size:11.5px; color:var(--text-tertiary); margin-top:6px; }
+    .seg-bar { display:flex; gap:6px; margin-bottom:16px; }
+    .seg-btn { border:1px solid var(--border); background:var(--surface); border-radius:99px; padding:4px 13px; font-size:12px; font-weight:500; color:var(--text-secondary); cursor:pointer; transition:all 140ms ease; white-space:nowrap; }
+    .seg-btn:hover { border-color:#CBD5E1; background:var(--bg-subtle); transform:translateY(-1px); }
+    .seg-btn.active { background:var(--brand-subtle); border-color:var(--brand-border); color:var(--brand-hover); font-weight:600; }
+    .patient-name-cell strong { font-size:13.5px; color:var(--text-primary); display:block; }
+    .patient-name-cell .mrn { font-size:11px; font-family:monospace; color:var(--text-secondary); }
+  </style>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <div data-shell="patients"></div>
+    <main class="main">
+      <section class="page">
+
+        <header class="topbar">
+          <div>
+            <div class="eyebrow">Clinical Records</div>
+            <h1 class="title">Patient Registry</h1>
+            <p class="subtle">Find the correct patient before opening any record or starting an assessment.</p>
+          </div>
+          <div class="actions" style="display:flex;gap:8px;">
+            <a class="btn" href="13-workspace-screening.html?patient=amaia">Rapid Screening</a>
+            <button class="btn primary" onclick="openNewPatientModal()">+ New Patient</button>
+          </div>
+        </header>
+
+        <div class="registry-search-wrap">
+          <span class="registry-search-icon">&#9906;</span>
+          <input type="text" class="registry-search-input" id="registrySearch"
+            placeholder="Search by name, MRN, phone number, or diagnosis..."
+            oninput="applyFilters()" autocomplete="off">
+          <div class="registry-kbd-hint">
+            <span class="registry-kbd">Ctrl</span>
+            <span class="registry-kbd">K</span>
+          </div>
+          <div class="registry-hint">
+            Results include MRN, age, gender, contact, and diagnosis to confirm the correct patient.
+          </div>
+        </div>
+
+        <div class="seg-bar">
+          <button class="seg-btn active" id="seg-all" onclick="setSeg('all')">All Patients (<span id="segAllCount">0</span>)</button>
+          <button class="seg-btn" id="seg-safety" onclick="setSeg('safety')">Safety / Referral</button>
+          <button class="seg-btn" id="seg-followup" onclick="setSeg('followup')">Follow-up Due</button>
+          <button class="seg-btn" id="seg-ha" onclick="setSeg('ha')">Hearing Aid</button>
+          <button class="seg-btn" id="seg-ci" onclick="setSeg('ci')">CI Protocol</button>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th style="cursor:pointer;" onclick="sortRegistry('name')" title="Sort by name">
+                  Patient <span id="sort-name" style="opacity:0.4;font-size:9px;">&#9650;</span>
+                </th>
+                <th>Age / Sex</th>
+                <th>Contact</th>
+                <th style="cursor:pointer;" onclick="sortRegistry('diagnosis')" title="Sort by diagnosis">
+                  Primary Diagnosis <span id="sort-diagnosis" style="opacity:0.4;font-size:9px;">&#9650;</span>
+                </th>
+                <th>Status</th>
+                <th style="cursor:pointer;" onclick="sortRegistry('encounter')" title="Sort by last seen">
+                  Last Encounter <span id="sort-encounter" style="opacity:0.4;font-size:9px;">&#9660;</span>
+                </th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="registryTbody"></tbody>
+          </table>
+        </div>
+
+      </section>
+    </main>
+  </div>
+  <div class="toast"></div>
+  <script src="data.js"></script>
+  <script src="prototype.js"></script>
+  <script>
+    var segFilter = 'all';
+    var allPatients = [];
+
+    function renderRegistry(patients) {
+      var tbody = document.getElementById('registryTbody');
+      document.getElementById('segAllCount').textContent = allPatients.length;
+      if (!patients || patients.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon"><svg xmlns=\'http://www.w3.org/2000/svg\' width=\'36\' height=\'36\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'1.5\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><circle cx=\'11\' cy=\'11\' r=\'8\'/><path d=\'m21 21-4.3-4.3\'/></svg></div><div class=\'empty-state-title\'>No patients found</div><div class=\'empty-state-desc\'>Try adjusting your search or filter criteria.</div></div></td></tr>';
+        return;
+      }
+      tbody.innerHTML = patients.map(function(p){
+        return '<tr style="cursor:pointer;" onclick="location.href=\'02-profile.html?patient='+p.id+'\'">'
+          +'<td class="patient-name-cell"><strong>'+p.name+'</strong><div class="mrn">'+p.mrn+'</div></td>'
+          +'<td style="font-size:12.5px;white-space:nowrap;">'+p.age+'y \xb7 '+p.gender+'</td>'
+          +'<td style="font-size:12.5px;color:var(--text-secondary);">'+(p.phone||'--')+'</td>'
+          +'<td style="font-size:12.5px;max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+p.primaryDiagnosis+'</td>'
+          +'<td><span class="badge '+(p.statusType||'neutral')+'">'+p.status+'</span></td>'
+          +'<td style="font-size:12px;color:var(--text-secondary);">'+(p.lastEncounter||'--')+'</td>'
+          +'<td style="text-align:right;white-space:nowrap;" onclick="event.stopPropagation();">'
+          +'<a class="btn" style="min-height:26px;padding:0 10px;font-size:11.5px;margin-right:4px;" href="02-profile.html?patient='+p.id+'">Record</a>'
+          +'<a class="btn primary" style="min-height:26px;padding:0 10px;font-size:11.5px;" href="03-start-encounter.html?patient='+p.id+'">Assess</a>'
+          +'</td></tr>';
+      }).join('');
+    }
+
+    var sortCol = 'encounter';
+    var sortDir = -1; // -1 = desc, 1 = asc
+
+    function sortRegistry(col) {
+      if(sortCol === col) { sortDir *= -1; } else { sortCol = col; sortDir = 1; }
+      // Update sort indicators
+      ['name','diagnosis','encounter'].forEach(function(c){
+        var el = document.getElementById('sort-'+c);
+        if(!el) return;
+        if(c === col) { el.style.opacity='0.9'; el.innerHTML = sortDir===1?'&#9650;':'&#9660;'; }
+        else { el.style.opacity='0.3'; }
+      });
+      applyFilters();
+    }
+
+    function applyFilters() {
+      var q = (document.getElementById('registrySearch').value||'').toLowerCase().trim();
+      var filtered = allPatients.filter(function(p){
+        return p.name.toLowerCase().includes(q)
+          || p.mrn.toLowerCase().includes(q)
+          || (p.phone&&p.phone.includes(q))
+          || (p.primaryDiagnosis&&p.primaryDiagnosis.toLowerCase().includes(q));
+      });
+      if(segFilter==='ha') filtered=filtered.filter(function(p){ return p.pathwayLabel&&p.pathwayLabel.toLowerCase().includes('ha'); });
+      if(segFilter==='safety') filtered=filtered.filter(function(p){ return p.statusType==='danger'||(p.alerts&&p.alerts.length>0); });
+      if(segFilter==='ci') filtered=filtered.filter(function(p){ return p.pathwayLabel&&p.pathwayLabel.toLowerCase().includes('ci'); });
+      if(segFilter==='followup') filtered=filtered.filter(function(p){ return p.nextRecall&&p.nextRecall!=='Pending'; });
+      // Apply sort
+      filtered.sort(function(a,b){
+        var av = '', bv = '';
+        if(sortCol==='name') { av=a.name||''; bv=b.name||''; }
+        else if(sortCol==='diagnosis') { av=a.primaryDiagnosis||''; bv=b.primaryDiagnosis||''; }
+        else if(sortCol==='encounter') { av=a.lastEncounter||''; bv=b.lastEncounter||''; }
+        return av.localeCompare(bv) * sortDir;
+      });
+      renderRegistry(filtered);
+    }
+
+    function setSeg(seg) {
+      segFilter = seg;
+      document.querySelectorAll('.seg-btn').forEach(function(b){ b.classList.remove('active'); });
+      var btn = document.getElementById('seg-'+seg);
+      if(btn) btn.classList.add('active');
+      applyFilters();
+    }
+
+    function setDensity(d) {
+      var t = document.getElementById('registryTable');
+      if(!t) return;
+      t.classList.remove('density-compact','density-comfortable');
+      if(d !== 'default') t.classList.add('density-' + d);
+      document.querySelectorAll('.density-btn').forEach(function(b){ b.classList.remove('active'); });
+      var btn = document.getElementById('density-' + d);
+      if(btn) btn.classList.add('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', function(){
+      if(!window.HearIntelDB) return;
+      allPatients = window.HearIntelDB.getAllPatients();
+      renderRegistry(allPatients);
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

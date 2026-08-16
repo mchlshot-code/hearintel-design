@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HearIntel — Verify Email</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .auth-canvas {
+      width: 100vw;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #2B3035;
+      padding: 24px;
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--white);
+      border-radius: var(--radius-md);
+      padding: 32px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.24);
+      text-align: center;
+    }
+    .code-inputs {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 20px 0;
+    }
+    .code-box {
+      width: 44px;
+      height: 48px;
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-primary);
+    }
+    .code-box:focus {
+      outline: none;
+      border-color: var(--teal);
+      box-shadow: 0 0 0 1px var(--teal);
+    }
+  </style>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+  <div class="auth-canvas">
+    <div class="auth-card">
+      <div class="brand-name" style="color:var(--text-primary);font-size:22px;">Hear<span style="color:var(--teal);">Intel</span></div>
+      <h1 style="font-size:18px;font-weight:700;margin-top:16px;color:var(--text-primary);">Verify your email</h1>
+      <p style="font-size:13px;color:var(--text-secondary);margin-top:4px;" id="verifyPrompt">We sent a 6-digit security code to your email.</p>
+
+      <form onsubmit="handleVerifySubmit(event)">
+        <div class="code-inputs">
+          <input class="code-box" maxlength="1" value="7">
+          <input class="code-box" maxlength="1" value="4">
+          <input class="code-box" maxlength="1" value="9">
+          <input class="code-box" maxlength="1" value="2">
+          <input class="code-box" maxlength="1" value="1">
+          <input class="code-box" maxlength="1" value="8">
+        </div>
+
+        <button type="submit" class="btn primary" style="width:100%;min-height:38px;font-size:13.5px;font-weight:600;">Confirm & Set Professional Context →</button>
+      </form>
+
+      <div style="margin-top:16px;font-size:12px;color:var(--text-secondary);">
+        Didn't receive code? <a href="#" onclick="notify('New code sent.');return false;" style="color:var(--teal);font-weight:600;">Resend email</a>
+      </div>
+    </div>
+  </div>
+  <div class="toast"></div>
+  <script src="data.js"></script>
+  <script src="prototype.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const email = localStorage.getItem('hearintel_reg_email');
+      if (email) {
+        document.getElementById('verifyPrompt').textContent = 'We sent a 6-digit security code to ' + email;
+      }
+    });
+
+    function handleVerifySubmit(event) {
+      event.preventDefault();
+      notify('Email verified successfully.');
+      setTimeout(() => location.href = 'auth-onboarding.html', 500);
+    }
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

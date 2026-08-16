@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HearIntel — Case History Intake</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .history-section-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow-card);
+    }
+    .history-card-title {
+      font-family: var(--font-heading);
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .red-flag-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+    }
+    .red-flag-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 12.5px;
+      color: var(--text-primary);
+      cursor: pointer;
+      line-height: 1.4;
+    }
+    .red-flag-item input {
+      margin-top: 2px;
+    }
+    .cosi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .cosi-box {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      background: var(--surface);
+      cursor: pointer;
+      transition: all 120ms ease;
+      font-size: 12.5px;
+    }
+    .cosi-box:hover {
+      background: var(--bg-subtle);
+      border-color: #CBD5E1;
+    }
+    .cosi-box.active {
+      background: var(--brand-subtle);
+      border-color: var(--brand);
+      font-weight: 600;
+    }
+    .status-pill-bar {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+  </style>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+  <div class="workspace-shell" data-workspace-page="history">
+    <div class="surface" style="padding:24px;">
+      
+            <!-- Header -->
+      <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center;padding:0 0 16px 0;margin-bottom:24px;border-bottom:1px solid var(--border-light);">
+        <h1 class="panel-title" style="font-size:18.5px;font-weight:700;color:var(--text-primary);margin:0;">Audiological Case History Intake</h1>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="badge" id="medicalClearanceBadge">✓ Medical Red Flags Cleared</span>
+          <button type="button" class="btn" style="min-height:30px;font-size:12px;padding:0 12px;font-weight:600;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-subtle);" onclick="openReportModal(getActivePatientId(), 'history')">📄 Export Report</button>
+        </div>
+      </div>
+
+<!-- ── CARD 1: PRESENTING COMPLAINT & SYMPTOM DYNAMICS ── -->
+      <div class="history-section-card">
+        <div class="history-card-title">
+          <span>1. Presenting Complaint & Auditory Onset Dynamics</span>
+          <span style="font-size:11px;color:var(--text-tertiary);font-weight:500;text-transform:none;">Standard Intake Standard</span>
+        </div>
+        <div class="form-grid" style="margin-bottom:12px;">
+          <div class="field" style="grid-column:1 / -1;">
+            <label for="chiefComplaint">Primary Chief Complaint *</label>
+            <input type="text" id="chiefComplaint" value="Bilateral hearing difficulty, worse in groups and noisy settings" oninput="autoSynthesizeIntake()">
+          </div>
+          <div class="field">
+            <label for="onsetPattern">Onset & Timeline *</label>
+            <select id="onsetPattern" onchange="checkRedFlags()">
+              <option value="gradual" selected>Gradual (Progressive over ~2 years)</option>
+              <option value="sudden">Sudden (<72 hours — Emergency Medical Red Flag)</option>
+              <option value="rapid">Rapid Decline (Past 30-90 days)</option>
+              <option value="fluctuating">Fluctuating / Episodic</option>
+              <option value="congenital">Congenital / Early Childhood</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="laterality">Laterality & Symmetry *</label>
+            <select id="laterality" onchange="checkRedFlags()">
+              <option value="bilateral" selected>Bilateral (Symmetric complaint)</option>
+              <option value="asymmetric_left">Asymmetric (Left ear perceived worse)</option>
+              <option value="asymmetric_right">Asymmetric (Right ear perceived worse)</option>
+              <option value="unilateral_left">Unilateral Left Only</option>
+              <option value="unilateral_right">Unilateral Right Only</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CARD 2: Clinical Red Flag Protocol MEDICAL RED FLAG SCREENER ── -->
+      <div class="history-section-card">
+        <div class="history-card-title">
+          <span>2. Clinical Red Flag Protocol 8-Point Medical Red Flag Screener</span>
+          <span style="font-size:11px;color:var(--text-secondary);font-weight:600;text-transform:none;">Mandatory Medical Clearance Check</span>
+        </div>
+        <div class="red-flag-grid" id="redFlagsGrid">
+          <label class="red-flag-item">
+            <input type="checkbox" id="rfSudden" onchange="checkRedFlags()">
+            <span><strong>1. Sudden Hearing Loss:</strong> Rapid drop in hearing within the past 72 hours.</span>
+          </label>
+          <label class="red-flag-item">
+            <input type="checkbox" id="rfAsymTin" onchange="checkRedFlags()">
+            <span><strong>2. Unilateral Tinnitus:</strong> New-onset or persistent ringing isolated to one ear.</span>
+          </label>
+          <label class="red-flag-item">
+            <input type="checkbox" id="rfDrainage" onchange="checkRedFlags()">
+            <span><strong>3. Active Otorrhoea:</strong> History of drainage, discharge, or blood within 90 days.</span>
+          </label>
+          <label class="red-flag-item">
+            <input type="checkbox" id="rfOtalgia" onchange="checkRedFlags()">
+            <span><strong>4. Otalgia:</strong> Active ear pain or significant discomfort.</span>
+          </label>
+          <label class="red-flag-item">
+            <input type="checkbox" id="rfVertigo" onchange="checkRedFlags()">
+            <span><strong>5. True Vertigo / Dizziness:</strong> Spinning sensation or balance disturbance.</span>
+          </label>
+          <label class="red-flag-item">
+            <input type="checkbox" id="rfDeformity" onchange="checkRedFlags()">
+            <span><strong>6. Deformity / Prior Surgery:</strong> Ear trauma, canal stenosis, or middle ear surgery.</span>
+          </label>
+          <label class="red-flag-item">
+            <input type="checkbox" id="rfOtotoxic" onchange="checkRedFlags()">
+            <span><strong>7. Ototoxic Exposure:</strong> Chemotherapy, aminoglycosides, or loop diuretics.</span>
+          </label>
+          <label class="red-flag-item">
+            <input type="checkbox" id="rfFullness">
+            <span><strong>8. Aural Fullness:</strong> Sensation of pressure or occlusion in middle ear.</span>
+          </label>
+        </div>
+        <div class="alert-strip" id="redFlagStatusAlert" style="margin-top:12px;margin-bottom:0;">
+          <strong>Medical Clearance Status:</strong> No Medical Screening medical red flags identified. Safe to proceed with full diagnostic battery.
+        </div>
+      </div>
+
+      <!-- ── CARD 3: PATIENT-CENTERED COMMUNICATION GOALS (COSI) ── -->
+      <div class="history-section-card">
+        <div class="history-card-title">
+          <span>3. Communication Breakdown Profile & COSI Goal Selection</span>
+          <span style="font-size:11px;color:var(--text-tertiary);font-weight:500;text-transform:none;">Select primary listening challenges</span>
+        </div>
+        <div class="cosi-grid" id="cosiGrid">
+          <div class="cosi-box active" onclick="toggleCosi(this, 'Restaurants / Background Noise')">
+            <strong>Restaurants & Crowds</strong>
+            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">Difficulty following speech in competing noise</div>
+          </div>
+          <div class="cosi-box active" onclick="toggleCosi(this, 'Family Dinners & Group Conversations')">
+            <strong>Group Conversations</strong>
+            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">Following family and multi-talker discussions</div>
+          </div>
+          <div class="cosi-box active" onclick="toggleCosi(this, 'Television Dialogue Clarity')">
+            <strong>Television & Media</strong>
+            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">Dialogue clarity without excessive volume</div>
+          </div>
+          <div class="cosi-box" onclick="toggleCosi(this, 'Phone & Mobile Calls')">
+            <strong>Phone & Mobile Calls</strong>
+            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">Understanding voices over cellular handset</div>
+          </div>
+          <div class="cosi-box" onclick="toggleCosi(this, 'Worship Centers & Lectures')">
+            <strong>Worship & Public Venues</strong>
+            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">Sermons, conferences, and reverberant rooms</div>
+          </div>
+          <div class="cosi-box" onclick="toggleCosi(this, 'Soft Voices & Children')">
+            <strong>Soft Voices & Children</strong>
+            <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">High-frequency comprehension of quiet voices</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CARD 4: ACOUSTIC NOISE & OTOLOGICAL ETIOLOGY ── -->
+      <div class="history-section-card">
+        <div class="history-card-title">
+          <span>4. Acoustic Noise Exposure & Otological Etiology</span>
+        </div>
+        <div class="form-grid">
+          <div class="field">
+            <label for="noiseHistory">Noise Exposure History</label>
+            <select id="noiseHistory" onchange="autoSynthesizeIntake()">
+              <option selected>Occasional church, social & market crowd noise</option>
+              <option>Chronic occupational noise (>85 dBA without hearing protection)</option>
+              <option>Military / Firearm / Impulse acoustic trauma</option>
+              <option>Recreational (Power tools / loud concerts)</option>
+              <option>None significant</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="familyHistory">Family & Otological History</label>
+            <select id="familyHistory" onchange="autoSynthesizeIntake()">
+              <option selected>No hereditary hearing loss; past childhood otitis media resolved</option>
+              <option>Positive family history of early-onset bilateral SNHL</option>
+              <option>History of recurrent PE tubes / tympanoplasty</option>
+              <option>History of acoustic barotrauma / diving trauma</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CARD 5: AMPLIFICATION & NON-AUDITORY FACTORS ── -->
+      <div class="history-section-card">
+        <div class="history-card-title">
+          <span>5. Amplification History & Physical Functional Factors</span>
+        </div>
+        <div class="form-grid">
+          <div class="field">
+            <label for="deviceStatus">Current Amplification Status</label>
+            <select id="deviceStatus" onchange="autoSynthesizeIntake()">
+              <option selected>Bilateral BTE/RIC devices (Oticon Real 1, fitted 2024)</option>
+              <option>Unilateral Right Device Only</option>
+              <option>Unilateral Left Device Only</option>
+              <option>Aided in past, currently non-user (Dissatisfied)</option>
+              <option>Never aided (First-time candidate)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="dexterityVision">Manual Dexterity & Visual Acuity</label>
+            <select id="dexterityVision">
+              <option selected>Normal dexterity and near vision (Suitable for all styles)</option>
+              <option>Reduced manual dexterity (Rechargeable RIC / custom recommended)</option>
+              <option>Visual impairment (Tactile controls / remote mic required)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CARD 6: OPTIONAL CLINICAL IMPRESSION & SYNTHESIS ── -->
+      <div class="history-section-card" style="margin-bottom:16px;">
+        <div class="history-card-title">
+          <span>6. Assessment Findings & Intake Synthesis Notes</span>
+          <span style="font-size:11px;color:var(--text-tertiary);font-weight:500;text-transform:none;">(Optional — Auto-synthesized from answers)</span>
+        </div>
+        <textarea id="intakeNotes" rows="3" style="width:100%;padding:10px 12px;font-size:13px;line-height:1.5;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-subtle);color:var(--text-primary);font-family:inherit;box-shadow:inset 0 1px 2px rgba(0,0,0,0.02);"></textarea>
+      </div>
+
+      <!-- Step Navigation Footer -->
+      <div class="footer-nav">
+        <a class="btn" id="btnSetup" href="03-start-encounter.html?patient=amaia">← Assessment Setup</a>
+        <a class="btn primary" id="btnNext" href="05-workspace-otoscopy.html?patient=amaia">Next: Otoscopy Examination →</a>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="toast"></div>
+  <script src="data.js"></script>
+  <script src="prototype.js"></script>
+  <script>
+    let selectedCosiGoals = [
+      'Restaurants / Background Noise',
+      'Family Dinners & Group Conversations',
+      'Television Dialogue Clarity'
+    ];
+
+    function toggleCosi(el, goal) {
+      el.classList.toggle('active');
+      if (el.classList.contains('active')) {
+        if (!selectedCosiGoals.includes(goal)) selectedCosiGoals.push(goal);
+      } else {
+        selectedCosiGoals = selectedCosiGoals.filter(g => g !== goal);
+      }
+      autoSynthesizeIntake();
+    }
+
+    function checkRedFlags() {
+      const isSudden = document.getElementById('onsetPattern').value === 'sudden';
+      const isRfSudden = document.getElementById('rfSudden').checked;
+      const isRfAsym = document.getElementById('rfAsymTin').checked;
+      const isRfDrain = document.getElementById('rfDrainage').checked;
+      const isRfPain = document.getElementById('rfOtalgia').checked;
+      const isRfVertigo = document.getElementById('rfVertigo').checked;
+      const isRfDeform = document.getElementById('rfDeformity').checked;
+      const isRfOto = document.getElementById('rfOtotoxic').checked;
+
+      const hasRedFlag = isSudden || isRfSudden || isRfAsym || isRfDrain || isRfPain || isRfVertigo || isRfDeform || isRfOto;
+
+      const badge = document.getElementById('medicalClearanceBadge');
+      const alertBox = document.getElementById('redFlagStatusAlert');
+
+      if (hasRedFlag) {
+        badge.textContent = '⚠ Medical Red Flag Flagged';
+        alertBox.innerHTML = '<strong>Medical Clearance Warning:</strong> Medical Screening medical red flag criteria identified. Medical / Otolaryngology referral consultation is indicated alongside diagnostic testing.';
+      } else {
+        badge.textContent = '✓ Medical Red Flags Cleared';
+        alertBox.innerHTML = '<strong>Medical Clearance Status:</strong> No Medical Screening medical red flags identified. Patient safe to proceed with comprehensive audiological diagnostic battery.';
+      }
+
+      autoSynthesizeIntake();
+    }
+
+    function autoSynthesizeIntake() {
+      const complaint = document.getElementById('chiefComplaint').value;
+      const onset = document.getElementById('onsetPattern').options[document.getElementById('onsetPattern').selectedIndex].text;
+      const lat = document.getElementById('laterality').options[document.getElementById('laterality').selectedIndex].text;
+      const noise = document.getElementById('noiseHistory').options[document.getElementById('noiseHistory').selectedIndex].text;
+      const device = document.getElementById('deviceStatus').options[document.getElementById('deviceStatus').selectedIndex].text;
+
+      let narrative = `Patient presents with chief complaint of: "${complaint}". Onset is ${onset.toLowerCase()}, presenting with ${lat.toLowerCase()}. Noise profile: ${noise}. Current amplification: ${device}. Key communication priority situations: ${selectedCosiGoals.join(', ')}.`;
+
+      const textarea = document.getElementById('intakeNotes');
+      if (!textarea.dataset.userEdited) {
+        textarea.value = narrative;
+      }
+    }
+
+    document.getElementById('intakeNotes').addEventListener('input', function() {
+      this.dataset.userEdited = 'true';
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const pid = getActivePatientId();
+      document.getElementById('btnSetup').href = '03-start-encounter.html?patient=' + pid;
+      document.getElementById('btnNext').href = '05-workspace-otoscopy.html?patient=' + pid;
+
+      autoSynthesizeIntake();
+      checkRedFlags();
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

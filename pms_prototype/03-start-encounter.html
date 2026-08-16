@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HearIntel — Assessment Setup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <div data-shell="patients"></div>
+    <main class="main">
+      <section class="page" style="max-width:880px;">
+        <header class="topbar">
+          <div>
+            <div class="eyebrow">Clinical Encounter Setup</div>
+            <h1 class="title">Initiate Assessment</h1>
+            <p class="subtle">Configure assessment context, responsible clinician, and clinical protocol.</p>
+          </div>
+          <a class="btn" id="exitToRecordBtn" href="02-profile.html?patient=amaia">← Back to Patient</a>
+        </header>
+
+        <form class="surface" style="padding:24px;" onsubmit="handleStartEncounter(event)">
+          <div class="panel-header" style="padding:0 0 14px 0;margin-bottom:18px;">
+            <div>
+              <h2 class="panel-title">Assessment Context</h2>
+              <p class="panel-subtitle">Select patient and define clinical scope.</p>
+            </div>
+            <span class="badge teal">Booth 1 Suite</span>
+          </div>
+
+          <div class="form-grid" style="margin-bottom:20px;">
+            <div class="field">
+              <label for="encPatientSelect">Select Patient</label>
+              <select id="encPatientSelect" onchange="onPatientSelectChange(this.value)">
+                <!-- Populated via JS -->
+              </select>
+            </div>
+            <div class="field">
+              <label for="encType">Assessment Type</label>
+              <select id="encType">
+                <option selected>Comprehensive Diagnostic Audiology</option>
+                <option>Hearing Aid Evaluation & Fitting (HA)</option>
+                <option>Cochlear Implant Candidacy Protocol (CI)</option>
+                <option>Pediatric Audiological Surveillance</option>
+                <option>Routine Annual Threshold Check</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="encClinician">Responsible Clinician</label>
+              <select id="encClinician">
+                <option selected>Dr. Chika Okafor, Au.D. (Lead Audiologist)</option>
+                <option>Amina Bello, Aud (Clinical Audiologist)</option>
+                <option>Kelechi Musa, HCP (Hearing Care Professional)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="encPriority">Clinical Priority</label>
+              <select id="encPriority">
+                <option selected>Routine Scheduled</option>
+                <option>Urgent / Post-treatment</option>
+                <option>Direct Referral</option>
+              </select>
+            </div>
+            <div class="field" style="grid-column:1 / -1;">
+              <label for="encReason">Reason for Assessment / Clinical Notes</label>
+              <textarea id="encReason" rows="3">Routine follow-up assessment to compare pure tone thresholds, evaluate speech discrimination in noise, and verify hearing aid settings.</textarea>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding-top:16px;border-top:1px solid var(--border-light);">
+            <a class="btn" href="01-registry.html">Cancel</a>
+            <button type="submit" class="btn primary">Launch Clinical Workspace →</button>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+  <div class="toast"></div>
+  <script src="data.js"></script>
+  <script src="prototype.js"></script>
+  <script>
+    function loadEncounterSetup() {
+      if (!window.HearIntelDB) return;
+      const patientId = getActivePatientId();
+      const patients = window.HearIntelDB.getAllPatients();
+      const select = document.getElementById('encPatientSelect');
+
+      select.innerHTML = patients.map(p => `
+        <option value="${p.id}" ${p.id === patientId ? 'selected' : ''}>
+          ${p.name} (${p.age}y, ${p.gender} · ${p.mrn})
+        </option>
+      `).join('');
+
+      document.getElementById('exitToRecordBtn').href = '02-profile.html?patient=' + patientId;
+    }
+
+    function onPatientSelectChange(id) {
+      document.getElementById('exitToRecordBtn').href = '02-profile.html?patient=' + id;
+    }
+
+    function handleStartEncounter(event) {
+      event.preventDefault();
+      const patientId = document.getElementById('encPatientSelect').value;
+      notify('Launching assessment suite for ' + patientId.toUpperCase());
+      setTimeout(() => {
+        location.href = '04-workspace-history.html?patient=' + patientId;
+      }, 500);
+    }
+
+    document.addEventListener('DOMContentLoaded', loadEncounterSetup);
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HearIntel — Brand Palette & Design System Book</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .swatch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .swatch-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-subtle);
+      cursor: pointer;
+      transition: transform 120ms ease, box-shadow 120ms ease;
+    }
+    .swatch-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-card);
+    }
+    .swatch-color {
+      height: 75px;
+      width: 100%;
+      position: relative;
+    }
+    .swatch-details {
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+    .swatch-name {
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+    .swatch-hex {
+      font-family: monospace;
+      color: var(--text-secondary);
+      font-size: 11.5px;
+    }
+  </style>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <div data-shell="settings"></div>
+    <main class="main">>
+      <section class="page" style="max-width:1100px;">
+        
+        <header class="topbar" style="margin-bottom:24px;padding-bottom:18px;border-bottom:1px solid var(--border);">
+          <div>
+            <div class="eyebrow" style="color:var(--brand-hover);font-weight:700;letter-spacing:0.06em;">Design System & Clinical Guidelines</div>
+            <h1 class="title" style="font-size:24px;font-weight:800;letter-spacing:-0.02em;">HearIntel Brand Palette Book</h1>
+            <p class="subtle" style="font-size:13px;color:var(--text-secondary);">Master color tokens, clinical measurement spectra, typography scales, and theme profiles.</p>
+          </div>
+          <div class="actions">
+            <a class="btn" href="00-dashboard.html">← Back to Ops</a>
+          </div>
+        </header>
+
+        <!-- 1. Primary Brand Palette (Deep Sea Teal) -->
+        <section class="surface" style="padding:22px;margin-bottom:24px;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-card);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border-light);">
+            <div>
+              <h2 style="font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-primary);">1. Primary Brand Color Family: Deep Sea Teal</h2>
+              <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">Medical-grade trust, precision, and focus. Used for primary CTAs, active states, and brand highlights.</div>
+            </div>
+            <span class="badge">Primary Spectrum</span>
+          </div>
+
+          <div class="swatch-grid">
+            <div class="swatch-card" onclick="copyHex('#E6F4F2')">
+              <div class="swatch-color" style="background:#E6F4F2;"></div>
+              <div class="swatch-details"><div class="swatch-name">--teal-50</div><div class="swatch-hex">#E6F4F2 · Tint Fill</div></div>
+            </div>
+            <div class="swatch-card" onclick="copyHex('#C2E5E0')">
+              <div class="swatch-color" style="background:#C2E5E0;"></div>
+              <div class="swatch-details"><div class="swatch-name">--teal-100</div><div class="swatch-hex">#C2E5E0 · Hover Tint</div></div>
+            </div>
+            <div class="swatch-card" onclick="copyHex('#66BEB3')">
+              <div class="swatch-color" style="background:#66BEB3;"></div>
+              <div class="swatch-details"><div class="swatch-name">--teal-300</div><div class="swatch-hex">#66BEB3 · Focus Ring</div></div>
+            </div>
+            <div class="swatch-card" onclick="copyHex('#00897B')">
+              <div class="swatch-color" style="background:#00897B;"></div>
+              <div class="swatch-details"><div class="swatch-name">--teal-500</div><div class="swatch-hex">#00897B · Brand Anchor</div></div>
+            </div>
+            <div class="swatch-card" onclick="copyHex('#00796B')">
+              <div class="swatch-color" style="background:#00796B;"></div>
+              <div class="swatch-details"><div class="swatch-name">--teal-600</div><div class="swatch-hex">#00796B · Primary CTA</div></div>
+            </div>
+            <div class="swatch-card" onclick="copyHex('#00695C')">
+              <div class="swatch-color" style="background:#00695C;"></div>
+              <div class="swatch-details"><div class="swatch-name">--teal-700</div><div class="swatch-hex">#00695C · Eyebrow / Text</div></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. Clinical Measurement Colors (ISO / ASHA Enforced) -->
+        <section class="surface" style="padding:22px;margin-bottom:24px;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-card);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border-light);">
+            <div>
+              <h2 style="font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-primary);">2. Clinical Measurement Standard Colors</h2>
+              <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">Exclusively reserved for physiological test data. Never used for general UI indicators.</div>
+            </div>
+            <span class="badge">ISO Standard</span>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="swatch-card" style="border-left:4px solid #DC2626;" onclick="copyHex('#DC2626')">
+              <div class="swatch-color" style="background:#DC2626;"></div>
+              <div class="swatch-details">
+                <div class="swatch-name" style="color:#DC2626;">Right Ear (AD) — #DC2626 (Red-600)</div>
+                <div style="font-size:11.5px;color:var(--text-secondary);margin-top:4px;">Used for Right AC (○), Right BC (&lt;), Right Tympanograms, and Right Otoscopy markers.</div>
+              </div>
+            </div>
+
+            <div class="swatch-card" style="border-left:4px solid #2563EB;" onclick="copyHex('#2563EB')">
+              <div class="swatch-color" style="background:#2563EB;"></div>
+              <div class="swatch-details">
+                <div class="swatch-name" style="color:#2563EB;">Left Ear (AS) — #2563EB (Blue-600)</div>
+                <div style="font-size:11.5px;color:var(--text-secondary);margin-top:4px;">Used for Left AC (✕), Left BC (&gt;), Left Tympanograms, and Left Otoscopy markers.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. Monochrome Neutrals & Surfaces -->
+        <section class="surface" style="padding:22px;margin-bottom:24px;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-card);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border-light);">
+            <div>
+              <h2 style="font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:var(--text-primary);">3. Monochrome Neutral Surfaces & Typography</h2>
+              <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">Clean contrast layers preventing visual noise and alert fatigue.</div>
+            </div>
+            <span class="badge">Neutrals</span>
+          </div>
+
+          <div class="swatch-grid">
+            <div class="swatch-card" onclick="copyHex('#F8FAFC')">
+              <div class="swatch-color" style="background:#F8FAFC;border-bottom:1px solid #E2E8F0;"></div>
+              <div class="swatch-details"><div class="swatch-name">--bg-page</div><div class="swatch-hex">#F8FAFC · Slate 50</div></div>
+            </div>
+            <div class="swatch-card" onclick="copyHex('#F1F5F9')">
+              <div class="swatch-color" style="background:#F1F5F9;border-bottom:1px solid #E2E8F0;"></div>
+              <div class="swatch-details"><div class="swatch-name">--bg-subtle</div><div class="swatch-hex">#F1F5F9 · Slate 100</div></div>
+            </div>
+            <div class="swatch-card" onclick="copyHex('#FFFFFF')">
+              <div class="swatch-color" style="background:#FFFFFF;border-bottom:1px solid #E2E8F0;"></div>
+              <div class="swatch-details"><div class="swatch-name">--surface</div><div class="swatch-hex">#FFFFFF · Pure White</div></div>
+            </div>
+            <div class="swatch-card" onclick="copyHex('#1E293B')">
+              <div class="swatch-color" style="background:#1E293B;"></div>
+              <div class="swatch-details"><div class="swatch-name">--sidebar-bg</div><div class="swatch-hex">#1E293B · Slate 800</div></div>
+            </div>
+            <div class="swatch-card" onclick="copyHex('#0F172A')">
+              <div class="swatch-color" style="background:#0F172A;"></div>
+              <div class="swatch-details"><div class="swatch-name">--text-primary</div><div class="swatch-hex">#0F172A · Slate 900</div></div>
+            </div>
+            <div class="swatch-card" onclick="copyHex('#E2E8F0')">
+              <div class="swatch-color" style="background:#E2E8F0;"></div>
+              <div class="swatch-details"><div class="swatch-name">--border</div><div class="swatch-hex">#E2E8F0 · 1px Divider</div></div>
+            </div>
+          </div>
+        </section>
+
+      </section>
+    </main>
+  </div>
+
+  <div class="toast"></div>
+  <script src="data.js"></script>
+  <script src="prototype.js"></script>
+  <script>
+    function copyHex(hex) {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(hex);
+        notify('Copied ' + hex + ' to clipboard');
+      } else {
+        notify('Color: ' + hex);
+      }
+    }
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

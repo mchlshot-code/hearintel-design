@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HearIntel — Immittance & Tympanometry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .tymp-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .tymp-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      box-shadow: var(--shadow-card);
+    }
+    .tymp-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .tymp-svg-wrap {
+      position: relative;
+      width: 100%;
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      cursor: crosshair;
+      user-select: none;
+    }
+    .tymp-svg-wrap svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .preset-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 10px;
+      margin-bottom: 12px;
+    }
+    .preset-btn {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: var(--radius-xs);
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 100ms ease;
+    }
+    .preset-btn:hover {
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+      border-color: #CBD5E1;
+    }
+    .preset-btn.active {
+      background: var(--text-primary);
+      color: #FFFFFF;
+      border-color: var(--text-primary);
+      font-weight: 600;
+    }
+    .param-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      background: var(--bg-subtle);
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-light);
+      font-size: 12px;
+    }
+    .param-box label {
+      display: block;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+    .param-box input {
+      width: 100%;
+      padding: 4px 6px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: monospace;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xs);
+      background: #FFFFFF;
+      color: var(--text-primary);
+    }
+    
+    /* Impression form */
+    .impression-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      margin-top: 22px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-card);
+    }
+    .impression-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .impression-badge {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      font-weight: 500;
+    }
+  </style>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+  <div class="workspace-shell" data-workspace-page="immittance">
+    <div class="surface" style="padding:24px;">
+      
+            <!-- Header -->
+      <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center;padding:0 0 16px 0;margin-bottom:24px;border-bottom:1px solid var(--border-light);">
+        <h1 class="panel-title" style="font-size:18.5px;font-weight:700;color:var(--text-primary);margin:0;">Immittance & Tympanometry</h1>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="badge" id="tympStatusBadge">Type A Bilateral</span>
+          <button type="button" class="btn" style="min-height:30px;font-size:12px;padding:0 12px;font-weight:600;background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-subtle);" onclick="openReportModal(getActivePatientId(), 'immittance')">📄 Export Report</button>
+        </div>
+      </div>
+
+<div class="tymp-grid">
+        
+        <!-- Right Ear (AD) Tympanogram -->
+        <div class="tymp-card">
+          <div class="tymp-header">
+            <div>
+              <strong style="color:var(--right-ear);font-size:13.5px;">Right Ear (AD) Tympanogram</strong>
+              <div style="font-size:11.5px;color:var(--text-secondary);">226 Hz Probe Tone</div>
+            </div>
+            <span class="badge" id="adCurveBadge">Type A (Normal)</span>
+          </div>
+
+          <!-- Interactive SVG Plot -->
+          <div class="tymp-svg-wrap" id="adSvgWrap" onclick="onTympCanvasClick('R', event)">
+            <svg viewBox="0 0 460 260" id="adTympSvg"></svg>
+          </div>
+
+          <!-- Tympanogram Type Presets -->
+          <div class="preset-bar">
+            <span style="font-size:11px;font-weight:600;color:var(--text-secondary);align-self:center;margin-right:2px;">Presets:</span>
+            <button type="button" class="preset-btn active" id="btnPresetR_A" onclick="setPreset('R', 'A')">Type A</button>
+            <button type="button" class="preset-btn" id="btnPresetR_As" onclick="setPreset('R', 'As')">Type As</button>
+            <button type="button" class="preset-btn" id="btnPresetR_Ad" onclick="setPreset('R', 'Ad')">Type Ad</button>
+            <button type="button" class="preset-btn" id="btnPresetR_B_eff" onclick="setPreset('R', 'B_eff')">Type B (Fluid)</button>
+            <button type="button" class="preset-btn" id="btnPresetR_B_perf" onclick="setPreset('R', 'B_perf')">Type B (Perf)</button>
+            <button type="button" class="preset-btn" id="btnPresetR_C" onclick="setPreset('R', 'C')">Type C</button>
+          </div>
+
+          <!-- Parameter Fields -->
+          <div class="param-row">
+            <div class="param-box">
+              <label>Peak Pres (daPa)</label>
+              <input type="number" id="adPres" value="-20" step="5" oninput="onParamInput('R')">
+            </div>
+            <div class="param-box">
+              <label>Compliance (mL)</label>
+              <input type="number" id="adComp" value="0.78" step="0.05" oninput="onParamInput('R')">
+            </div>
+            <div class="param-box">
+              <label>Volume ECV (mL)</label>
+              <input type="number" id="adEcv" value="1.15" step="0.05" oninput="onParamInput('R')">
+            </div>
+            <div class="param-box">
+              <label>Gradient (daPa)</label>
+              <input type="number" id="adGrad" value="85" step="5" oninput="onParamInput('R')">
+            </div>
+          </div>
+        </div>
+
+        <!-- Left Ear (AS) Tympanogram -->
+        <div class="tymp-card">
+          <div class="tymp-header">
+            <div>
+              <strong style="color:var(--left-ear);font-size:13.5px;">Left Ear (AS) Tympanogram</strong>
+              <div style="font-size:11.5px;color:var(--text-secondary);">226 Hz Probe Tone</div>
+            </div>
+            <span class="badge" id="asCurveBadge">Type A (Normal)</span>
+          </div>
+
+          <!-- Interactive SVG Plot -->
+          <div class="tymp-svg-wrap" id="asSvgWrap" onclick="onTympCanvasClick('L', event)">
+            <svg viewBox="0 0 460 260" id="asTympSvg"></svg>
+          </div>
+
+          <!-- Tympanogram Type Presets -->
+          <div class="preset-bar">
+            <span style="font-size:11px;font-weight:600;color:var(--text-secondary);align-self:center;margin-right:2px;">Presets:</span>
+            <button type="button" class="preset-btn active" id="btnPresetL_A" onclick="setPreset('L', 'A')">Type A</button>
+            <button type="button" class="preset-btn" id="btnPresetL_As" onclick="setPreset('L', 'As')">Type As</button>
+            <button type="button" class="preset-btn" id="btnPresetL_Ad" onclick="setPreset('L', 'Ad')">Type Ad</button>
+            <button type="button" class="preset-btn" id="btnPresetL_B_eff" onclick="setPreset('L', 'B_eff')">Type B (Fluid)</button>
+            <button type="button" class="preset-btn" id="btnPresetL_B_perf" onclick="setPreset('L', 'B_perf')">Type B (Perf)</button>
+            <button type="button" class="preset-btn" id="btnPresetL_C" onclick="setPreset('L', 'C')">Type C</button>
+          </div>
+
+          <!-- Parameter Fields -->
+          <div class="param-row">
+            <div class="param-box">
+              <label>Peak Pres (daPa)</label>
+              <input type="number" id="asPres" value="-30" step="5" oninput="onParamInput('L')">
+            </div>
+            <div class="param-box">
+              <label>Compliance (mL)</label>
+              <input type="number" id="asComp" value="0.72" step="0.05" oninput="onParamInput('L')">
+            </div>
+            <div class="param-box">
+              <label>Volume ECV (mL)</label>
+              <input type="number" id="asEcv" value="1.08" step="0.05" oninput="onParamInput('L')">
+            </div>
+            <div class="param-box">
+              <label>Gradient (daPa)</label>
+              <input type="number" id="asGrad" value="90" step="5" oninput="onParamInput('L')">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Section 2: Acoustic Stapedial Reflex Thresholds & Decay -->
+      <h3 style="font-family:'Figtree',sans-serif;font-size:13.5px;font-weight:700;color:var(--text-primary);letter-spacing:-0.01em;margin-bottom:10px;">2. Acoustic Stapedial Reflex Thresholds (dB HL) & 10s Decay</h3>
+      <div class="table-container" style="margin-bottom:16px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Probe Ear</th>
+              <th>Ipsi 500 Hz</th>
+              <th>Ipsi 1 kHz</th>
+              <th>Ipsi 2 kHz</th>
+              <th>Contra 500 Hz</th>
+              <th>Contra 1 kHz</th>
+              <th>Contra 2 kHz</th>
+              <th>Reflex Decay (10s @ 1k)</th>
+              <th>Reflex Arc Interpretation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong style="color:var(--right-ear);">Right (AD)</strong></td>
+              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="85" id="artR_i500"></td>
+              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="85" id="artR_i1k"></td>
+              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="90" id="artR_i2k"></td>
+              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="90" id="artR_c500"></td>
+              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="90" id="artR_c1k"></td>
+              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="95" id="artR_c2k"></td>
+              <td>
+                <select id="decayR" onchange="updateSynthesizedImpression()" style="padding:3px 6px;font-size:12px;">
+                  <option selected>Negative (No Decay)</option>
+                  <option>Positive (>50% Decay - Retrocochlear)</option>
+                  <option>Absent Reflex (Unable to test)</option>
+                </select>
+              </td>
+              <td style="font-size:12px;color:var(--text-secondary);" id="artInterpR">Normal Bilateral Acoustic Reflex Arc</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--left-ear);">Left (AS)</strong></td>
+              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="90" id="artL_i500"></td>
+              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="90" id="artL_i1k"></td>
+              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="95" id="artL_i2k"></td>
+              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="95" id="artL_c500"></td>
+              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="95" id="artL_c1k"></td>
+              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="100" id="artL_c2k"></td>
+              <td>
+                <select id="decayL" onchange="updateSynthesizedImpression()" style="padding:3px 6px;font-size:12px;">
+                  <option selected>Negative (No Decay)</option>
+                  <option>Positive (>50% Decay - Retrocochlear)</option>
+                  <option>Absent Reflex (Unable to test)</option>
+                </select>
+              </td>
+              <td style="font-size:12px;color:var(--text-secondary);" id="artInterpL">Normal Bilateral Acoustic Reflex Arc</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Section 3: Universal Optional Assessment Findings & Notes Form -->
+      <div class="impression-card">
+        <div class="impression-header">
+          <div>
+            <strong style="font-size:13.5px;color:var(--text-primary);">Assessment Findings & Summary Notes</strong>
+            <span class="impression-badge">(Optional — Auto-synthesizes from parameters)</span>
+          </div>
+          <button class="btn" style="min-height:26px;font-size:11.5px;padding:0 8px;" onclick="resetImpressionDraft()">Reset to Auto-Draft</button>
+        </div>
+        <textarea id="tympImpressionText" rows="3" style="width:100%;padding:10px 12px;font-size:13px;line-height:1.5;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-subtle);color:var(--text-primary);font-family:inherit;box-shadow:inset 0 1px 2px rgba(0,0,0,0.02);" placeholder="Enter clinician summary notes or keep the auto-synthesized clinical draft..."></textarea>
+      </div>
+
+      <!-- Footer Nav -->
+      <div class="footer-nav">
+        <a class="btn" id="prevStepBtn" href="06-workspace-pta.html?patient=amaia">← Previous: Pure Tone (PTA)</a>
+        <a class="btn primary" id="nextStepBtn" href="08-workspace-speech.html?patient=amaia">Next: Speech Audiometry →</a>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="toast"></div>
+  <script src="data.js"></script>
+  <script src="prototype.js"></script>
+  <script>
+    // ── Tympanometry Scale & Geometry ──
+    const SVG_W = 460;
+    const SVG_H = 260;
+    const PAD_LEFT = 45;
+    const PAD_RIGHT = 25;
+    const PAD_TOP = 25;
+    const PAD_BOTTOM = 35;
+    const PLOT_W = SVG_W - PAD_LEFT - PAD_RIGHT;
+    const PLOT_H = SVG_H - PAD_TOP - PAD_BOTTOM;
+
+    const PRES_MIN = -400;
+    const PRES_MAX = 200;
+    const COMP_MIN = 0.0;
+    const COMP_MAX = 2.5;
+
+    // Coordinate converters
+    function getTympX(pres) {
+      return PAD_LEFT + ((pres - PRES_MIN) / (PRES_MAX - PRES_MIN)) * PLOT_W;
+    }
+    function getTympY(comp) {
+      return PAD_TOP + ((COMP_MAX - comp) / (COMP_MAX - COMP_MIN)) * PLOT_H;
+    }
+    function getPresFromX(x) {
+      const raw = PRES_MIN + ((x - PAD_LEFT) / PLOT_W) * (PRES_MAX - PRES_MIN);
+      const snapped = Math.round(raw / 10) * 10;
+      return Math.max(PRES_MIN, Math.min(PRES_MAX, snapped));
+    }
+    function getCompFromY(y) {
+      const raw = COMP_MAX - ((y - PAD_TOP) / PLOT_H) * (COMP_MAX - COMP_MIN);
+      const rounded = Math.round(raw * 20) / 20; // 0.05 step
+      return Math.max(COMP_MIN, Math.min(COMP_MAX, rounded));
+    }
+
+    // State
+    let tympData = {
+      R: { pres: -20, comp: 0.78, ecv: 1.15, grad: 85, type: 'A', preset: 'A' },
+      L: { pres: -30, comp: 0.72, ecv: 1.08, grad: 90, type: 'A', preset: 'A' }
+    };
+
+    // ── SVG Canvas Plotting (Gaussian Bell Curve with Normative Box) ──
+    function drawTympanogram(ear) {
+      const svg = document.getElementById(ear === 'R' ? 'adTympSvg' : 'asTympSvg');
+      if (!svg) return;
+
+      const d = tympData[ear];
+      const color = ear === 'R' ? '#DC2626' : '#2563EB';
+      let html = `<rect width="${SVG_W}" height="${SVG_H}" fill="#FFFFFF"/>`;
+
+      // 1. Normative Adult Box: Pressure -100 to +50 daPa, Compliance 0.3 to 1.6 mL
+      const normX1 = getTympX(-100);
+      const normX2 = getTympX(50);
+      const normY1 = getTympY(1.6);
+      const normY2 = getTympY(0.3);
+      html += `<rect x="${normX1}" y="${normY1}" width="${normX2 - normX1}" height="${normY2 - normY1}" fill="rgba(15, 118, 110, 0.06)" stroke="rgba(15, 118, 110, 0.3)" stroke-width="1" stroke-dasharray="3,2" rx="3"/>`;
+      html += `<text x="${normX1 + 4}" y="${normY1 + 11}" font-size="8.5" fill="#0F766E" font-weight="600">Adult Norms (0.3-1.6 mL / -100 to +50 daPa)</text>`;
+
+      // 2. Grid lines
+      // Pressure vertical lines (every 100 daPa)
+      for (let p = PRES_MIN; p <= PRES_MAX; p += 100) {
+        const x = getTympX(p);
+        const isZero = (p === 0);
+        html += `<line x1="${x}" y1="${PAD_TOP}" x2="${x}" y2="${SVG_H - PAD_BOTTOM}" stroke="${isZero ? '#CBD5E1' : '#F1F5F9'}" stroke-width="${isZero ? 1.5 : 1}"/>`;
+        html += `<text x="${x}" y="${SVG_H - PAD_BOTTOM + 14}" text-anchor="middle" font-size="9.5" font-family="monospace" fill="#64748B">${p}</text>`;
+      }
+
+      // Compliance horizontal lines (every 0.5 mL)
+      for (let c = COMP_MIN; c <= COMP_MAX; c += 0.5) {
+        const y = getTympY(c);
+        html += `<line x1="${PAD_LEFT}" y1="${y}" x2="${SVG_W - PAD_RIGHT}" y2="${y}" stroke="#F1F5F9" stroke-width="1"/>`;
+        html += `<text x="${PAD_LEFT - 6}" y="${y + 3.5}" text-anchor="end" font-size="9.5" font-family="monospace" fill="#64748B">${c.toFixed(1)}</text>`;
+      }
+
+      // Axis labels
+      html += `<text x="${SVG_W / 2}" y="${SVG_H - 6}" text-anchor="middle" font-size="10" font-weight="600" fill="#475569">Pressure (daPa)</text>`;
+      html += `<text x="12" y="${SVG_H / 2}" text-anchor="middle" font-size="10" font-weight="600" fill="#475569" transform="rotate(-90 12,${SVG_H/2})">Compliance (mL)</text>`;
+
+      // 3. Dynamic Gaussian Curve Generator
+      // Y(p) = baseline + compliance * exp(-((p - peakPres)^2) / (2 * sigma^2))
+      let points = [];
+      const sigma = Math.max(25, d.grad * 0.55); // spread determined by gradient
+      const isFlatTypeB = (d.type.startsWith('B') || d.comp < 0.1);
+
+      for (let p = PRES_MIN; p <= PRES_MAX; p += 10) {
+        let compVal = 0.05;
+        if (!isFlatTypeB) {
+          const exponent = -Math.pow(p - d.pres, 2) / (2 * Math.pow(sigma, 2));
+          compVal = 0.05 + d.comp * Math.exp(exponent);
+        } else {
+          compVal = 0.06 + Math.sin(p / 50) * 0.02; // slight realistic flat ripple
+        }
+        compVal = Math.min(COMP_MAX, Math.max(0, compVal));
+        points.push(`${getTympX(p)},${getTympY(compVal)}`);
+      }
+
+      html += `<polyline points="${points.join(' ')}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+
+      // 4. Peak Marker (Draggable coordinate)
+      if (!isFlatTypeB) {
+        const peakX = getTympX(d.pres);
+        const peakY = getTympY(d.comp);
+        html += `<circle cx="${peakX}" cy="${peakY}" r="5" fill="#FFFFFF" stroke="${color}" stroke-width="2.5"/>`;
+        html += `<text x="${peakX}" y="${peakY - 9}" text-anchor="middle" font-size="10" font-weight="700" fill="${color}" font-family="monospace">${d.pres} daPa, ${d.comp.toFixed(2)} mL</text>`;
+      } else {
+        html += `<text x="${SVG_W / 2}" y="${getTympY(0.2)}" text-anchor="middle" font-size="11" font-weight="700" fill="#64748B">Type B — Flat (No Peak Compliance)</text>`;
+      }
+
+      svg.innerHTML = html;
+    }
+
+    // ── Interactive Canvas Click to Reposition Peak ──
+    function onTympCanvasClick(ear, e) {
+      const wrap = document.getElementById(ear === 'R' ? 'adSvgWrap' : 'asSvgWrap');
+      const rect = wrap.getBoundingClientRect();
+      const scaleX = SVG_W / rect.width;
+      const scaleY = SVG_H / rect.height;
+      const clickX = (e.clientX - rect.left) * scaleX;
+      const clickY = (e.clientY - rect.top) * scaleY;
+
+      if (clickX < PAD_LEFT || clickX > SVG_W - PAD_RIGHT || clickY < PAD_TOP || clickY > SVG_H - PAD_BOTTOM) return;
+
+      const pres = getPresFromX(clickX);
+      const comp = getCompFromY(clickY);
+
+      tympData[ear].pres = pres;
+      tympData[ear].comp = comp;
+
+      // Update input fields
+      document.getElementById(ear === 'R' ? 'adPres' : 'asPres').value = pres;
+      document.getElementById(ear === 'R' ? 'adComp' : 'asComp').value = comp.toFixed(2);
+
+      updateClassification(ear);
+      drawTympanogram(ear);
+      updateSynthesizedImpression();
+    }
+
+    // ── Presets ──
+    function setPreset(ear, presetKey) {
+      tympData[ear].preset = presetKey;
+
+      if (presetKey === 'A') {
+        tympData[ear].pres = -20;
+        tympData[ear].comp = 0.75;
+        tympData[ear].ecv = 1.15;
+        tympData[ear].grad = 85;
+      } else if (presetKey === 'As') {
+        tympData[ear].pres = -10;
+        tympData[ear].comp = 0.22;
+        tympData[ear].ecv = 1.10;
+        tympData[ear].grad = 60;
+      } else if (presetKey === 'Ad') {
+        tympData[ear].pres = 0;
+        tympData[ear].comp = 2.10;
+        tympData[ear].ecv = 1.25;
+        tympData[ear].grad = 140;
+      } else if (presetKey === 'B_eff') {
+        tympData[ear].pres = 0;
+        tympData[ear].comp = 0.05;
+        tympData[ear].ecv = 1.05;
+        tympData[ear].grad = 250;
+      } else if (presetKey === 'B_perf') {
+        tympData[ear].pres = 0;
+        tympData[ear].comp = 0.05;
+        tympData[ear].ecv = 3.20;
+        tympData[ear].grad = 300;
+      } else if (presetKey === 'C') {
+        tympData[ear].pres = -210;
+        tympData[ear].comp = 0.65;
+        tympData[ear].ecv = 1.12;
+        tympData[ear].grad = 110;
+      }
+
+      // Sync form inputs
+      const p = ear === 'R' ? 'ad' : 'as';
+      document.getElementById(p + 'Pres').value = tympData[ear].pres;
+      document.getElementById(p + 'Comp').value = tympData[ear].comp.toFixed(2);
+      document.getElementById(p + 'Ecv').value = tympData[ear].ecv.toFixed(2);
+      document.getElementById(p + 'Grad').value = tympData[ear].grad;
+
+      // Update preset button active states
+      const prefix = ear === 'R' ? 'btnPresetR_' : 'btnPresetL_';
+      ['A','As','Ad','B_eff','B_perf','C'].forEach(k => {
+        const btn = document.getElementById(prefix + k);
+        if (btn) btn.className = 'preset-btn' + (k === presetKey ? ' active' : '');
+      });
+
+      updateClassification(ear);
+      drawTympanogram(ear);
+      updateSynthesizedImpression();
+    }
+
+    function onParamInput(ear) {
+      const p = ear === 'R' ? 'ad' : 'as';
+      tympData[ear].pres = parseFloat(document.getElementById(p + 'Pres').value) || 0;
+      tympData[ear].comp = parseFloat(document.getElementById(p + 'Comp').value) || 0;
+      tympData[ear].ecv = parseFloat(document.getElementById(p + 'Ecv').value) || 1.1;
+      tympData[ear].grad = parseFloat(document.getElementById(p + 'Grad').value) || 85;
+
+      updateClassification(ear);
+      drawTympanogram(ear);
+      updateSynthesizedImpression();
+    }
+
+    function updateClassification(ear) {
+      const d = tympData[ear];
+      let type = 'A';
+      let label = 'Type A (Normal)';
+
+      if (d.comp < 0.15) {
+        if (d.ecv > 2.5) {
+          type = 'B (Perf)';
+          label = 'Type B (Perforation / Patent Tube)';
+        } else {
+          type = 'B (Fluid)';
+          label = 'Type B (Middle Ear Effusion)';
+        }
+      } else if (d.pres < -100) {
+        type = 'C';
+        label = 'Type C (Negative Pressure / ETD)';
+      } else if (d.comp < 0.3) {
+        type = 'As';
+        label = 'Type As (Stiff / Otosclerosis)';
+      } else if (d.comp > 1.6) {
+        type = 'Ad';
+        label = 'Type Ad (Flaccid / Discontinuity)';
+      }
+
+      d.type = type;
+      const badgeId = ear === 'R' ? 'adCurveBadge' : 'asCurveBadge';
+      document.getElementById(badgeId).textContent = label;
+
+      const adType = tympData.R.type;
+      const asType = tympData.L.type;
+      const summary = (adType === asType && adType === 'A') 
+        ? 'Type A Bilateral' 
+        : `AD: Type ${adType} / AS: Type ${asType}`;
+      document.getElementById('tympStatusBadge').textContent = summary;
+    }
+
+    // ── Synthesized Auto-Draft Assessment Findings ──
+    function updateSynthesizedImpression() {
+      const ad = tympData.R;
+      const as = tympData.L;
+      const decayR = document.getElementById('decayR').value;
+      const decayL = document.getElementById('decayL').value;
+
+      let narrative = '';
+      if (ad.type === 'A' && as.type === 'A') {
+        narrative = 'Bilateral Type A tympanograms confirm normal tympanic membrane compliance and middle ear pressure bilaterally. ';
+      } else {
+        narrative = `Right ear exhibits ${document.getElementById('adCurveBadge').textContent} (Peak: ${ad.pres} daPa, Comp: ${ad.comp.toFixed(2)} mL, ECV: ${ad.ecv.toFixed(2)} mL). Left ear exhibits ${document.getElementById('asCurveBadge').textContent} (Peak: ${as.pres} daPa, Comp: ${as.comp.toFixed(2)} mL, ECV: ${as.ecv.toFixed(2)} mL). `;
+      }
+
+      if (decayR.includes('Negative') && decayL.includes('Negative')) {
+        narrative += 'Normal ipsilateral and contralateral acoustic stapedial reflexes present with no significant reflex decay observed (negative for retrocochlear fatigue).';
+      } else if (decayR.includes('Positive') || decayL.includes('Positive')) {
+        narrative += 'Significant acoustic reflex decay (>50% reduction over 10 seconds) noted, indicating potential retrocochlear involvement requiring specialist referral.';
+      } else {
+        narrative += 'Acoustic stapedial reflexes evaluated across ipsilateral and contralateral stimulus frequencies.';
+      }
+
+      const textarea = document.getElementById('tympImpressionText');
+      if (!textarea.dataset.userEdited) {
+        textarea.value = narrative;
+      }
+    }
+
+    function resetImpressionDraft() {
+      const textarea = document.getElementById('tympImpressionText');
+      delete textarea.dataset.userEdited;
+      updateSynthesizedImpression();
+      notify('Impression notes reset to auto-synthesized draft.');
+    }
+
+    document.getElementById('tympImpressionText').addEventListener('input', function() {
+      this.dataset.userEdited = 'true';
+    });
+
+    // ── Init ──
+    document.addEventListener('DOMContentLoaded', function() {
+      const pid = getActivePatientId();
+      document.getElementById('prevStepBtn').href = '06-workspace-pta.html?patient=' + pid;
+      document.getElementById('nextStepBtn').href = '08-workspace-speech.html?patient=' + pid;
+
+      drawTympanogram('R');
+      drawTympanogram('L');
+      updateClassification('R');
+      updateClassification('L');
+      updateSynthesizedImpression();
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
