@@ -227,12 +227,28 @@ function submitNewPatient() {
     window.HearIntelDB.savePatient(newPatientObj);
   }
 
-  closeModal('newPatientModal');
-  notify('Patient registered: ' + newPatientObj.name + '. Opening patient record...');
+  const wfEl = document.querySelector('input[name="npWorkflow"]:checked');
+  const workflow = wfEl ? wfEl.value : 'diagnostic';
 
-  setTimeout(function() {
-    window.location.href = '02-profile.html?patient=' + newId;
-  }, 350);
+  if (workflow === 'screening') {
+    newPatientObj.status = 'Screening Pending';
+    newPatientObj.statusType = 'warning';
+    newPatientObj.pathwayLabel = 'Rapid Screening Protocol';
+  }
+
+  closeModal('newPatientModal');
+
+  if (workflow === 'screening') {
+    notify('Patient registered for Rapid Screening: ' + newPatientObj.name + '. Launching Screening Module...');
+    setTimeout(function() {
+      window.location.href = '13-workspace-screening.html?patient=' + newId;
+    }, 350);
+  } else {
+    notify('Patient registered: ' + newPatientObj.name + '. Opening patient record...');
+    setTimeout(function() {
+      window.location.href = '02-profile.html?patient=' + newId;
+    }, 350);
+  }
 }
 
 // ── Clinical Referral Modal ──
@@ -768,21 +784,24 @@ function openReportModal(patientId, reportType = 'full') {
     <div class="report-modal-window">
       <div class="report-modal-header">
         <div style="display:flex;align-items:center;gap:12px;">
-          <strong style="font-size:15px;">Clinical Report Export & Download</strong>
-          <select id="reportTypeSelector" onchange="switchReportView(this.value)" style="padding:4px 10px;font-size:12.5px;font-weight:600;border:1px solid var(--border);border-radius:var(--radius-sm);" ${currentReportType === 'screening' ? 'disabled style="opacity:0.6;cursor:not-allowed;"' : ''}>
-            <option value="full" ${currentReportType === 'full' ? 'selected' : ''}>Full Comprehensive Evaluation Report (All Tests + Management)</option>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38BDF8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
+            <strong style="font-size:14px;color:#FFFFFF;">Clinical Report Export</strong>
+          </div>
+          <select id="reportTypeSelector" onchange="switchReportView(this.value)" style="padding:6px 12px;font-size:12.5px;font-weight:600;">
+            <option value="full" ${currentReportType === 'full' ? 'selected' : ''}>Full Comprehensive Evaluation Report (All Tests + Care Plan)</option>
             <option value="screening" ${currentReportType === 'screening' ? 'selected' : ''}>Hearing Screening Report</option>
-            <option value="all_assessments" ${currentReportType === 'all_assessments' ? 'selected' : ''}>Diagnostic Battery Report (All Tests Only, No Management/Rx)</option>
-            <option value="history" ${currentReportType === 'history' ? 'selected' : ''}>1. Case History & Red Flag Report</option>
-            <option value="otoscopy" ${currentReportType === 'otoscopy' ? 'selected' : ''}>2. Otoscopy Examination Report</option>
+            <option value="all_assessments" ${currentReportType === 'all_assessments' ? 'selected' : ''}>Diagnostic Assessment Battery (All Diagnostic Tests)</option>
+            <option value="history" ${currentReportType === 'history' ? 'selected' : ''}>1. Case History & Red Flag Clearance</option>
+            <option value="otoscopy" ${currentReportType === 'otoscopy' ? 'selected' : ''}>2. Otoscopic Examination Report</option>
             <option value="pta" ${currentReportType === 'pta' ? 'selected' : ''}>3. Pure Tone Audiometry (PTA) Report</option>
             <option value="immittance" ${currentReportType === 'immittance' ? 'selected' : ''}>4. Immittance & Tympanometry Report</option>
             <option value="speech" ${currentReportType === 'speech' ? 'selected' : ''}>5. Speech & Tinnitus Assessment Report</option>
-            <option value="electrophysiology" ${currentReportType === 'electrophysiology' ? 'selected' : ''}>6. Electrophysiological Battery Report</option>
-            <option value="management" ${currentReportType === 'management' ? 'selected' : ''}>7. Diagnosis & Care Plan Management Report</option>
+            <option value="electrophysiology" ${currentReportType === 'electrophysiology' ? 'selected' : ''}>6. Electrophysiology Battery Report</option>
+            <option value="management" ${currentReportType === 'management' ? 'selected' : ''}>7. Diagnosis & Care Plan Management</option>
           </select>
         </div>
-        <button class="btn" style="min-height:28px;padding:0 10px;font-weight:700;" onclick="closeReportModal()">✕</button>
+        <button class="btn ghost" style="min-height:28px;padding:0 8px;font-size:15px;color:rgba(255,255,255,0.7);" onclick="closeReportModal()" title="Close">✕</button>
       </div>
 
       <div class="report-modal-body">
@@ -791,13 +810,20 @@ function openReportModal(patientId, reportType = 'full') {
         </div>
       </div>
 
-      <div class="report-modal-header" style="background:#FFFFFF;border-top:1px solid var(--border);border-bottom:none;justify-content:space-between;">
-        <div style="font-size:12px;color:var(--text-secondary);">
+      <div class="report-modal-header" style="background:#0F172A;border-top:1px solid rgba(255,255,255,0.08);border-bottom:none;justify-content:space-between;">
+        <div style="font-size:12px;color:rgba(255,255,255,0.6);display:flex;align-items:center;gap:6px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
           Formatted for standard A4 Clinical PDF / Print
         </div>
-        <div style="display:flex;gap:8px;">
-          <button class="btn" onclick="saveReportToMedia()">Save to Patient Media</button>
-          <button class="btn primary" onclick="printReportDocument()">Download / Print PDF 🖨️</button>
+        <div style="display:flex;gap:10px;">
+          <button class="btn" onclick="saveReportToMedia()" style="background:rgba(255,255,255,0.08);color:#FFFFFF;border:1px solid rgba(255,255,255,0.15);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Save to Patient Media
+          </button>
+          <button class="btn primary" onclick="printReportDocument()" style="background:#0891B2;color:#FFFFFF;border:none;box-shadow:0 2px 8px rgba(8,145,178,0.4);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+            Download / Print PDF
+          </button>
         </div>
       </div>
     </div>
@@ -1318,4 +1344,9 @@ function saveReportToMedia() {
     window.HearIntelDB.savePatient(patient);
     notify(`${reportLabel} saved to Patient Media & Documents.`);
   }
+}
+
+
+function printReportDocument() {
+  window.print();
 }
