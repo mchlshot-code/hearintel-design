@@ -1885,3 +1885,121 @@ table[data-density="spacious"] td  { padding: 19px 14px; }
     page-break-inside: avoid !important;
   }
 }
+
+
+/* ── Workspace Main & Top Steps Navigation Bar ── */
+.workspace-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-page);
+  min-width: 0;
+}
+
+.encounter-header {
+  background: #0F172A;
+  color: #FFFFFF;
+  padding: 12px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.encounter-title {
+  font-family: var(--font-heading);
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: -0.01em;
+}
+
+.encounter-patient {
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 2px;
+  font-family: var(--font-sans);
+}
+
+.encounter-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.encounter-actions .btn {
+  min-height: 28px;
+  padding: 0 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: var(--radius);
+}
+
+.steps-nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  overflow-x: auto;
+  flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.step-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-bottom: 2.5px solid transparent;
+  transition: all 120ms ease;
+  white-space: nowrap;
+}
+
+.step-item:hover {
+  color: var(--text-primary);
+  background: var(--bg-subtle);
+}
+
+.step-item.active {
+  color: var(--brand-hover);
+  font-weight: 700;
+  border-bottom-color: var(--brand);
+  background: var(--brand-subtle);
+}
+
+.step-item .step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--border);
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  transition: all 120ms ease;
+}
+
+.step-item.active .step-num {
+  background: var(--brand);
+  color: #FFFFFF;
+}
+
+.workspace-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 22px 28px;
+  background: var(--bg-page);
+}

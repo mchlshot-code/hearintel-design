@@ -641,13 +641,13 @@ function workspaceShell(active, content) {
   const assessHref = '04-workspace-history.html?patient=' + patientId;
 
   const steps = [
-    ['04-workspace-history.html?patient=' + patientId, 'History',          active === 'history'],
-    ['05-workspace-otoscopy.html?patient=' + patientId, 'Otoscopy',         active === 'otoscopy'],
-    ['06-workspace-pta.html?patient=' + patientId,      'Pure Tone (PTA)',  active === 'pta'],
-    ['07-workspace-immittance.html?patient=' + patientId,'Immittance',      active === 'immittance'],
-    ['08-workspace-speech.html?patient=' + patientId,   'Speech',           active === 'speech'],
-    ['12-workspace-electrophysiology.html?patient=' + patientId, 'E-Physiology', active === 'electrophysiology'],
-    ['09-conclusion.html?patient=' + patientId,         'Management',       active === 'conclusion'],
+    ['04-workspace-history.html?patient=' + patientId, 'History',          '1', active === 'history'],
+    ['05-workspace-otoscopy.html?patient=' + patientId, 'Otoscopy',         '2', active === 'otoscopy'],
+    ['06-workspace-pta.html?patient=' + patientId,      'Pure Tone (PTA)',  '3', active === 'pta'],
+    ['07-workspace-immittance.html?patient=' + patientId,'Immittance',      '4', active === 'immittance'],
+    ['08-workspace-speech.html?patient=' + patientId,   'Speech',           '5', active === 'speech'],
+    ['12-workspace-electrophysiology.html?patient=' + patientId, 'E-Physiology', '6', active === 'electrophysiology'],
+    ['09-conclusion.html?patient=' + patientId,         'Management',       '7', active === 'conclusion'],
   ];
 
   const sidebarHtml = [
@@ -714,13 +714,15 @@ function workspaceShell(active, content) {
           '<div class="encounter-patient">' + patient.name + ' &middot; ' + patient.mrn + ' &middot; Booth 1 Sound Suite</div>',
         '</div>',
         '<div class="encounter-actions">',
-          '<a class="btn" href="02-profile.html?patient=' + patientId + '">Exit Session</a>',
-          '<button type="button" class="btn primary" onclick="openReportModal(\'' + patientId + '\', \'full\')">Generate Report</button>',
+          '<a class="btn" href="02-profile.html?patient=' + patientId + '" style="background:rgba(255,255,255,0.08);color:#FFFFFF;border:1px solid rgba(255,255,255,0.15);">Exit Session</a>',
         '</div>',
       '</header>',
       '<nav class="steps-nav">',
         steps.map(function(s) {
-          return '<a class="step-item ' + (s[2] ? 'active' : '') + '" href="' + s[0] + '">' + s[1] + '</a>';
+          return '<a class="step-item ' + (s[3] ? 'active' : '') + '" href="' + s[0] + '">' +
+                   '<span class="step-num">' + s[2] + '</span>' +
+                   '<span class="step-label">' + s[1] + '</span>' +
+                 '</a>';
         }).join(''),
       '</nav>',
       '<div class="workspace-body">',
