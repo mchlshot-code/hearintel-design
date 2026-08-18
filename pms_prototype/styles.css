@@ -1681,7 +1681,7 @@ table[data-density="spacious"] td  { padding: 19px 14px; }
   color: #0F172A !important;
   width: 100%;
   max-width: 820px;
-  min-height: 1080px;
+  min-height: auto;
   padding: 44px 48px;
   border-radius: 2px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);

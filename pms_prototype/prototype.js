@@ -826,15 +826,15 @@ function openReportModal(patientId, reportType = 'full') {
       <!-- Quick-Jump Document Navigation Bar -->
       <div style="background:#0F172A;border-bottom:1px solid rgba(255,255,255,0.08);padding:6px 20px;display:flex;gap:8px;overflow-x:auto;font-size:11px;white-space:nowrap;">
         <span style="color:rgba(255,255,255,0.4);display:flex;align-items:center;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;">Jump to:</span>
-        <a href="#sec-summary" style="color:#38BDF8;padding:2px 6px;border-radius:3px;background:rgba(56,189,248,0.1);">1. Summary</a>
-        <a href="#sec-timeline" style="color:#94A3B8;padding:2px 6px;">2. Timeline</a>
-        <a href="#sec-results" style="color:#94A3B8;padding:2px 6px;">3. Measurements</a>
-        <a href="#sec-audiogram" style="color:#94A3B8;padding:2px 6px;">4. Audiogram</a>
-        <a href="#sec-longitudinal" style="color:#94A3B8;padding:2px 6px;">5. Shift &amp; Delta</a>
-        <a href="#sec-diagnoses" style="color:#94A3B8;padding:2px 6px;">6. Diagnoses</a>
-        <a href="#sec-careplan" style="color:#94A3B8;padding:2px 6px;">7. Care Plan</a>
-        <a href="#sec-media" style="color:#94A3B8;padding:2px 6px;">8. Media</a>
-        <a href="#sec-conclusion" style="color:#94A3B8;padding:2px 6px;">9. Conclusion</a>
+        <a href="javascript:void(0)" onclick="reportScrollTo('sec-summary')" style="color:#38BDF8;padding:2px 6px;border-radius:3px;background:rgba(56,189,248,0.1);cursor:pointer;">1. Summary</a>
+        <a href="javascript:void(0)" onclick="reportScrollTo('sec-timeline')" style="color:#94A3B8;padding:2px 6px;cursor:pointer;">2. Timeline</a>
+        <a href="javascript:void(0)" onclick="reportScrollTo('sec-results')" style="color:#94A3B8;padding:2px 6px;cursor:pointer;">3. Measurements</a>
+        <a href="javascript:void(0)" onclick="reportScrollTo('sec-audiogram')" style="color:#94A3B8;padding:2px 6px;cursor:pointer;">4. Audiogram</a>
+        <a href="javascript:void(0)" onclick="reportScrollTo('sec-longitudinal')" style="color:#94A3B8;padding:2px 6px;cursor:pointer;">5. Shift &amp; Delta</a>
+        <a href="javascript:void(0)" onclick="reportScrollTo('sec-diagnoses')" style="color:#94A3B8;padding:2px 6px;cursor:pointer;">6. Diagnoses</a>
+        <a href="javascript:void(0)" onclick="reportScrollTo('sec-careplan')" style="color:#94A3B8;padding:2px 6px;cursor:pointer;">7. Care Plan</a>
+        <a href="javascript:void(0)" onclick="reportScrollTo('sec-media')" style="color:#94A3B8;padding:2px 6px;cursor:pointer;">8. Media</a>
+        <a href="javascript:void(0)" onclick="reportScrollTo('sec-conclusion')" style="color:#94A3B8;padding:2px 6px;cursor:pointer;">9. Conclusion</a>
       </div>
 
       <!-- Scrollable Document Desk Background -->
@@ -1112,15 +1112,15 @@ function renderReportContent() {
   const reportGenDate = now2.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
   const dateRangeStr  = baselineEnc ? `${baselineEnc.date} &ndash; ${latestEnc.date}` : (latestEnc ? latestEnc.date : reportGenDate);
 
-  // Audience section visibility
-  const showSummary    = ['full','ent_referral','patient_summary','screening'].includes(currentReportType);
-  const showTimeline   = ['full','ent_referral','audiology_battery'].includes(currentReportType);
-  const showMeasure    = ['full','ent_referral','audiology_battery'].includes(currentReportType);
-  const showAudiogram  = ['full','ent_referral','audiology_battery'].includes(currentReportType);
-  const showDelta      = ['full','ent_referral','audiology_battery'].includes(currentReportType) && filteredEncs.length > 1;
-  const showDiagnoses  = ['full','ent_referral'].includes(currentReportType);
-  const showCarePlan   = ['full','patient_summary'].includes(currentReportType);
-  const showMedia      = currentReportType === 'full';
+  // Audience section visibility — all sections always visible; data guards handle empty content
+  const showSummary    = true;
+  const showTimeline   = true;
+  const showMeasure    = true;
+  const showAudiogram  = true;
+  const showDelta      = filteredEncs.length > 1;
+  const showDiagnoses  = true;
+  const showCarePlan   = true;
+  const showMedia      = true;
   const showConclusion = true;
 
   const reportTitle = {
@@ -1815,6 +1815,14 @@ function renderSingleEncounterReport() {
   `;
 
   paper.innerHTML = html;
+}
+
+function reportScrollTo(sectionId) {
+  var container = document.getElementById('reportModalBodyContainer');
+  var target    = document.getElementById(sectionId);
+  if (container && target) {
+    container.scrollTo({ top: target.offsetTop - 12, behavior: 'smooth' });
+  }
 }
 
 function closeReportModal() {
