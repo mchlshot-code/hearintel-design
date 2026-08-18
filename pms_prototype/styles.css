@@ -1339,7 +1339,7 @@ table[data-density="spacious"] td  { padding: 19px 14px; }
   overflow: hidden;
 }
 .encounter-header {
-  background: #1A1714;
+  background: var(--sidebar-bg);
   color: #FFFFFF;
   padding: 11px 24px;
   display: flex;
@@ -1899,7 +1899,7 @@ table[data-density="spacious"] td  { padding: 19px 14px; }
 }
 
 .encounter-header {
-  background: #0F172A;
+  background: var(--sidebar-bg);
   color: #FFFFFF;
   padding: 12px 28px;
   display: flex;
