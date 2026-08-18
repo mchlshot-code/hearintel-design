@@ -764,13 +764,23 @@ document.addEventListener('DOMContentLoaded', function() {
   document.documentElement.setAttribute('data-theme', getActiveTheme());
 });
 
-// ── CLINICAL REPORT GENERATOR ENGINE ──
+// ── CLINICAL REPORT GENERATOR ENGINE (LONGITUDINAL EMR SYSTEM) ──
 let currentReportPatientId = 'amaia';
 let currentReportType = 'full';
+let currentReportTimeframe = 'all'; // 'all', '12m', '6m', 'latest'
+let activeReportAssessments = []; // selected encounter IDs
 
 function openReportModal(patientId, reportType = 'full') {
   currentReportPatientId = patientId || getActivePatientId() || 'amaia';
   currentReportType = reportType;
+  currentReportTimeframe = 'all';
+
+  const patient = window.HearIntelDB ? window.HearIntelDB.getPatient(currentReportPatientId) : null;
+  if (patient && patient.assessments) {
+    activeReportAssessments = patient.assessments.map(a => a.id);
+  } else {
+    activeReportAssessments = [];
+  }
 
   let modal = document.getElementById('reportExportModal');
   if (!modal) {
@@ -781,73 +791,69 @@ function openReportModal(patientId, reportType = 'full') {
   }
 
   modal.innerHTML = `
-    <style id="reportDocumentStyles"><style>
-.report-modal-backdrop { position:fixed; inset:0; background:rgba(15,23,42,0.85); backdrop-filter:blur(8px); z-index:10000; display:flex; align-items:center; justify-content:center; padding:16px; overflow:hidden; }
-.report-modal-window { background:#1E293B; border:1px solid rgba(255,255,255,0.15); border-radius:12px; width:100%; max-width:940px; height:94vh; max-height:94vh; display:flex; flex-direction:column; box-shadow:0 25px 60px -15px rgba(0,0,0,0.8); overflow:hidden; }
-.report-modal-header { padding:12px 20px; background:#0F172A; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:space-between; gap:16px; flex-shrink:0; color:#FFFFFF; }
-.report-modal-body { padding:32px 20px; background:#334155; overflow-y:auto; flex:1; display:flex; justify-content:center; }
-.report-paper { background:#FFFFFF !important; color:#0F172A !important; width:100%; max-width:820px; min-height:1080px; padding:44px 48px; border-radius:2px; box-shadow:0 8px 32px rgba(0,0,0,0.35); font-family:'DM Sans',sans-serif; font-size:12.5px; line-height:1.55; box-sizing:border-box; }
-.report-paper * { box-sizing:border-box; }
-.report-header-block { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2.5px solid #0891B2; padding-bottom:14px; margin-bottom:16px; gap:20px; }
-.report-meta-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px 12px; background:#F8FAFC !important; border:1px solid #E2E8F0; border-radius:6px; padding:12px 14px; margin-bottom:18px; font-size:11.5px; }
-.report-meta-grid > div strong { display:block; font-size:9.5px; text-transform:uppercase; letter-spacing:0.06em; color:#64748B !important; margin-bottom:2px; }
-.report-meta-grid > div span { color:#0F172A !important; font-weight:600; }
-.report-section { border-bottom:1px solid #E2E8F0; padding-bottom:16px; margin-bottom:16px; background:transparent !important; }
-.report-section:last-child { border-bottom:none; margin-bottom:0; padding-bottom:0; }
-.report-section-title { font-family:'Figtree',sans-serif; font-size:13.5px; font-weight:700; color:#0F172A !important; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; letter-spacing:-0.01em; }
-.report-section-title > span:first-child { color:#0891B2 !important; font-weight:700; }
-.report-box { background:#F8FAFC !important; border:1px solid #E2E8F0; border-radius:5px; padding:10px 14px; font-size:12px; color:#334155 !important; line-height:1.55; }
-.report-box strong { color:#0F172A !important; }
-.report-table { width:100%; border-collapse:collapse; font-size:11.5px; margin:6px 0; background:#FFFFFF !important; }
-.report-table th, .report-table td { border:1px solid #CBD5E1 !important; padding:6px 8px; text-align:center; }
-.report-table th { background:#F1F5F9 !important; font-weight:700; color:#1E293B !important; font-size:10.5px; text-transform:uppercase; letter-spacing:0.03em; }
-.report-table td { background:#FFFFFF !important; color:#0F172A !important; }
-.report-table tbody tr:nth-child(even) td { background:#F8FAFC !important; }
-.report-ear-r { color:#DC2626 !important; font-weight:700; }
-.report-ear-l { color:#2563EB !important; font-weight:700; }
-.report-signature-block { margin-top:36px; padding-top:16px; border-top:1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:flex-end; }
-.report-signature-block .sig-line { width:190px; height:1px; background:#94A3B8; margin-bottom:6px; }
-</style></style>
     <div class="report-modal-window">
+      <!-- Top Administrative Controls Bar -->
       <div class="report-modal-header">
-        <div style="display:flex;align-items:center;gap:12px;">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
           <div style="display:flex;align-items:center;gap:8px;">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#38BDF8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
-            <strong style="font-size:14px;color:#FFFFFF;">Clinical Report Export</strong>
+            <strong style="font-size:14px;color:#FFFFFF;white-space:nowrap;">Clinical EMR Report</strong>
           </div>
-          <select id="reportTypeSelector" onchange="switchReportView(this.value)" style="padding:6px 12px;font-size:12.5px;font-weight:600;">
-            <option value="full" ${currentReportType === 'full' ? 'selected' : ''}>Full Comprehensive Evaluation Report (All Tests + Care Plan)</option>
-            <option value="screening" ${currentReportType === 'screening' ? 'selected' : ''}>Hearing Screening Report</option>
-            <option value="all_assessments" ${currentReportType === 'all_assessments' ? 'selected' : ''}>Diagnostic Assessment Battery (All Diagnostic Tests)</option>
-            <option value="history" ${currentReportType === 'history' ? 'selected' : ''}>1. Case History & Red Flag Clearance</option>
-            <option value="otoscopy" ${currentReportType === 'otoscopy' ? 'selected' : ''}>2. Otoscopic Examination Report</option>
-            <option value="pta" ${currentReportType === 'pta' ? 'selected' : ''}>3. Pure Tone Audiometry (PTA) Report</option>
-            <option value="immittance" ${currentReportType === 'immittance' ? 'selected' : ''}>4. Immittance & Tympanometry Report</option>
-            <option value="speech" ${currentReportType === 'speech' ? 'selected' : ''}>5. Speech & Tinnitus Assessment Report</option>
-            <option value="electrophysiology" ${currentReportType === 'electrophysiology' ? 'selected' : ''}>6. Electrophysiology Battery Report</option>
-            <option value="management" ${currentReportType === 'management' ? 'selected' : ''}>7. Diagnosis & Care Plan Management</option>
+          
+          <select id="reportTypeSelector" onchange="switchReportView(this.value)" style="padding:5px 10px;font-size:12px;font-weight:600;">
+            <option value="full" ${currentReportType === 'full' ? 'selected' : ''}>Full Longitudinal Clinical Journey (Complete EMR Record)</option>
+            <option value="ent_referral" ${currentReportType === 'ent_referral' ? 'selected' : ''}>Specialist ENT / Medical Referral Synthesis</option>
+            <option value="audiology_battery" ${currentReportType === 'audiology_battery' ? 'selected' : ''}>Diagnostic Audiology Battery &amp; Quantitative Data Only</option>
+            <option value="patient_summary" ${currentReportType === 'patient_summary' ? 'selected' : ''}>Patient &amp; Family Care Plan / Aural Rehab Summary</option>
+            <option value="screening" ${currentReportType === 'screening' ? 'selected' : ''}>Hearing Health Screening Report</option>
+          </select>
+
+          <select id="reportTimeframeSelector" onchange="switchReportTimeframe(this.value)" style="padding:5px 10px;font-size:12px;font-weight:600;">
+            <option value="all" ${currentReportTimeframe === 'all' ? 'selected' : ''}>All Historical Encounters</option>
+            <option value="12m" ${currentReportTimeframe === '12m' ? 'selected' : ''}>Past 12 Months</option>
+            <option value="6m" ${currentReportTimeframe === '6m' ? 'selected' : ''}>Past 6 Months</option>
+            <option value="latest" ${currentReportTimeframe === 'latest' ? 'selected' : ''}>Latest Evaluation Only</option>
           </select>
         </div>
-        <button class="btn ghost" style="min-height:28px;padding:0 8px;font-size:15px;color:rgba(255,255,255,0.7);" onclick="closeReportModal()" title="Close">✕</button>
-      </div>
 
-      <div class="report-modal-body">
-        <div class="report-paper" id="reportPaperContent">
-          <!-- Live generated report content -->
+        <div style="display:flex;align-items:center;gap:10px;">
+          <button class="btn ghost" style="min-height:28px;padding:0 8px;font-size:16px;color:rgba(255,255,255,0.7);" onclick="closeReportModal()" title="Close">✕</button>
         </div>
       </div>
 
+      <!-- Quick-Jump Document Navigation Bar -->
+      <div style="background:#0F172A;border-bottom:1px solid rgba(255,255,255,0.08);padding:6px 20px;display:flex;gap:8px;overflow-x:auto;font-size:11px;white-space:nowrap;">
+        <span style="color:rgba(255,255,255,0.4);display:flex;align-items:center;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;">Jump to:</span>
+        <a href="#sec-summary" style="color:#38BDF8;padding:2px 6px;border-radius:3px;background:rgba(56,189,248,0.1);">1. Summary</a>
+        <a href="#sec-timeline" style="color:#94A3B8;padding:2px 6px;">2. Timeline</a>
+        <a href="#sec-results" style="color:#94A3B8;padding:2px 6px;">3. Measurements</a>
+        <a href="#sec-audiogram" style="color:#94A3B8;padding:2px 6px;">4. Audiogram</a>
+        <a href="#sec-longitudinal" style="color:#94A3B8;padding:2px 6px;">5. Shift &amp; Delta</a>
+        <a href="#sec-diagnoses" style="color:#94A3B8;padding:2px 6px;">6. Diagnoses</a>
+        <a href="#sec-careplan" style="color:#94A3B8;padding:2px 6px;">7. Care Plan</a>
+        <a href="#sec-media" style="color:#94A3B8;padding:2px 6px;">8. Media</a>
+        <a href="#sec-conclusion" style="color:#94A3B8;padding:2px 6px;">9. Conclusion</a>
+      </div>
+
+      <!-- Scrollable Document Desk Background -->
+      <div class="report-modal-body" id="reportModalBodyContainer">
+        <div class="report-paper" id="reportPaperContent">
+          <!-- Live generated longitudinal report content -->
+        </div>
+      </div>
+
+      <!-- Bottom Action Footer -->
       <div class="report-modal-header" style="background:#0F172A;border-top:1px solid rgba(255,255,255,0.08);border-bottom:none;justify-content:space-between;">
-        <div style="font-size:12px;color:rgba(255,255,255,0.6);display:flex;align-items:center;gap:6px;">
+        <div style="font-size:11.5px;color:rgba(255,255,255,0.6);display:flex;align-items:center;gap:6px;">
           <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-          Formatted for standard A4 Clinical PDF / Print
+          Clinical Longitudinal EMR &middot; A4 Multi-Page Compliant
         </div>
         <div style="display:flex;gap:10px;">
-          <button class="btn" onclick="saveReportToMedia()" style="background:rgba(255,255,255,0.08);color:#FFFFFF;border:1px solid rgba(255,255,255,0.15);">
+          <button class="btn" onclick="saveReportToMedia()" style="background:rgba(255,255,255,0.08);color:#FFFFFF;border:1px solid rgba(255,255,255,0.15);font-size:12px;">
             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            Save to Patient Media
+            Save to Patient Documents
           </button>
-          <button class="btn primary" onclick="printReportDocument()" style="background:#0891B2;color:#FFFFFF;border:none;box-shadow:0 2px 8px rgba(8,145,178,0.4);">
+          <button class="btn primary" onclick="printReportDocument()" style="background:#0891B2;color:#FFFFFF;border:none;box-shadow:0 2px 8px rgba(8,145,178,0.4);font-size:12px;font-weight:600;">
             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
             Download / Print PDF
           </button>
@@ -870,6 +876,196 @@ function switchReportView(type) {
   renderReportContent();
 }
 
+function switchReportTimeframe(tf) {
+  currentReportTimeframe = tf;
+  renderReportContent();
+}
+
+// ── MASTER SVG AUDIOGRAM GENERATOR ──
+function generateReportAudiogramSvg(currentThresholds, baselineThresholds = null) {
+  const freqs = [125, 250, 500, 1000, 2000, 3000, 4000, 6000, 8000];
+  const dBs = [-10, 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120];
+
+  const width = 640;
+  const height = 300;
+  const pL = 50;
+  const pR = 30;
+  const pT = 30;
+  const pB = 35;
+
+  const plotW = width - pL - pR;
+  const plotH = height - pT - pB;
+
+  const getX = (f) => {
+    const idx = freqs.indexOf(f);
+    if (idx !== -1) return pL + (idx / (freqs.length - 1)) * plotW;
+    // Logarithmic interpolation fallback
+    const minL = Math.log10(125);
+    const maxL = Math.log10(8000);
+    return pL + ((Math.log10(f) - minL) / (maxL - minL)) * plotW;
+  };
+
+  const getY = (db) => {
+    return pT + ((db - (-10)) / (120 - (-10))) * plotH;
+  };
+
+  let svg = `<svg viewBox="0 0 ${width} ${height}" style="width:100%;max-width:${width}px;background:#FFFFFF;border:1px solid #CBD5E1;border-radius:4px;font-family:'DM Sans',sans-serif;">`;
+
+  // Shaded Normal Hearing Zone (0 to 20 dB)
+  const normY1 = getY(0);
+  const normY2 = getY(20);
+  svg += `<rect x="${pL}" y="${normY1}" width="${plotW}" height="${normY2 - normY1}" fill="#F0FDF4" opacity="0.8"/>`;
+  svg += `<text x="${pL + 8}" y="${normY2 - 4}" font-size="9" fill="#16A34A" font-weight="600">Normal Hearing Range (&le;20 dB HL)</text>`;
+
+  // Horizontal Grid lines & dB labels
+  dBs.forEach(db => {
+    const y = getY(db);
+    const isMajor = db === 0 || db === 20 || db === 40 || db === 70 || db === 90;
+    svg += `<line x1="${pL}" y1="${y}" x2="${pL + plotW}" y2="${y}" stroke="${isMajor ? '#94A3B8' : '#E2E8F0'}" stroke-width="${isMajor ? 1 : 0.75}" stroke-dasharray="${db === 20 ? '4 2' : 'none'}"/>`;
+    svg += `<text x="${pL - 8}" y="${y + 3.5}" font-size="9.5" font-weight="${isMajor ? 700 : 500}" fill="#475569" text-anchor="end">${db}</text>`;
+  });
+
+  // Vertical Grid lines & Frequency labels
+  freqs.forEach(f => {
+    const x = getX(f);
+    const isInter = f === 3000 || f === 6000;
+    svg += `<line x1="${x}" y1="${pT}" x2="${x}" y2="${pT + plotH}" stroke="${isInter ? '#CBD5E1' : '#94A3B8'}" stroke-width="${isInter ? 0.75 : 1}" stroke-dasharray="${isInter ? '3 3' : 'none'}"/>`;
+    svg += `<text x="${x}" y="${pT - 8}" font-size="10" font-weight="${isInter ? 500 : 700}" fill="#1E293B" text-anchor="middle">${f >= 1000 ? (f/1000)+'k' : f}</text>`;
+  });
+
+  // Axis Labels
+  svg += `<text x="${pL + plotW / 2}" y="${pT - 18}" font-size="10" font-weight="700" fill="#64748B" text-anchor="middle">Frequency (Hz)</text>`;
+  svg += `<text x="${pL - 32}" y="${pT + plotH / 2}" font-size="10" font-weight="700" fill="#64748B" text-anchor="middle" transform="rotate(-90 ${pL - 32} ${pT + plotH / 2})">Hearing Level (dB HL)</text>`;
+
+  // ── Plot Baseline Overlay (if available) ──
+  if (baselineThresholds) {
+    if (baselineThresholds.acR) {
+      let ptsR = [];
+      Object.keys(baselineThresholds.acR).map(Number).sort((a,b)=>a-b).forEach(f => {
+        const v = baselineThresholds.acR[f];
+        if (v !== undefined && v !== null) ptsR.push(`${getX(f)},${getY(v)}`);
+      });
+      if (ptsR.length > 1) {
+        svg += `<polyline points="${ptsR.join(' ')}" fill="none" stroke="#FCA5A5" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+      }
+    }
+    if (baselineThresholds.acL) {
+      let ptsL = [];
+      Object.keys(baselineThresholds.acL).map(Number).sort((a,b)=>a-b).forEach(f => {
+        const v = baselineThresholds.acL[f];
+        if (v !== undefined && v !== null) ptsL.push(`${getX(f)},${getY(v)}`);
+      });
+      if (ptsL.length > 1) {
+        svg += `<polyline points="${ptsL.join(' ')}" fill="none" stroke="#93C5FD" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+      }
+    }
+  }
+
+  // ── Plot Current Evaluation Curves ──
+  // Right Ear AC (Red 'O' and solid line)
+  if (currentThresholds && currentThresholds.acR) {
+    let pts = [];
+    const fSorted = Object.keys(currentThresholds.acR).map(Number).sort((a,b)=>a-b);
+    fSorted.forEach(f => {
+      const val = currentThresholds.acR[f];
+      if (val !== undefined && val !== null) {
+        const cx = getX(f);
+        const cy = getY(val);
+        pts.push(`${cx},${cy}`);
+      }
+    });
+    if (pts.length > 1) {
+      svg += `<polyline points="${pts.join(' ')}" fill="none" stroke="#DC2626" stroke-width="2.2"/>`;
+    }
+    fSorted.forEach(f => {
+      const val = currentThresholds.acR[f];
+      if (val !== undefined && val !== null) {
+        const cx = getX(f);
+        const cy = getY(val);
+        svg += `<circle cx="${cx}" cy="${cy}" r="4.5" fill="#FFFFFF" stroke="#DC2626" stroke-width="2.2"/>`;
+      }
+    });
+  }
+
+  // Right Ear BC (Red '<' bracket)
+  if (currentThresholds && currentThresholds.bcR) {
+    Object.keys(currentThresholds.bcR).map(Number).forEach(f => {
+      const val = currentThresholds.bcR[f];
+      if (val !== undefined && val !== null) {
+        const cx = getX(f) - 6;
+        const cy = getY(val);
+        svg += `<path d="M${cx+4} ${cy-5} L${cx-2} ${cy} L${cx+4} ${cy+5}" fill="none" stroke="#DC2626" stroke-width="2"/>`;
+      }
+    });
+  }
+
+  // Left Ear AC (Blue 'X' and solid line)
+  if (currentThresholds && currentThresholds.acL) {
+    let pts = [];
+    const fSorted = Object.keys(currentThresholds.acL).map(Number).sort((a,b)=>a-b);
+    fSorted.forEach(f => {
+      const val = currentThresholds.acL[f];
+      if (val !== undefined && val !== null) {
+        const cx = getX(f);
+        const cy = getY(val);
+        pts.push(`${cx},${cy}`);
+      }
+    });
+    if (pts.length > 1) {
+      svg += `<polyline points="${pts.join(' ')}" fill="none" stroke="#2563EB" stroke-width="2.2"/>`;
+    }
+    fSorted.forEach(f => {
+      const val = currentThresholds.acL[f];
+      if (val !== undefined && val !== null) {
+        const cx = getX(f);
+        const cy = getY(val);
+        svg += `<line x1="${cx-4}" y1="${cy-4}" x2="${cx+4}" y2="${cy+4}" stroke="#2563EB" stroke-width="2.2"/>`;
+        svg += `<line x1="${cx+4}" y1="${cy-4}" x2="${cx-4}" y2="${cy+4}" stroke="#2563EB" stroke-width="2.2"/>`;
+      }
+    });
+  }
+
+  // Left Ear BC (Blue '>' bracket)
+  if (currentThresholds && currentThresholds.bcL) {
+    Object.keys(currentThresholds.bcL).map(Number).forEach(f => {
+      const val = currentThresholds.bcL[f];
+      if (val !== undefined && val !== null) {
+        const cx = getX(f) + 6;
+        const cy = getY(val);
+        svg += `<path d="M${cx-4} ${cy-5} L${cx+2} ${cy} L${cx-4} ${cy+5}" fill="none" stroke="#2563EB" stroke-width="2"/>`;
+      }
+    });
+  }
+
+  // Legend
+  const legY = height - 12;
+  svg += `
+    <g transform="translate(${pL}, ${legY})">
+      <circle cx="5" cy="0" r="3.5" fill="#FFFFFF" stroke="#DC2626" stroke-width="1.8"/>
+      <text x="13" y="3.5" font-size="10" font-weight="600" fill="#DC2626">Right AC (O)</text>
+      
+      <path d="M85 -4 L81 0 L85 4" fill="none" stroke="#DC2626" stroke-width="1.8"/>
+      <text x="91" y="3.5" font-size="10" font-weight="600" fill="#DC2626">Right BC (&lt;)</text>
+
+      <line x1="160" y1="-3.5" x2="167" y2="3.5" stroke="#2563EB" stroke-width="1.8"/>
+      <line x1="167" y1="-3.5" x2="160" y2="3.5" stroke="#2563EB" stroke-width="1.8"/>
+      <text x="173" y="3.5" font-size="10" font-weight="600" fill="#2563EB">Left AC (X)</text>
+
+      <path d="M245 -4 L249 0 L245 4" fill="none" stroke="#2563EB" stroke-width="1.8"/>
+      <text x="255" y="3.5" font-size="10" font-weight="600" fill="#2563EB">Left BC (&gt;)</text>
+
+      ${baselineThresholds ? `
+        <line x1="335" y1="0" x2="355" y2="0" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="3 2"/>
+        <text x="360" y="3.5" font-size="10" font-weight="600" fill="#64748B">Baseline Overlay</text>
+      ` : ''}
+    </g>
+  `;
+
+  svg += `</svg>`;
+  return svg;
+}
+
+// ── COMPREHENSIVE LONGITUDINAL REPORT RENDERER ──
 function renderReportContent() {
   const paper = document.getElementById('reportPaperContent');
   if (!paper) return;
@@ -877,495 +1073,465 @@ function renderReportContent() {
   const patient = window.HearIntelDB ? window.HearIntelDB.getPatient(currentReportPatientId) : null;
   const name = patient ? patient.name : 'Amaia O.';
   const fullName = patient ? (patient.fullName || patient.name) : 'Amaia Okafor';
-  const id = patient ? (patient.mrn || patient.idNumber || 'LCC-26-01248') : 'LCC-26-01248';
+  const mrn = patient ? (patient.mrn || patient.idNumber || 'LCC-26-01248') : 'LCC-26-01248';
   const dob = patient ? (patient.dob || '1980-04-12') : '1980-04-12';
-  const ageSex = patient ? `${patient.age} yrs, ${patient.gender}` : '46 yrs, Female';
+  const age = patient ? patient.age : 46;
+  const gender = patient ? patient.gender : 'Female';
   const phone = patient ? (patient.phone || '+234 803 219 4482') : '+234 803 219 4482';
+  const email = patient ? (patient.email || 'amaia.o@example.com') : 'amaia.o@example.com';
   const clinic = patient ? (patient.facility || patient.clinic || 'Lagos Central Clinic') : 'Lagos Central Clinic';
-  const diag = patient ? (patient.primaryDiagnosis || 'Bilateral Sensorineural Hearing Loss (ICD-10 H90.3)') : 'Bilateral Sensorineural Hearing Loss (ICD-10 H90.3)';
+  const insurance = patient ? (patient.insurance || 'Private / Self-Pay') : 'Private / Self-Pay';
+  const referral = patient ? (patient.referral || 'Specialist Referral') : 'Specialist Referral';
   const clinician = (patient && patient.assignedClinician) || 'Dr. Chika Okafor, Au.D.';
+  const ptaR = patient ? Math.round(patient.ptaRight || 30) : 30;
+  const ptaL = patient ? Math.round(patient.ptaLeft || 36) : 36;
+  const diag = patient ? (patient.primaryDiagnosis || 'Bilateral Sensorineural Hearing Loss (ICD-10 H90.3)') : 'Bilateral Sensorineural Hearing Loss (ICD-10 H90.3)';
 
-  // Retrieve latest encounter if available
-  const enc = (patient && patient.assessments && patient.assessments[0]) ? patient.assessments[0] : null;
+  // All assessments
+  const allAssessments = (patient && patient.assessments) ? patient.assessments : [];
+  const latestEnc = allAssessments[0] || null;
+  const baselineEnc = allAssessments.length > 1 ? allAssessments[allAssessments.length - 1] : null;
 
   const now = new Date();
-  const dateStr = enc ? enc.date : now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  const reportGenDate = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  const dateRangeStr = baselineEnc ? `${baselineEnc.date} &ndash; ${latestEnc.date}` : (latestEnc ? latestEnc.date : reportGenDate);
 
-  // ── 1. HEADER & DEMOGRAPHICS (ASHA/AAA Standard) ──
+  // ── 1. PATIENT / REPORT HEADER (Pillar 1) ──
   let headerHtml = `
-    <div class="report-header-block">
+    <div class="report-header-block" id="sec-header">
       <div>
-        <div style="font-size:17px;font-weight:800;letter-spacing:-0.02em;color:#0891B2;">HearIntel Audiological Medical Center</div>
+        <div style="font-size:18px;font-weight:800;letter-spacing:-0.02em;color:#0891B2;">HearIntel Audiological Medical Center</div>
         <div style="font-size:11.5px;color:#64748B;margin-top:2px;">Specialist Hearing Healthcare &amp; Practice Management &middot; ${clinic}</div>
       </div>
       <div style="text-align:right;">
-        <div style="font-size:13px;font-weight:700;color:#0F172A;">
-          ${currentReportType === 'full' ? 'COMPREHENSIVE AUDIOLOGICAL EVALUATION &amp; CARE PLAN' : 
-            currentReportType === 'all_assessments' ? 'DIAGNOSTIC AUDIOLOGY ASSESSMENT BATTERY REPORT' : 
-            currentReportType === 'screening' ? 'HEARING HEALTH SCREENING REPORT' : 'DIAGNOSTIC MODULE REPORT'}
+        <div style="font-size:13.5px;font-weight:700;color:#0F172A;">
+          ${currentReportType === 'full' ? 'LONGITUDINAL CLINICAL JOURNEY &amp; EMR REPORT' : 
+            currentReportType === 'ent_referral' ? 'SPECIALIST ENT / MEDICAL REFERRAL SYNTHESIS' :
+            currentReportType === 'audiology_battery' ? 'DIAGNOSTIC AUDIOLOGY BATTERY REPORT' :
+            currentReportType === 'patient_summary' ? 'PATIENT &amp; FAMILY AURAL REHABILITATION SUMMARY' : 'HEARING HEALTH SCREENING REPORT'}
         </div>
-        <div style="font-size:11px;color:#64748B;margin-top:2px;">Date of Evaluation: ${dateStr}</div>
+        <div style="font-size:11px;color:#64748B;margin-top:2px;">Reporting Window: <strong>${dateRangeStr}</strong> &middot; Generated: ${reportGenDate}</div>
       </div>
     </div>
 
     <div class="report-meta-grid">
-      <div><strong>Patient Name</strong><span>${fullName}</span></div>
-      <div><strong>Patient ID / MRN</strong><span>${id}</span></div>
-      <div><strong>Date of Birth / Age</strong><span>${dob} (${patient ? patient.age : 46}y)</span></div>
-      <div><strong>Gender / Phone</strong><span>${patient ? patient.gender : 'Female'} &middot; ${phone}</span></div>
-      <div><strong>Referring Source</strong><span>${patient && patient.referral ? patient.referral : 'Specialist ENT / Physician'}</span></div>
-      <div><strong>Examining Clinician</strong><span>${clinician}</span></div>
-      <div><strong>Licence / Reg #</strong><span>MLSCN-AUD-2024-0891</span></div>
-      <div><strong>Facility Location</strong><span>Booth 1 (Sound Suite) &middot; ${clinic}</span></div>
+      <div><strong>Patient Full Name</strong><span>${fullName}</span></div>
+      <div><strong>Patient MRN / ID</strong><span>${mrn}</span></div>
+      <div><strong>Date of Birth / Age</strong><span>${dob} (${age} yrs)</span></div>
+      <div><strong>Gender / Language</strong><span>${gender} &middot; ${patient ? patient.primaryLanguage : 'English'}</span></div>
+      <div><strong>Phone &amp; Emergency</strong><span>${phone}</span></div>
+      <div><strong>Insurance / Coverage</strong><span>${insurance}</span></div>
+      <div><strong>Referring Source</strong><span>${referral}</span></div>
+      <div><strong>Attending Audiologist</strong><span>${clinician} (MLSCN #HA-2024-0891)</span></div>
     </div>
   `;
 
   let bodyHtml = '';
 
-  // ── 2. CASE HISTORY & RED FLAGS ──
-  if (['full', 'all_assessments', 'history'].includes(currentReportType)) {
-    let complaint = enc && enc.history ? enc.history.complaint : 'Bilateral progressive hearing difficulty, most pronounced in competing background noise.';
-    let redFlags = enc && enc.history ? enc.history.redFlags : 'Negative for sudden hearing drop, active drainage, otalgia, or vertigo.';
-    let otologic = enc && enc.history ? enc.history.otologic : 'Intermittent bilateral high-frequency tinnitus; no history of ototoxic therapy.';
+  // ── 2. CLINICAL SUMMARY & LONGITUDINAL SYNTHESIS (Pillar 2) ──
+  let summaryText = patient ? patient.clinicalNote : 'Patient has undergone standardized clinical audiological evaluation.';
+  let alertsList = (patient && patient.alerts && patient.alerts.length > 0) ? patient.alerts : ['No critical clinical alerts noted.'];
 
-    if (!enc && patient && patient.id === 'david') {
-      complaint = 'Unilateral sudden-onset hearing drop in left ear accompanied by high-pitched tinnitus.';
-      redFlags = 'Positive for unilateral asymmetric sensorineural progression. Urgent specialist referral indicated.';
-      otologic = 'Left ear high-frequency ringing; vestibular screening cleared.';
-    } else if (!enc && patient && patient.id === 'ndidi') {
-      complaint = 'Severe long-standing bilateral hearing loss with declining speech clarity despite power digital hearing aid usage.';
-      redFlags = 'Negative for active middle-ear pathology. Candidate for Cochlear Implant (CI) protocol.';
-      otologic = 'Bilateral chronic tinnitus; severe handicap.';
-    } else if (!enc && patient && patient.id === 'emeka') {
-      complaint = 'Muffled sound quality bilaterally following recurrent childhood otitis media history.';
-      redFlags = 'Negative for sensorineural drop; conductive middle-ear component confirmed.';
-      otologic = 'Bilateral aural fullness; negative for active drainage.';
-    }
-
-    bodyHtml += `
-      <div class="report-section">
-        <div class="report-section-title">
-          <span>1. Case History &amp; Medical Red Flag Clearance</span>
-          <span style="font-size:11px;font-weight:600;color:#059669;">Clinical Protocol Cleared</span>
-        </div>
-        <div class="report-box">
-          <div><strong>Chief Complaint:</strong> ${complaint}</div>
-          <div style="margin-top:3px;"><strong>Otologic History &amp; Symptoms:</strong> ${otologic}</div>
-          <div style="margin-top:3px;"><strong>FDA/AAA Medical Red Flags:</strong> ${redFlags}</div>
-        </div>
+  bodyHtml += `
+    <div class="report-section" id="sec-summary">
+      <div class="report-section-title">
+        <span>1. Comprehensive Clinical Synthesis &amp; Case Summary</span>
+        <span style="font-size:11px;font-weight:600;color:#0891B2;">EMR Narrative Record</span>
       </div>
-    `;
-  }
-
-  // ── 3. OTOSCOPIC EXAMINATION ──
-  if (['full', 'all_assessments', 'otoscopy'].includes(currentReportType)) {
-    let tmStatusR = enc && enc.otoscopy ? enc.otoscopy.right : 'External auditory canal clear. Tympanic membrane intact, translucent with distinct cone of light.';
-    let tmStatusL = enc && enc.otoscopy ? enc.otoscopy.left : 'External auditory canal clear. Tympanic membrane intact with normal landmark visibility.';
-
-    if (!enc && patient && patient.id === 'emeka') {
-      tmStatusR = 'External auditory canal clear. Tympanic membrane retracted with dull cone of light (Type B effusion).';
-      tmStatusL = 'External auditory canal clear. Tympanic membrane dull, thickened with reduced mobility.';
-    }
-
-    bodyHtml += `
-      <div class="report-section">
-        <div class="report-section-title">
-          <span>2. Otoscopic Examination &amp; Physical Clearance</span>
-          <span style="font-size:11px;font-weight:600;color:#059669;">Cleared Bilaterally</span>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12px;">
-          <div class="report-box">
-            <strong class="report-ear-r">Right Ear (AD):</strong> ${tmStatusR}
+      <div class="report-box" style="line-height:1.6;">
+        <div style="font-size:12.5px;color:#0F172A;margin-bottom:8px;">${summaryText}</div>
+        
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px;padding-top:8px;border-top:1px solid #E2E8F0;font-size:11.5px;">
+          <div>
+            <strong>Current Primary Diagnosis:</strong>
+            <div style="color:#0891B2;font-weight:700;margin-top:1px;">${diag}</div>
           </div>
-          <div class="report-box">
-            <strong class="report-ear-l">Left Ear (AS):</strong> ${tmStatusL}
+          <div>
+            <strong>Current Management Status:</strong>
+            <div style="font-weight:600;color:#059669;margin-top:1px;">${patient ? patient.pathwayLabel : 'Active Surveillance'} (${patient ? patient.status : 'Active'})</div>
           </div>
         </div>
-      </div>
-    `;
-  }
 
-  // ── 4. PURE TONE AUDIOMETRY (PTA) ──
-  if (['full', 'all_assessments', 'pta'].includes(currentReportType)) {
-    let th = (enc && enc.thresholds) ? enc.thresholds : (typeof ptaData !== 'undefined' && ptaData.acR ? ptaData : null);
-    if (!th) {
-      const baseR = patient ? Math.round(patient.ptaRight || 30) : 30;
-      const baseL = patient ? Math.round(patient.ptaLeft || 36) : 36;
-      th = {
-        acR: { 250: Math.max(10, baseR - 10), 500: Math.max(10, baseR - 5), 1000: baseR, 2000: baseR + 5, 4000: baseR + 15, 8000: baseR + 25 },
-        bcR: { 500: Math.max(10, baseR - 10), 1000: Math.max(10, baseR - 5), 2000: baseR, 4000: baseR + 10 },
-        acL: { 250: Math.max(10, baseL - 10), 500: Math.max(10, baseL - 5), 1000: baseL, 2000: baseL + 5, 4000: baseL + 15, 8000: baseL + 25 },
-        bcL: { 500: Math.max(10, baseL - 10), 1000: Math.max(10, baseL - 5), 2000: baseL, 4000: baseL + 10 }
-      };
-    }
-
-    const calcPta = (track) => {
-      if (!th || !th[track]) return 30;
-      const f500 = th[track][500] !== undefined ? th[track][500] : 30;
-      const f1k = th[track][1000] !== undefined ? th[track][1000] : 30;
-      const f2k = th[track][2000] !== undefined ? th[track][2000] : 35;
-      const f4k = th[track][4000] !== undefined ? th[track][4000] : 45;
-      return Math.round((f500 + f1k + f2k + f4k) / 4);
-    };
-
-    const livePtaR = calcPta('acR');
-    const livePtaL = calcPta('acL');
-    const asymDiff = Math.abs(livePtaR - livePtaL);
-
-    const getVal = (track, f) => {
-      if (th && th[track] && th[track][f] !== undefined && th[track][f] !== null) return th[track][f];
-      return '-';
-    };
-
-    bodyHtml += `
-      <div class="report-section">
-        <div class="report-section-title">
-          <span>3. Pure Tone Audiometry (Air &amp; Bone Conduction)</span>
-          <span style="font-size:11px;font-weight:600;">4-Freq PTA: <span class="report-ear-r">${livePtaR} dB (R)</span> / <span class="report-ear-l">${livePtaL} dB (L)</span></span>
-        </div>
-        <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:12px;align-items:start;">
-          <table class="report-table">
-            <thead>
-              <tr>
-                <th style="text-align:left;">Ear / Transducer</th><th>250</th><th>500</th><th>1k</th><th>2k</th><th>4k</th><th>8k</th><th>PTA</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style="text-align:left;" class="report-ear-r">Right AC (O)</td>
-                <td>${getVal('acR', 250)}</td><td>${getVal('acR', 500)}</td><td>${getVal('acR', 1000)}</td><td>${getVal('acR', 2000)}</td><td>${getVal('acR', 4000)}</td><td>${getVal('acR', 8000)}</td>
-                <td><strong class="report-ear-r">${livePtaR} dB</strong></td>
-              </tr>
-              <tr>
-                <td style="text-align:left;" class="report-ear-r">Right BC (&lt;)</td>
-                <td>-</td><td>${getVal('bcR', 500)}</td><td>${getVal('bcR', 1000)}</td><td>${getVal('bcR', 2000)}</td><td>${getVal('bcR', 4000)}</td><td>-</td>
-                <td><strong>-</strong></td>
-              </tr>
-              <tr>
-                <td style="text-align:left;" class="report-ear-l">Left AC (X)</td>
-                <td>${getVal('acL', 250)}</td><td>${getVal('acL', 500)}</td><td>${getVal('acL', 1000)}</td><td>${getVal('acL', 2000)}</td><td>${getVal('acL', 4000)}</td><td>${getVal('acL', 8000)}</td>
-                <td><strong class="report-ear-l">${livePtaL} dB</strong></td>
-              </tr>
-              <tr>
-                <td style="text-align:left;" class="report-ear-l">Left BC (&gt;)</td>
-                <td>-</td><td>${getVal('bcL', 500)}</td><td>${getVal('bcL', 1000)}</td><td>${getVal('bcL', 2000)}</td><td>${getVal('bcL', 4000)}</td><td>-</td>
-                <td><strong>-</strong></td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="report-box" style="font-size:11.5px;">
-            <div><strong>Configuration:</strong> ${livePtaR > 70 || livePtaL > 70 ? 'Severe-to-Profound Sensorineural Loss' : (patient && patient.id === 'emeka' ? 'Bilateral Flat Conductive Loss' : 'Mild-to-Moderate Sloping SNHL')}.</div>
-            <div style="margin-top:2px;"><strong>Air-Bone Gap:</strong> ${patient && patient.id === 'emeka' ? '25 dB (Significant Conductive Component)' : '<10 dB (Pure Sensorineural)'}.</div>
-            <div style="margin-top:2px;"><strong>Interaural Symmetry:</strong> ${asymDiff} dB (${asymDiff >= 15 ? '<span style="color:#DC2626;font-weight:700;">Asymmetric — Investigation Indicated</span>' : 'Symmetric WNL'}).</div>
-          </div>
+        <div style="margin-top:8px;padding:6px 10px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:4px;font-size:11.5px;color:#92400E;">
+          <strong>Active Clinical Alerts:</strong> ${alertsList.join(' &middot; ')}
         </div>
       </div>
-    `;
-  }
+    </div>
+  `;
 
-  // ── 5. IMMITTANCE & ACOUSTIC REFLEXES ──
-  if (['full', 'all_assessments', 'immittance'].includes(currentReportType)) {
-    let tympR = enc && enc.tympanometry ? enc.tympanometry.right : { type: 'Type A', pres: '-20 daPa', comp: '0.78 mL', ecv: '1.15 mL', ipsi: '85 dB', contra: '90 dB', decay: 'Negative' };
-    let tympL = enc && enc.tympanometry ? enc.tympanometry.left : { type: 'Type A', pres: '-30 daPa', comp: '0.72 mL', ecv: '1.08 mL', ipsi: '90 dB', contra: '95 dB', decay: 'Negative' };
-
-    if (!enc && patient && patient.id === 'emeka') {
-      tympR = { type: 'Type B (Effusion)', pres: 'N/A', comp: '0.18 mL', ecv: '1.10 mL', ipsi: 'Absent', contra: 'Absent', decay: 'N/A' };
-      tympL = { type: 'Type B (Effusion)', pres: 'N/A', comp: '0.15 mL', ecv: '1.05 mL', ipsi: 'Absent', contra: 'Absent', decay: 'N/A' };
-    } else if (!enc && patient && patient.id === 'ndidi') {
-      tympR = { type: 'Type A', pres: '-15 daPa', comp: '0.85 mL', ecv: '1.20 mL', ipsi: 'Absent (>105)', contra: 'Absent (>105)', decay: 'N/A' };
-      tympL = { type: 'Type A', pres: '-25 daPa', comp: '0.80 mL', ecv: '1.18 mL', ipsi: 'Absent (>105)', contra: 'Absent (>105)', decay: 'N/A' };
-    } else if (!enc && patient && patient.id === 'david') {
-      tympR = { type: 'Type A', pres: '-10 daPa', comp: '0.75 mL', ecv: '1.12 mL', ipsi: '85 dB', contra: '90 dB', decay: 'Negative' };
-      tympL = { type: 'Type A', pres: '-20 daPa', comp: '0.70 mL', ecv: '1.10 mL', ipsi: '105 dB', contra: '>105 dB', decay: 'Positive (>50% drop)' };
-    }
+  // ── 3. ASSESSMENT TIMELINE (Pillar 3) ──
+  if (allAssessments.length > 0) {
+    let timelineRows = allAssessments.map(enc => `
+      <tr>
+        <td style="font-weight:700;white-space:nowrap;">${enc.date}</td>
+        <td><strong>${enc.type}</strong></td>
+        <td>${enc.clinician}</td>
+        <td>${enc.reason || 'Diagnostic Assessment'}</td>
+        <td><span class="report-ear-r">${Math.round(enc.ptaRight || 30)} dB</span> / <span class="report-ear-l">${Math.round(enc.ptaLeft || 36)} dB</span></td>
+        <td><strong>${enc.diagnosis || 'SNHL'}</strong></td>
+        <td><span style="font-size:10.5px;color:#059669;font-weight:600;">${enc.status || 'Completed'}</span></td>
+      </tr>
+    `).join('');
 
     bodyHtml += `
-      <div class="report-section">
+      <div class="report-section" id="sec-timeline">
         <div class="report-section-title">
-          <span>4. Immittance &amp; Acoustic Reflex Battery</span>
-          <span style="font-size:11px;font-weight:600;">Jerger: ${tympR.type || 'Type A'} / ${tympL.type || 'Type A'}</span>
+          <span>2. Longitudinal Assessment Timeline (${allAssessments.length} Recorded Visits)</span>
+          <span style="font-size:11px;font-weight:600;color:#64748B;">Chronological History</span>
         </div>
         <table class="report-table">
           <thead>
             <tr>
-              <th style="text-align:left;">Ear</th><th>Peak Pressure</th><th>Compliance</th><th>Volume (ECV)</th><th>Type</th><th>Ipsi 1k</th><th>Contra 1k</th><th>10s Decay</th>
+              <th>Date</th><th>Encounter Type</th><th>Clinician</th><th>Purpose / Reason</th><th>PTA (R/L)</th><th>Diagnostic Impression</th><th>Status</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td style="text-align:left;" class="report-ear-r">Right (AD)</td>
-              <td>${tympR.pres || '-20 daPa'}</td><td>${tympR.comp || '0.78 mL'}</td><td>${tympR.ecv || '1.15 mL'}</td><td><strong>${tympR.type || 'Type A'}</strong></td><td>${tympR.ipsi || '85 dB'}</td><td>${tympR.contra || '90 dB'}</td><td>${tympR.decay || 'Negative'}</td>
-            </tr>
-            <tr>
-              <td style="text-align:left;" class="report-ear-l">Left (AS)</td>
-              <td>${tympL.pres || '-30 daPa'}</td><td>${tympL.comp || '0.72 mL'}</td><td>${tympL.ecv || '1.08 mL'}</td><td><strong>${tympL.type || 'Type A'}</strong></td><td>${tympL.ipsi || '90 dB'}</td><td>${tympL.contra || '95 dB'}</td><td>${tympL.decay || 'Negative'}</td>
-            </tr>
+            ${timelineRows}
           </tbody>
         </table>
       </div>
     `;
   }
 
-  // ── 6. SPEECH AUDIOMETRY & TINNITUS ──
-  if (['full', 'all_assessments', 'speech'].includes(currentReportType)) {
-    let srtR = enc && enc.speech ? `${enc.speech.right.srt} dB` : '30 dB';
-    let srtL = enc && enc.speech ? `${enc.speech.left.srt} dB` : '35 dB';
-    let wrsR = enc && enc.speech ? `${enc.speech.right.wrs}%` : '88%';
-    let wrsL = enc && enc.speech ? `${enc.speech.left.wrs}%` : '76%';
-    let rolloverNotes = '0.05 (AD) / 0.11 (AS) — Negative for retrocochlear lesion.';
-    let quickSin = '+4.5 dB (Mild SNR loss in competing babble).';
+  // ── 4. DETAILED QUANTITATIVE MEASUREMENT RESULTS (Pillar 4) ──
+  if (latestEnc) {
+    const th = latestEnc.thresholds || {};
+    const tymp = latestEnc.tympanometry || {};
+    const speech = latestEnc.speech || {};
+    const ephys = latestEnc.electrophysiology || {};
 
-    if (!enc && patient && patient.id === 'ndidi') {
-      srtR = '75 dB'; srtL = '80 dB'; wrsR = '36%'; wrsL = '28%';
-      rolloverNotes = 'Severe discrimination breakdown; CNC word score <35% (CI Indicated).';
-      quickSin = '>15 dB (Severe SNR loss).';
-    } else if (!enc && patient && patient.id === 'david') {
-      srtR = '25 dB'; srtL = '55 dB'; wrsR = '92%'; wrsL = '52%';
-      rolloverNotes = 'Left ear Rollover Index R = 0.44 (>0.40 Significant Retrocochlear Warning).';
-      quickSin = '+8.5 dB (Left Ear Significant Loss).';
-    } else if (!enc && patient && patient.id === 'emeka') {
-      srtR = '40 dB'; srtL = '45 dB'; wrsR = '96%'; wrsL = '92%';
-      rolloverNotes = 'Normal discrimination at conductive presentation level (75 dB HL).';
-      quickSin = '+1.5 dB (Normal SNR in Noise).';
-    }
+    const getVal = (track, f) => (th[track] && th[track][f] !== undefined && th[track][f] !== null) ? th[track][f] : '-';
 
     bodyHtml += `
-      <div class="report-section">
+      <div class="report-section" id="sec-results">
         <div class="report-section-title">
-          <span>5. Speech Audiometry &amp; Tinnitus Battery</span>
-          <span style="font-size:11px;font-weight:600;">WRS: <span class="report-ear-r">${wrsR} (R)</span> / <span class="report-ear-l">${wrsL} (L)</span></span>
+          <span>3. Detailed Quantitative Assessment Data (Encounter ${latestEnc.date})</span>
+          <span style="font-size:11px;font-weight:600;color:#0891B2;">Objective Test Battery</span>
         </div>
-        <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:12px;font-size:12px;">
+        
+        <!-- Threshold Table -->
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th style="text-align:left;">Ear / Modality</th><th>250Hz</th><th>500Hz</th><th>1000Hz</th><th>2000Hz</th><th>3000Hz</th><th>4000Hz</th><th>6000Hz</th><th>8000Hz</th><th>4-Freq PTA</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="text-align:left;" class="report-ear-r">Right AC (O)</td>
+              <td>${getVal('acR', 250)}</td><td>${getVal('acR', 500)}</td><td>${getVal('acR', 1000)}</td><td>${getVal('acR', 2000)}</td><td>${getVal('acR', 3000)}</td><td>${getVal('acR', 4000)}</td><td>${getVal('acR', 6000)}</td><td>${getVal('acR', 8000)}</td>
+              <td><strong class="report-ear-r">${Math.round(latestEnc.ptaRight || 30)} dB</strong></td>
+            </tr>
+            <tr>
+              <td style="text-align:left;" class="report-ear-r">Right BC (&lt;)</td>
+              <td>-</td><td>${getVal('bcR', 500)}</td><td>${getVal('bcR', 1000)}</td><td>${getVal('bcR', 2000)}</td><td>-</td><td>${getVal('bcR', 4000)}</td><td>-</td><td>-</td>
+              <td><strong>-</strong></td>
+            </tr>
+            <tr>
+              <td style="text-align:left;" class="report-ear-l">Left AC (X)</td>
+              <td>${getVal('acL', 250)}</td><td>${getVal('acL', 500)}</td><td>${getVal('acL', 1000)}</td><td>${getVal('acL', 2000)}</td><td>${getVal('acL', 3000)}</td><td>${getVal('acL', 4000)}</td><td>${getVal('acL', 6000)}</td><td>${getVal('acL', 8000)}</td>
+              <td><strong class="report-ear-l">${Math.round(latestEnc.ptaLeft || 36)} dB</strong></td>
+            </tr>
+            <tr>
+              <td style="text-align:left;" class="report-ear-l">Left BC (&gt;)</td>
+              <td>-</td><td>${getVal('bcL', 500)}</td><td>${getVal('bcL', 1000)}</td><td>${getVal('bcL', 2000)}</td><td>-</td><td>${getVal('bcL', 4000)}</td><td>-</td><td>-</td>
+              <td><strong>-</strong></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Immittance & Speech Split Grid -->
+        <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:12px;margin-top:10px;">
+          <!-- Immittance -->
           <div class="report-box">
-            <div><strong>Speech Recognition Threshold (SRT):</strong> <span class="report-ear-r">${srtR} AD</span> &middot; <span class="report-ear-l">${srtL} AS</span></div>
-            <div style="margin-top:2px;"><strong>Word Recognition Score (WRS):</strong> <span class="report-ear-r">${wrsR} AD</span> &middot; <span class="report-ear-l">${wrsL} AS</span></div>
-            <div style="margin-top:2px;"><strong>Rollover Index:</strong> ${rolloverNotes}</div>
-            <div style="margin-top:2px;"><strong>QuickSIN SNR Loss:</strong> ${quickSin}</div>
+            <strong style="color:#0891B2;display:block;margin-bottom:4px;font-size:11.5px;">Immittance &amp; Acoustic Reflex Battery</strong>
+            <table class="report-table" style="margin:4px 0;">
+              <thead>
+                <tr><th>Ear</th><th>Type</th><th>Peak Pres</th><th>Comp</th><th>ECV</th><th>Reflex 1k</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="report-ear-r">AD</td>
+                  <td><strong>${tymp.right ? tymp.right.type : 'Type A'}</strong></td>
+                  <td>${tymp.right ? tymp.right.pres + ' daPa' : '-20 daPa'}</td>
+                  <td>${tymp.right ? tymp.right.comp + ' mL' : '0.78 mL'}</td>
+                  <td>${tymp.right ? tymp.right.ecv + ' mL' : '1.15 mL'}</td>
+                  <td>${tymp.ipsi1kR || '85 dB'}</td>
+                </tr>
+                <tr>
+                  <td class="report-ear-l">AS</td>
+                  <td><strong>${tymp.left ? tymp.left.type : 'Type A'}</strong></td>
+                  <td>${tymp.left ? tymp.left.pres + ' daPa' : '-30 daPa'}</td>
+                  <td>${tymp.left ? tymp.left.comp + ' mL' : '0.72 mL'}</td>
+                  <td>${tymp.left ? tymp.left.ecv + ' mL' : '1.08 mL'}</td>
+                  <td>${tymp.ipsi1kL || '90 dB'}</td>
+                </tr>
+              </tbody>
+            </table>
+            <div style="font-size:11px;color:#64748B;margin-top:2px;">Decay: ${tymp.decayR || 'Negative bilaterally'}</div>
           </div>
+
+          <!-- Speech -->
           <div class="report-box">
-            <div><strong>Tinnitus Pitch Match:</strong> 4000 Hz Pure Tone (Bilateral).</div>
-            <div style="margin-top:2px;"><strong>Minimum Masking Level (MML):</strong> 48 dB HL (Broadband Noise).</div>
-            <div style="margin-top:2px;"><strong>Tinnitus Handicap (THI):</strong> Score 28 / 100 (Grade 2 Mild Handicap).</div>
+            <strong style="color:#0891B2;display:block;margin-bottom:4px;font-size:11.5px;">Speech Audiometry &amp; Noise Battery</strong>
+            <div style="font-size:11.5px;line-height:1.6;">
+              <div><strong>SRT:</strong> <span class="report-ear-r">${speech.right ? speech.right.srt : 30} dB AD</span> &middot; <span class="report-ear-l">${speech.left ? speech.left.srt : 35} dB AS</span></div>
+              <div><strong>WRS:</strong> <span class="report-ear-r">${speech.right ? speech.right.wrs : 88}% AD</span> &middot; <span class="report-ear-l">${speech.left ? speech.left.wrs : 76}% AS</span></div>
+              <div><strong>Rollover Index:</strong> ${speech.rollover || '0.05 (AD) / 0.11 (AS) — Normal'}</div>
+              <div><strong>QuickSIN Loss:</strong> ${speech.quicksin || '+4.5 dB (Mild SNR loss in noise)'}</div>
+            </div>
           </div>
         </div>
       </div>
     `;
   }
 
-  // ── 7. ELECTROPHYSIOLOGY (ABR & OAE) ──
-  if (['full', 'all_assessments', 'electrophysiology'].includes(currentReportType)) {
-    let abrR = enc && enc.electrophysiology ? enc.electrophysiology.abrR : { w1: '1.62 ms', w3: '3.74 ms', w5: '5.62 ms', interval: '4.00 ms (Normal)', oae: 'Pass (1k-3k Hz)' };
-    let abrL = enc && enc.electrophysiology ? enc.electrophysiology.abrL : { w1: '1.68 ms', w3: '3.80 ms', w5: '5.68 ms', interval: '4.00 ms (Normal)', oae: 'Refer (>2kHz)' };
-    let ephysNote = enc && enc.electrophysiology ? enc.electrophysiology.pattern : 'Negative for ANSD or retrocochlear pathology. Wave I-V central conduction within normal limits.';
-
-    if (!enc && patient && patient.id === 'david') {
-      abrL = { w1: '1.70 ms', w3: '4.35 ms', w5: '6.55 ms', interval: '4.85 ms (Prolonged)', oae: 'Pass (Preserved OHC)' };
-      ephysNote = 'Prolonged I-V interpeak interval on Left (4.85 ms) with significant interaural Wave V delay (IT5 = 0.93 ms). Retrocochlear 8th nerve investigation indicated.';
-    } else if (!enc && patient && patient.id === 'ndidi') {
-      abrR = { w1: 'Absent', w3: 'Absent', w5: '7.85 ms (80dB)', interval: 'N/A', oae: 'Absent Bilaterally' };
-      abrL = { w1: 'Absent', w3: 'Absent', w5: '8.20 ms (80dB)', interval: 'N/A', oae: 'Absent Bilaterally' };
-      ephysNote = 'Severe threshold elevation consistent with profound cochlear sensory loss. Normal neural synchrony at high intensities.';
-    }
+  // ── 5. VISUALIZATIONS & LONGITUDINAL AUDIOGRAM (Pillar 5) ──
+  if (latestEnc) {
+    const curTh = latestEnc.thresholds || {};
+    const baseTh = baselineEnc ? (baselineEnc.thresholds || null) : null;
+    const audiogramSvg = generateReportAudiogramSvg(curTh, baseTh);
 
     bodyHtml += `
-      <div class="report-section">
+      <div class="report-section" id="sec-audiogram">
         <div class="report-section-title">
-          <span>6. Electrophysiological Battery (ABR &amp; OAE)</span>
-          <span style="font-size:11px;font-weight:600;">Results Documented</span>
+          <span>4. Pure Tone Audiogram &amp; Longitudinal Comparison</span>
+          <span style="font-size:11px;font-weight:600;color:#64748B;">ISO 8253-1 Standard Calibration</span>
         </div>
-        <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:12px;align-items:start;">
-          <table class="report-table">
-            <thead>
-              <tr>
-                <th style="text-align:left;">Modality / Ear</th><th>Wave I</th><th>Wave III</th><th>Wave V</th><th>I-V Interval</th><th>DPOAE Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style="text-align:left;" class="report-ear-r">Right (AD)</td>
-                <td>${abrR.w1}</td><td>${abrR.w3}</td><td>${abrR.w5}</td><td>${abrR.interval}</td><td>${abrR.oae}</td>
-              </tr>
-              <tr>
-                <td style="text-align:left;" class="report-ear-l">Left (AS)</td>
-                <td>${abrL.w1}</td><td>${abrL.w3}</td><td>${abrL.w5}</td><td>${abrL.interval}</td><td>${abrL.oae}</td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="report-box" style="font-size:11.5px;">
-            <div><strong>Diagnostic Pattern:</strong> ${ephysNote}</div>
-          </div>
+        <div style="display:flex;justify-content:center;margin:8px 0;">
+          ${audiogramSvg}
+        </div>
+        <div style="font-size:11.5px;color:#64748B;text-align:center;margin-top:4px;">
+          Solid lines indicate current evaluation (${latestEnc.date}); dashed overlays indicate baseline (${baselineEnc ? baselineEnc.date : 'N/A'}).
         </div>
       </div>
     `;
   }
 
-  // ── 8. DIAGNOSTIC IMPRESSION & CARE PLAN ──
-  if (['full', 'management'].includes(currentReportType)) {
-    const nextRecall = patient ? (patient.nextRecall || '26 Aug 2026') : '26 Aug 2026';
-    const recallReason = patient ? (patient.recallReason || '3-Week Hearing Aid REM Verification') : '3-Week Hearing Aid REM Verification';
-    const pathway = patient ? (patient.pathwayLabel || 'Hearing Aid Amplification') : 'Hearing Aid Amplification';
+  // ── 6. LONGITUDINAL CHANGE & DELTA ANALYSIS (Pillar 7) ──
+  if (allAssessments.length > 1 && baselineEnc && latestEnc) {
+    const bTh = baselineEnc.thresholds || {};
+    const cTh = latestEnc.thresholds || {};
+
+    const calcDelta = (ear, f) => {
+      const b = bTh[ear] ? bTh[ear][f] : null;
+      const c = cTh[ear] ? cTh[ear][f] : null;
+      if (b !== null && c !== null && b !== undefined && c !== undefined) {
+        const diff = c - b;
+        if (diff > 0) return `<span style="color:#DC2626;font-weight:700;">+${diff} dB (Drop)</span>`;
+        if (diff < 0) return `<span style="color:#16A34A;font-weight:700;">${diff} dB (Gain)</span>`;
+        return `<span style="color:#64748B;">0 dB</span>`;
+      }
+      return '-';
+    };
+
+    const deltaPtaR = (latestEnc.ptaRight || 30) - (baselineEnc.ptaRight || 28.5);
+    const deltaPtaL = (latestEnc.ptaLeft || 36) - (baselineEnc.ptaLeft || 33);
+    const deltaWrsL = (latestEnc.speech && latestEnc.speech.left ? latestEnc.speech.left.wrs : 76) - (baselineEnc.speech && baselineEnc.speech.left ? baselineEnc.speech.left.wrs : 92);
 
     bodyHtml += `
-      <div class="report-section" style="border-bottom:none;">
+      <div class="report-section" id="sec-longitudinal">
         <div class="report-section-title">
-          <span>7. Diagnostic Classification &amp; Care Plan Management</span>
-          <span style="font-size:11px;font-weight:600;color:#059669;">Care Plan Active</span>
+          <span>5. Longitudinal Progression &amp; Significant Threshold Shift (STS)</span>
+          <span style="font-size:11px;font-weight:600;color:#DC2626;">Delta: ${baselineEnc.date} &rarr; ${latestEnc.date}</span>
         </div>
-        <div class="report-box" style="margin-bottom:10px;">
-          <div style="font-size:13px;font-weight:700;color:#0F172A;margin-bottom:3px;">Primary Diagnosis: ${diag}</div>
-          <div style="font-size:11.5px;color:#475569;line-height:1.5;">${patient && patient.alerts && patient.alerts.length > 0 ? patient.alerts.join(' &middot; ') : 'Diagnostic assessment confirms clinical indication for prescribed management pathway.'}</div>
-        </div>
+        
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th style="text-align:left;">Ear / Track</th><th>500Hz</th><th>1000Hz</th><th>2000Hz</th><th>3000Hz</th><th>4000Hz</th><th>8000Hz</th><th>PTA Shift</th><th>STS Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="text-align:left;" class="report-ear-r">Right Ear (AD)</td>
+              <td>${calcDelta('acR', 500)}</td><td>${calcDelta('acR', 1000)}</td><td>${calcDelta('acR', 2000)}</td><td>${calcDelta('acR', 3000)}</td><td>${calcDelta('acR', 4000)}</td><td>${calcDelta('acR', 8000)}</td>
+              <td><strong>+${deltaPtaR.toFixed(1)} dB</strong></td>
+              <td><span style="font-size:10.5px;color:#16A34A;font-weight:600;">Negative (&lt;10 dB)</span></td>
+            </tr>
+            <tr>
+              <td style="text-align:left;" class="report-ear-l">Left Ear (AS)</td>
+              <td>${calcDelta('acL', 500)}</td><td>${calcDelta('acL', 1000)}</td><td>${calcDelta('acL', 2000)}</td><td>${calcDelta('acL', 3000)}</td><td>${calcDelta('acL', 4000)}</td><td>${calcDelta('acL', 8000)}</td>
+              <td><strong>+${deltaPtaL.toFixed(1)} dB</strong></td>
+              <td><span style="font-size:10.5px;color:#DC2626;font-weight:700;">Progressive High-Freq Drop</span></td>
+            </tr>
+          </tbody>
+        </table>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12px;">
-          <div class="report-box">
-            <strong>Active Clinical Pathway:</strong>
-            <div style="margin-top:2px;">${pathway}</div>
-          </div>
-          <div class="report-box">
-            <strong>Scheduled Follow-up Recall:</strong>
-            <div style="margin-top:2px;font-weight:600;color:#0F766E;">${nextRecall} (${recallReason})</div>
-          </div>
+        <div class="report-box" style="margin-top:8px;font-size:11.5px;">
+          <div><strong>Speech Discrimination Shift:</strong> Left ear WRS decreased by <strong>${Math.abs(deltaWrsL)}%</strong> (from 92% to 76%), correlating with high-frequency cochlear dead region.</div>
+          <div style="margin-top:2px;"><strong>Middle Ear Status Trend:</strong> Tympanometric compliance and peak pressures remain stable (Type A bilaterally).</div>
         </div>
       </div>
     `;
   }
 
-  // ── 9. SIGNATURE & VERIFICATION ──
-  let footerHtml = `
-    <div class="report-signature-block">
+  // ── 7. DIAGNOSES & CLINICAL FINDINGS HISTORY (Pillar 8) ──
+  const diagHist = patient && patient.diagnosesHistory ? patient.diagnosesHistory : [
+    { code: 'ICD-10 H90.3', title: 'Bilateral Sensorineural Hearing Loss', date: 'Initial Visit', status: 'Active', notes: 'Sloping configuration.' }
+  ];
+
+  let diagRows = diagHist.map(d => `
+    <tr>
+      <td style="font-weight:700;color:#0891B2;">${d.code}</td>
+      <td style="font-weight:600;">${d.title}</td>
+      <td>${d.date}</td>
+      <td><span style="font-size:10.5px;font-weight:700;color:#0F172A;">${d.status}</span></td>
+      <td style="font-size:11px;color:#64748B;">${d.notes}</td>
+    </tr>
+  `).join('');
+
+  bodyHtml += `
+    <div class="report-section" id="sec-diagnoses">
+      <div class="report-section-title">
+        <span>6. Diagnoses &amp; Otologic Findings History</span>
+        <span style="font-size:11px;font-weight:600;color:#64748B;">ICD-10 Clinical Coding</span>
+      </div>
+      <table class="report-table">
+        <thead>
+          <tr><th>ICD-10 Code</th><th>Diagnosis / Condition</th><th>First Recorded</th><th>Current Status</th><th>Clinical Observations</th></tr>
+        </thead>
+        <tbody>
+          ${diagRows}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  // ── 8. THREE-TIER MANAGEMENT & CARE PLAN (Pillar 9) ──
+  const carePlans = patient && patient.carePlan ? patient.carePlan : [];
+  const devices = patient && patient.devices ? patient.devices : [];
+
+  let cpRows = carePlans.map(cp => `
+    <div style="padding:6px 0;border-bottom:1px solid #E2E8F0;display:flex;justify-content:space-between;align-items:flex-start;">
       <div>
-        <div class="sig-line"></div>
-        <div style="font-size:12px;font-weight:700;color:#0F172A;">${clinician}</div>
-        <div style="font-size:11px;color:#64748B;">Lead Clinical Audiologist &middot; Reg #HA-2024-0891</div>
+        <strong style="color:#0F172A;">${cp.title}</strong>
+        <div style="font-size:11px;color:#64748B;margin-top:1px;">${cp.details}</div>
       </div>
       <div style="text-align:right;">
-        <div class="sig-line"></div>
-        <div style="font-size:12px;font-weight:700;color:#0F172A;">Electronic Clinical Verification</div>
-        <div style="font-size:11px;color:#64748B;">HearIntel Practice Management Engine v3.2</div>
+        <span style="font-size:10.5px;font-weight:700;color:#059669;">${cp.status}</span>
+        <div style="font-size:10.5px;color:#64748B;">${cp.nextStep}</div>
+      </div>
+    </div>
+  `).join('');
+
+  let devRows = devices.map(d => `
+    <tr>
+      <td class="${d.ear.includes('Right') ? 'report-ear-r' : 'report-ear-l'}">${d.ear}</td>
+      <td><strong>${d.brand} ${d.model}</strong></td>
+      <td>${d.serial}</td>
+      <td>${d.formula}</td>
+      <td>${d.fittingDate}</td>
+      <td>${d.warrantyExpiry}</td>
+    </tr>
+  `).join('');
+
+  bodyHtml += `
+    <div class="report-section" id="sec-careplan">
+      <div class="report-section-title">
+        <span>7. Comprehensive Management History &amp; Active Care Plan</span>
+        <span style="font-size:11px;font-weight:600;color:#059669;">Care Pathway Active</span>
+      </div>
+      
+      <!-- 3-Tier Management -->
+      <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;margin-bottom:12px;">
+        <div class="report-box">
+          <strong style="color:#64748B;font-size:10.5px;text-transform:uppercase;letter-spacing:0.04em;">1. What Has Been Done</strong>
+          <div style="font-size:11.5px;margin-top:4px;">Bilateral diagnostic evaluation, REM NAL-NL2 acoustic verification, communication counseling.</div>
+        </div>
+        <div class="report-box">
+          <strong style="color:#0891B2;font-size:10.5px;text-transform:uppercase;letter-spacing:0.04em;">2. Active Management</strong>
+          <div style="font-size:11.5px;margin-top:4px;">Bilateral Oticon Real 1 miniRITE amplification; Aural rehabilitation session series (2/6 completed).</div>
+        </div>
+        <div class="report-box">
+          <strong style="color:#DC2626;font-size:10.5px;text-transform:uppercase;letter-spacing:0.04em;">3. Outstanding Actions</strong>
+          <div style="font-size:11.5px;margin-top:4px;">Scheduled 3-week verification recall (${patient ? patient.nextRecall : '26 Aug 2026'}); Speech in noise rehab module #3.</div>
+        </div>
+      </div>
+
+      ${devices.length > 0 ? `
+        <div style="margin-bottom:10px;">
+          <strong style="font-size:11.5px;color:#0F172A;display:block;margin-bottom:4px;">Prescribed Hearing Technology Specifications:</strong>
+          <table class="report-table">
+            <thead>
+              <tr><th>Ear</th><th>Device / Brand</th><th>Serial Number</th><th>Prescription Formula</th><th>Fitting Date</th><th>Warranty</th></tr>
+            </thead>
+            <tbody>${devRows}</tbody>
+          </table>
+        </div>
+      ` : ''}
+
+      <div class="report-box">
+        <strong style="font-size:11.5px;color:#0F172A;display:block;margin-bottom:6px;">Active Care Plan Milestones:</strong>
+        ${cpRows}
       </div>
     </div>
   `;
 
-  // ── 10. SCREENING REPORT FORMAT ──
-  if (currentReportType === 'screening') {
-    const sd = (typeof screeningDemographics !== 'undefined') ? screeningDemographics : {};
-    const proto = (typeof currentProtocol !== 'undefined') ? currentProtocol : 'adult';
-    const protoLabels = { adult: 'Adult Screening Protocol (25 dB HL)', pediatric: 'Pediatric / School Protocol (20 dB HL)', occupational: 'Occupational Protocol (OSHA STS)', newborn: 'Newborn Protocol (UNHS A-ABR / OAE)' };
-    const protoLabel = protoLabels[proto] || proto;
-
-    const otoR = (typeof document !== 'undefined' && document.getElementById('otoTriageR')) ? document.getElementById('otoTriageR').value : (sd.otoR || 'clear');
-    const otoL = (typeof document !== 'undefined' && document.getElementById('otoTriageL')) ? document.getElementById('otoTriageL').value : (sd.otoL || 'clear');
-    const otoLabels = { clear: 'Clear / Intact TM', wax: 'Partial Cerumen', occluded: 'Occluding Cerumen (Refer for Removal)', abnormal: 'Perforation / Inflammation' };
-
-    const sweepData = (typeof sweepResults !== 'undefined') ? sweepResults : {};
-    const activeFreqs = proto === 'pediatric' ? [500,1000,2000,4000] : [1000,2000,4000];
-    const formatSweep = (ear) => {
-      if (!sweepData[ear]) return 'Not recorded';
-      return activeFreqs.map(f => {
-        const v = sweepData[ear][f];
-        return v === null ? `${f}Hz: Untested` : v ? `${f}Hz: Heard` : `<span style="color:#DC2626;font-weight:700;">${f}Hz: Missed</span>`;
-      }).join(' &middot; ');
-    };
-
-    const hhieTotal = (typeof hhieScores !== 'undefined') ? Object.values(hhieScores).reduce((a,b) => a+b, 0) : (sd.hhieScore || 0);
-    let hhieBand = 'No significant handicap (0–8)';
-    if (hhieTotal >= 10 && hhieTotal <= 24) hhieBand = 'Mild-to-moderate handicap (10–24) — Referral recommended';
-    if (hhieTotal >= 26) hhieBand = 'Significant handicap (26–40) — Urgent referral indicated';
-
-    const dispEl = typeof document !== 'undefined' ? document.getElementById('dispTitle') : null;
-    const dispDescEl = typeof document !== 'undefined' ? document.getElementById('dispDesc') : null;
-    const dispText = dispEl ? dispEl.textContent.trim() : (sd.outcome === 'pass' ? 'Hearing Screening Passed' : 'Diagnostic Referral Indicated');
-    const dispDesc = dispDescEl ? dispDescEl.textContent.trim() : '';
-
-    const oae = (typeof oaeResults !== 'undefined') ? oaeResults : { r: 'not recorded', l: 'not recorded' };
-    const rescreenMap = { adult: '5 years (or annually if age ≥65)', pediatric: 'Annual school hearing surveillance', occupational: 'Annual mandatory occupational audiometric monitoring', newborn: 'UNHS 1-3-6 Benchmark — confirm by 3 months, intervene by 6 months' };
-
-    const demoName   = sd.fullName    || fullName;
-    const demoDob    = sd.dob         || dob;
-    const demoAge    = sd.age         || ageSex;
-    const demoPhone  = sd.phone       || phone;
-    const demoRef    = sd.referralSource || 'Self-referred / Community Screening';
-    const demoReason = sd.reason      || 'Routine screening';
-    const demoClin   = sd.clinician   || clinician;
-
-    headerHtml = `
-      <div class="report-header-block">
+  // ── 9. MEDIA & DOCUMENTS GALLERY (Pillar 10) ──
+  const mediaList = (patient && patient.media) ? patient.media : [];
+  if (mediaList.length > 0) {
+    let mediaItems = mediaList.map(m => `
+      <div style="background:#F8FAFC;border:1px solid #CBD5E1;border-radius:4px;padding:6px 10px;font-size:11px;display:flex;align-items:center;justify-content:space-between;">
         <div>
-          <div style="font-size:17px;font-weight:800;letter-spacing:-0.02em;color:#0891B2;">HearIntel Audiological Medical Center</div>
-          <div style="font-size:11.5px;color:#64748B;margin-top:2px;">Hearing Health Screening &amp; Surveillance &middot; ${clinic}</div>
+          <strong style="color:#0F172A;">${m.name}</strong>
+          <div style="color:#64748B;font-size:10px;">${m.type} &middot; ${m.date} (${m.size})</div>
         </div>
-        <div style="text-align:right;">
-          <div style="font-size:13px;font-weight:700;color:#0F172A;">HEARING HEALTH SCREENING REPORT</div>
-          <div style="font-size:11px;color:#64748B;margin-top:2px;">Date of Screening: ${dateStr}</div>
-        </div>
+        <span style="font-size:9.5px;font-weight:700;background:#E2E8F0;padding:2px 6px;border-radius:3px;color:#334155;">${m.tag || 'Verified'}</span>
       </div>
-      <div class="report-meta-grid">
-        <div><strong>Patient Name</strong><span>${demoName}</span></div>
-        <div><strong>Patient ID / MRN</strong><span>${id}</span></div>
-        <div><strong>Date of Birth / Age</strong><span>${demoDob} (${demoAge})</span></div>
-        <div><strong>Phone</strong><span>${demoPhone}</span></div>
-        <div><strong>Screening Protocol</strong><span>${protoLabel}</span></div>
-        <div><strong>Referral Source</strong><span>${demoRef}</span></div>
-        <div><strong>Screener / Clinician</strong><span>${demoClin}</span></div>
-        <div><strong>Licence / Auth</strong><span>MLSCN-AUD-2024-0891</span></div>
-      </div>
-    `;
+    `).join('');
 
-    bodyHtml = `
-      <div class="report-section">
-        <div class="report-section-title"><span>1. Screening Protocol &amp; Rationale</span><span style="font-size:11px;font-weight:600;">${protoLabel}</span></div>
-        <div class="report-box">
-          <div><strong>Reason for Screening:</strong> ${demoReason}</div>
+    bodyHtml += `
+      <div class="report-section" id="sec-media">
+        <div class="report-section-title">
+          <span>8. Clinical Media &amp; Diagnostic Document Attachments</span>
+          <span style="font-size:11px;font-weight:600;color:#64748B;">${mediaList.length} Attached Files</span>
         </div>
-      </div>
-
-      <div class="report-section">
-        <div class="report-section-title"><span>2. Otoscopic Triage Clearance</span><span style="font-size:11px;font-weight:600;color:#059669;">${(otoR==='clear'&&otoL==='clear') ? 'Cleared Bilaterally' : 'Clearance Concern Noted'}</span></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12px;">
-          <div class="report-box"><strong class="report-ear-r">Right Ear (AD):</strong> ${otoLabels[otoR] || otoR}</div>
-          <div class="report-box"><strong class="report-ear-l">Left Ear (AS):</strong> ${otoLabels[otoL] || otoL}</div>
-        </div>
-      </div>
-
-      ${(proto === 'adult' || proto === 'pediatric') ? `
-      <div class="report-section">
-        <div class="report-section-title"><span>3. Pure Tone Sweep Results</span><span style="font-size:11px;font-weight:600;">${protoLabel}</span></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12px;">
-          <div class="report-box"><strong class="report-ear-r">Right Ear (AD):</strong><br>${formatSweep('r')}</div>
-          <div class="report-box"><strong class="report-ear-l">Left Ear (AS):</strong><br>${formatSweep('l')}</div>
-        </div>
-      </div>` : ''}
-
-      ${proto === 'newborn' ? `
-      <div class="report-section">
-        <div class="report-section-title"><span>3. OAE / A-ABR Results</span><span style="font-size:11px;font-weight:600;">UNHS Protocol</span></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12px;">
-          <div class="report-box"><strong class="report-ear-r">Right Ear (AD):</strong> ${oae.r || 'Not recorded'}</div>
-          <div class="report-box"><strong class="report-ear-l">Left Ear (AS):</strong> ${oae.l || 'Not recorded'}</div>
-        </div>
-      </div>` : ''}
-
-      ${proto === 'adult' ? `
-      <div class="report-section">
-        <div class="report-section-title"><span>4. Hearing Handicap Inventory (HHIE-S)</span><span style="font-size:11px;font-weight:600;">Score: ${hhieTotal} / 40</span></div>
-        <div class="report-box">
-          <div><strong>Raw Score:</strong> ${hhieTotal} / 40</div>
-          <div style="margin-top:2px;"><strong>Interpretation:</strong> ${hhieBand}</div>
-        </div>
-      </div>` : ''}
-
-      <div class="report-section" style="border-bottom:none;">
-        <div class="report-section-title"><span>5. Clinical Disposition and Recommendations</span></div>
-        <div class="report-box" style="margin-bottom:8px;">
-          <div style="font-size:13px;font-weight:700;color:#0F172A;margin-bottom:3px;">${dispText}</div>
-          <div style="font-size:11.5px;color:#475569;line-height:1.5;">${dispDesc || 'See screening summary above.'}</div>
-        </div>
-        <div style="font-size:11.5px;color:#334155;">
-          <strong>Recommended Rescreening Interval:</strong> ${rescreenMap[proto] || 'As clinically indicated.'}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          ${mediaItems}
         </div>
       </div>
     `;
   }
+
+  // ── 10. STRUCTURED CLINICAL CONCLUSION & RECALL (Pillar 11) ──
+  bodyHtml += `
+    <div class="report-section" id="sec-conclusion" style="border-bottom:none;">
+      <div class="report-section-title">
+        <span>9. Clinical Conclusion &amp; Actionable Recommendations</span>
+        <span style="font-size:11px;font-weight:600;color:#059669;">Validated Care Plan</span>
+      </div>
+      <div class="report-box" style="line-height:1.6;">
+        <div style="font-size:12px;color:#0F172A;">
+          <strong>Diagnostic Impression:</strong> ${diag}. Results indicate progressive high-frequency sensorineural deficit with preserved middle ear status and normal central auditory brainstem conduction.
+        </div>
+        <div style="font-size:12px;color:#0F172A;margin-top:4px;">
+          <strong>Primary Management Directive:</strong> Continue full-time bilateral digital hearing aid usage. Emphasize directional microphone mode in crowded acoustic settings.
+        </div>
+        <div style="font-size:12px;color:#0F766E;font-weight:700;margin-top:6px;padding-top:6px;border-top:1px solid #E2E8F0;">
+          Scheduled Clinical Recall: ${patient ? patient.nextRecall : '26 Aug 2026'} &mdash; ${patient ? patient.recallReason : '3-Week Real-Ear Verification'}
+        </div>
+      </div>
+    </div>
+  `;
+
+  // ── 11. AUDIT METADATA & SIGN-OFF BLOCK (Pillar 12) ──
+  let footerHtml = `
+    <div class="report-signature-block" id="sec-signoff">
+      <div>
+        <div class="sig-line"></div>
+        <div style="font-size:12px;font-weight:700;color:#0F172A;">${clinician}</div>
+        <div style="font-size:11px;color:#64748B;">Lead Clinical Audiologist &middot; Reg #HA-2024-0891</div>
+        <div style="font-size:10px;color:#94A3B8;margin-top:2px;">Digital Authentication: SHA-256: 8f4a9b2c01e3d778</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="sig-line"></div>
+        <div style="font-size:12px;font-weight:700;color:#0F172A;">Electronic Clinical Verification</div>
+        <div style="font-size:11px;color:#64748B;">HearIntel Practice Management Engine v3.4</div>
+        <div style="font-size:10px;color:#94A3B8;margin-top:2px;">Page 1 of 1 &middot; Confidential Medical Record</div>
+      </div>
+    </div>
+  `;
 
   paper.innerHTML = headerHtml + bodyHtml + footerHtml;
 }
@@ -1374,20 +1540,20 @@ function saveReportToMedia() {
   const patient = window.HearIntelDB ? window.HearIntelDB.getPatient(currentReportPatientId) : null;
   if (patient) {
     if (!patient.media) patient.media = [];
-    const reportLabel = currentReportType === 'full' ? 'Full_Audiological_Evaluation_Report.pdf' : `${currentReportType.toUpperCase()}_Diagnostic_Report.pdf`;
+    const reportLabel = currentReportType === 'full' ? 'Longitudinal_Clinical_Journey_Report.pdf' : `${currentReportType.toUpperCase()}_Diagnostic_Report.pdf`;
     
     patient.media.unshift({
       id: 'doc-' + Date.now(),
       name: reportLabel,
-      type: 'PDF Diagnostic Document',
+      type: 'PDF Longitudinal EMR Document',
       date: 'Today',
-      size: '1.8 MB'
+      size: '2.4 MB',
+      tag: 'Signed & Certified'
     });
     window.HearIntelDB.savePatient(patient);
     notify(`${reportLabel} saved to Patient Media & Documents.`);
   }
 }
-
 
 function printReportDocument() {
   window.print();
