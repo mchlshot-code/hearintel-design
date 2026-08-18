@@ -781,6 +781,33 @@ function openReportModal(patientId, reportType = 'full') {
   }
 
   modal.innerHTML = `
+    <style id="reportDocumentStyles"><style>
+.report-modal-backdrop { position:fixed; inset:0; background:rgba(15,23,42,0.85); backdrop-filter:blur(8px); z-index:10000; display:flex; align-items:center; justify-content:center; padding:16px; overflow:hidden; }
+.report-modal-window { background:#1E293B; border:1px solid rgba(255,255,255,0.15); border-radius:12px; width:100%; max-width:940px; height:94vh; max-height:94vh; display:flex; flex-direction:column; box-shadow:0 25px 60px -15px rgba(0,0,0,0.8); overflow:hidden; }
+.report-modal-header { padding:12px 20px; background:#0F172A; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:space-between; gap:16px; flex-shrink:0; color:#FFFFFF; }
+.report-modal-body { padding:32px 20px; background:#334155; overflow-y:auto; flex:1; display:flex; justify-content:center; }
+.report-paper { background:#FFFFFF !important; color:#0F172A !important; width:100%; max-width:820px; min-height:1080px; padding:44px 48px; border-radius:2px; box-shadow:0 8px 32px rgba(0,0,0,0.35); font-family:'DM Sans',sans-serif; font-size:12.5px; line-height:1.55; box-sizing:border-box; }
+.report-paper * { box-sizing:border-box; }
+.report-header-block { display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2.5px solid #0891B2; padding-bottom:14px; margin-bottom:16px; gap:20px; }
+.report-meta-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px 12px; background:#F8FAFC !important; border:1px solid #E2E8F0; border-radius:6px; padding:12px 14px; margin-bottom:18px; font-size:11.5px; }
+.report-meta-grid > div strong { display:block; font-size:9.5px; text-transform:uppercase; letter-spacing:0.06em; color:#64748B !important; margin-bottom:2px; }
+.report-meta-grid > div span { color:#0F172A !important; font-weight:600; }
+.report-section { border-bottom:1px solid #E2E8F0; padding-bottom:16px; margin-bottom:16px; background:transparent !important; }
+.report-section:last-child { border-bottom:none; margin-bottom:0; padding-bottom:0; }
+.report-section-title { font-family:'Figtree',sans-serif; font-size:13.5px; font-weight:700; color:#0F172A !important; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; letter-spacing:-0.01em; }
+.report-section-title > span:first-child { color:#0891B2 !important; font-weight:700; }
+.report-box { background:#F8FAFC !important; border:1px solid #E2E8F0; border-radius:5px; padding:10px 14px; font-size:12px; color:#334155 !important; line-height:1.55; }
+.report-box strong { color:#0F172A !important; }
+.report-table { width:100%; border-collapse:collapse; font-size:11.5px; margin:6px 0; background:#FFFFFF !important; }
+.report-table th, .report-table td { border:1px solid #CBD5E1 !important; padding:6px 8px; text-align:center; }
+.report-table th { background:#F1F5F9 !important; font-weight:700; color:#1E293B !important; font-size:10.5px; text-transform:uppercase; letter-spacing:0.03em; }
+.report-table td { background:#FFFFFF !important; color:#0F172A !important; }
+.report-table tbody tr:nth-child(even) td { background:#F8FAFC !important; }
+.report-ear-r { color:#DC2626 !important; font-weight:700; }
+.report-ear-l { color:#2563EB !important; font-weight:700; }
+.report-signature-block { margin-top:36px; padding-top:16px; border-top:1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:flex-end; }
+.report-signature-block .sig-line { width:190px; height:1px; background:#94A3B8; margin-bottom:6px; }
+</style></style>
     <div class="report-modal-window">
       <div class="report-modal-header">
         <div style="display:flex;align-items:center;gap:12px;">
