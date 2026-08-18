@@ -3,7 +3,7 @@
  * Multi-Encounter Longitudinal EMR Dataset
  */
 const HearIntelDB = (function() {
-  const STORAGE_KEY = 'hearintel_pms_db_v5_longitudinal';
+  const STORAGE_KEY = 'hearintel_pms_db_v6_clean';
 
   const defaultData = {
     currentClinician: {
@@ -356,120 +356,7 @@ const HearIntelDB = (function() {
           { id: 'm-d1', name: 'Asymmetry_Audiogram_18May.pdf', type: 'Report PDF', date: '18 May 2026', size: '380 KB', tag: 'Asymmetric Curve' },
           { id: 'm-d2', name: 'ABR_Traces_18May.pdf', type: 'Electrophysiology', date: '18 May 2026', size: '620 KB', tag: 'Prolonged Wave V Left' }
         ]
-      },
-      'ndidi': {
-        id: 'ndidi',
-        mrn: 'LCC-26-06177',
-        name: 'Ndidi A.',
-        fullName: 'Ndidi Adeleke',
-        dob: '1965-11-03',
-        age: 61,
-        gender: 'Female',
-        phone: '+234 814 901 8823',
-        homePhone: '+234 1 552 9110',
-        workPhone: '+234 814 901 8823',
-        email: 'ndidi.a@example.com',
-        address: '88 Bode Thomas St, Surulere, Lagos, Nigeria',
-        emergencyContact: 'Chinedu A. (Son) · +234 803 119 4482',
-        primaryLanguage: 'English / Igbo',
-        insurance: 'Reliance HMO (Platinum Tier #REL-44109)',
-        assignedClinician: 'Dr. Chika Okafor, Au.D.',
-        facility: 'Lagos Central Clinic',
-        referral: 'Prof. K. Alabi, Head of Otolaryngology (LUTH)',
-        primaryDiagnosis: 'Bilateral Severe-to-Profound Sensorineural Hearing Loss (ICD-10 H90.3)',
-        ptaRight: 75.0,
-        ptaLeft: 82.5,
-        airBoneGap: '<10 dB (Sensorineural)',
-        status: 'CI Protocol Active',
-        statusType: 'warning',
-        lastEncounter: '12 May 2026',
-        nextRecall: '28 May 2026',
-        recallReason: 'MDT Cochlear Implant Candidacy Sign-off Conference',
-        pathway: 'ci',
-        pathwayLabel: 'Cochlear Implant Candidacy (CI)',
-        alerts: [
-          'Aided sentence score CNC < 35% bilaterally with optimal power digital hearing aids',
-          'MDT pre-surgical surgical candidacy sign-off in progress',
-          'High-resolution CT temporal bones scheduled'
-        ],
-        clinicalNote: 'Long-standing progressive severe-to-profound bilateral sensorineural hearing loss. Patient has exhausted acoustic amplification benefits; aided sentence comprehension in quiet is 32% (AD) and 24% (AS). Multi-disciplinary team evaluation confirms candidacy for unilateral right cochlear implantation.',
-        diagnosesHistory: [
-          { code: 'ICD-10 H90.3', title: 'Bilateral Severe-to-Profound Sensorineural Hearing Loss', date: '20 Mar 2024', status: 'Active (Progressive)', notes: 'Profound sensory drop across all frequencies.' }
-        ],
-        assessments: [
-          {
-            id: 'enc-ndidi-2',
-            number: 4,
-            date: '12 May 2026',
-            type: 'Cochlear Implant Candidacy Protocol',
-            clinician: 'Dr. Chika Okafor, Au.D.',
-            facility: 'Lagos Central Clinic (Booth 1)',
-            reason: 'Formal Cochlear Implant Audiological & Speech Evaluation',
-            status: 'Completed',
-            ptaRight: 75.0,
-            ptaLeft: 82.5,
-            diagnosis: 'Bilateral Severe-to-Profound SNHL — CI Candidate',
-            history: {
-              complaint: 'Severe communication breakdown; inability to understand family or telephone speech despite power hearing aids.',
-              redFlags: 'Negative for active middle ear infection or acute neurological trauma.',
-              otologic: 'Bilateral profound tinnitus; heavy reliance on speech reading.'
-            },
-            otoscopy: {
-              right: 'External auditory canal clear. TM intact with distinct landmarks.',
-              left: 'External auditory canal clear. TM intact, translucent.'
-            },
-            thresholds: {
-              acR: { 250: 60, 500: 65, 1000: 70, 2000: 75, 3000: 80, 4000: 80, 6000: 90, 8000: 95 },
-              bcR: { 500: 60, 1000: 65, 2000: 70, 4000: 75 },
-              acL: { 250: 70, 500: 80, 1000: 85, 2000: 90, 3000: 95, 4000: 95, 6000: 105, 8000: 110 },
-              bcL: { 500: 75, 1000: 80, 2000: 85, 4000: 90 }
-            },
-            tympanometry: {
-              right: { ecv: 1.20, comp: 0.85, pres: -15, grad: 90, type: 'Type A (Normal)' },
-              left: { ecv: 1.18, comp: 0.80, pres: -25, grad: 95, type: 'Type A (Normal)' },
-              ipsi1kR: 'Absent (>105 dB HL)', contra1kR: 'Absent (>105 dB HL)',
-              ipsi1kL: 'Absent (>105 dB HL)', contra1kL: 'Absent (>105 dB HL)',
-              decayR: 'N/A (Reflex absent)', decayL: 'N/A (Reflex absent)'
-            },
-            speech: {
-              right: { srt: 75, wrs: 36, wrsLevel: '95 dB HL', mcl: 95, ucl: 110 },
-              left: { srt: 80, wrs: 28, wrsLevel: '100 dB HL', mcl: 100, ucl: 115 },
-              rollover: 'Severe discrimination breakdown; CNC word score <35% (CI Indicated)',
-              quicksin: '>15 dB SNR Loss (Severe SNR deficit)'
-            },
-            electrophysiology: {
-              abrR: { w1: 'Absent', w3: 'Absent', w5: '7.85 ms (80dB)', interval: 'N/A', oae: 'Absent Bilaterally' },
-              abrL: { w1: 'Absent', w3: 'Absent', w5: '8.20 ms (80dB)', interval: 'N/A', oae: 'Absent Bilaterally' },
-              pattern: 'Severe threshold elevation consistent with profound sensory cochlear loss. Normal neural synchrony at high intensities.'
-            },
-            management: 'MDT pre-surgical candidacy protocol approved. Surgical consult referral sent to LUTH Otolaryngology.'
-          }
-        ],
-        carePlan: [
-          {
-            id: 'cp-ndidi-1',
-            title: 'Cochlear Implant Pre-Surgical Evaluation',
-            category: 'Cochlear Implant (CI)',
-            status: 'Active (Pre-op)',
-            badgeClass: 'warning',
-            details: 'LUTH surgical team review. High-resolution CT petrous temporal bones completed.',
-            nextStep: 'MDT Decision Conference on 28 May 2026',
-            clinician: 'Dr. Chika Okafor, Au.D.'
-          }
-        ],
-        devices: [
-          { ear: 'Right (AD)', brand: 'Phonak', model: 'Naida Paradise P90-UP', serial: 'PH-24-R-1109', battery: '675 Zinc-Air', fittingDate: '15 Oct 2024', warrantyExpiry: '15 Oct 2026', formula: 'DSL v5', receiver: 'UltraPower' },
-          { ear: 'Left (AS)', brand: 'Phonak', model: 'Naida Paradise P90-UP', serial: 'PH-24-L-1110', battery: '675 Zinc-Air', fittingDate: '15 Oct 2024', warrantyExpiry: '15 Oct 2026', formula: 'DSL v5', receiver: 'UltraPower' }
-        ],
-        appointments: [
-          { id: 'apt-n1', date: '28 May 2026', time: '14:00 - 15:30', reason: 'MDT Cochlear Implant Candidacy Sign-off Conference', specialist: 'Dr. Chika Okafor, Au.D.', status: 'Booked', outcome: 'Pending MDT Review' },
-          { id: 'apt-n2', date: '12 May 2026', time: '10:00 - 12:00', reason: 'Cochlear Implant Candidacy Evaluation', specialist: 'Dr. Chika Okafor, Au.D.', status: 'Completed', outcome: 'CI Candidate criteria met' }
-        ],
-        media: [
-          { id: 'm-n1', name: 'CI_Battery_Results_12May.pdf', type: 'Report PDF', date: '12 May 2026', size: '540 KB', tag: 'CI Battery Summary' }
-        ]
-      },
-      'emeka': {
+      },      'emeka': {
         id: 'emeka',
         mrn: 'LCC-26-03319',
         name: 'Emeka O.',

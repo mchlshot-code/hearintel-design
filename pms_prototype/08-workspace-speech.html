@@ -141,24 +141,24 @@
             <tbody>
               <tr>
                 <td><strong style="color:var(--right-ear);">Right Ear (AD)</strong></td>
-                <td><input type="number" id="adSrtInput" value="30" step="5" oninput="calculateSpeechIndices()"></td>
+                <td><input type="number" id="adSrtInput" value="" placeholder="--" step="5" oninput="calculateSpeechIndices()"></td>
                 <td><span class="badge" id="adConcordBadge">Concordant (0 dB gap)</span></td>
-                <td><input type="number" id="adWrsInput" value="88" step="4" oninput="calculateSpeechIndices()"></td>
-                <td><input type="number" id="adWrs90Input" value="84" step="4" oninput="calculateSpeechIndices()"></td>
+                <td><input type="number" id="adWrsInput" value="" placeholder="--" step="4" oninput="calculateSpeechIndices()"></td>
+                <td><input type="number" id="adWrs90Input" value="" placeholder="--" step="4" oninput="calculateSpeechIndices()"></td>
                 <td><span class="badge" id="adRolloverBadge">0.05 (Normal)</span></td>
-                <td><input type="number" id="adMclInput" value="65" step="5" oninput="calculateSpeechIndices()"></td>
-                <td><input type="number" id="adUclInput" value="95" step="5" oninput="calculateSpeechIndices()"></td>
+                <td><input type="number" id="adMclInput" value="" placeholder="--" step="5" oninput="calculateSpeechIndices()"></td>
+                <td><input type="number" id="adUclInput" value="" placeholder="--" step="5" oninput="calculateSpeechIndices()"></td>
                 <td><strong id="adDynRange" style="font-family:monospace;">65 dB (Normal)</strong></td>
               </tr>
               <tr>
                 <td><strong style="color:var(--left-ear);">Left Ear (AS)</strong></td>
-                <td><input type="number" id="asSrtInput" value="35" step="5" oninput="calculateSpeechIndices()"></td>
+                <td><input type="number" id="asSrtInput" value="" placeholder="--" step="5" oninput="calculateSpeechIndices()"></td>
                 <td><span class="badge" id="asConcordBadge">Concordant (1 dB gap)</span></td>
-                <td><input type="number" id="asWrsInput" value="76" step="4" oninput="calculateSpeechIndices()"></td>
-                <td><input type="number" id="asWrs90Input" value="68" step="4" oninput="calculateSpeechIndices()"></td>
+                <td><input type="number" id="asWrsInput" value="" placeholder="--" step="4" oninput="calculateSpeechIndices()"></td>
+                <td><input type="number" id="asWrs90Input" value="" placeholder="--" step="4" oninput="calculateSpeechIndices()"></td>
                 <td><span class="badge" id="asRolloverBadge">0.11 (Normal)</span></td>
-                <td><input type="number" id="asMclInput" value="70" step="5" oninput="calculateSpeechIndices()"></td>
-                <td><input type="number" id="asUclInput" value="95" step="5" oninput="calculateSpeechIndices()"></td>
+                <td><input type="number" id="asMclInput" value="" placeholder="--" step="5" oninput="calculateSpeechIndices()"></td>
+                <td><input type="number" id="asUclInput" value="" placeholder="--" step="5" oninput="calculateSpeechIndices()"></td>
                 <td><strong id="asDynRange" style="font-family:monospace;">60 dB (Normal)</strong></td>
               </tr>
             </tbody>
@@ -215,11 +215,11 @@
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                 <div>
                   <label style="font-size:11.5px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Presentation Level (dB HL)</label>
-                  <input type="number" id="quickSinLevel" value="70" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-family:monospace;font-size:13px;">
+                  <input type="number" id="quickSinLevel" value="" placeholder="70" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-family:monospace;font-size:13px;">
                 </div>
                 <div>
                   <label style="font-size:11.5px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Total Words Correct (out of 30)</label>
-                  <input type="number" id="quickSinWords" value="21" min="0" max="30" oninput="calculateQuickSin()" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-family:monospace;font-size:13px;">
+                  <input type="number" id="quickSinWords" value="" placeholder="--" min="0" max="30" oninput="calculateQuickSin()" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-family:monospace;font-size:13px;">
                 </div>
               </div>
 
@@ -365,7 +365,7 @@
           </div>
           <button class="btn" style="min-height:26px;font-size:11.5px;padding:0 8px;" onclick="resetImpressionDraft()">Reset to Auto-Draft</button>
         </div>
-        <textarea id="speechImpressionText" rows="3" style="width:100%;padding:10px 12px;font-size:13px;line-height:1.5;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-subtle);color:var(--text-primary);font-family:inherit;box-shadow:inset 0 1px 2px rgba(0,0,0,0.02);"></textarea>
+        <textarea id="speechImpressionText" rows="3" style="width:100%;padding:10px 12px;font-size:13px;line-height:1.5;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-subtle);color:var(--text-primary);font-family:inherit;box-shadow:inset 0 1px 2px rgba(0,0,0,0.02);" placeholder="Enter speech audiometry summary, discrimination index, or speech in noise notes..."></textarea>
       </div>
 
       <!-- Step Navigation Footer -->
