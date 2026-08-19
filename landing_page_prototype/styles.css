@@ -880,8 +880,9 @@ footer {
 }
 .footer-grid {
   display: grid;
-  grid-template-columns: 1.4fr 1fr 1fr 1.4fr;
-  gap: 48px; margin-bottom: 48px;
+  grid-template-columns: 1.3fr 0.9fr 1fr 1.3fr;
+  gap: 40px;
+  margin-bottom: 48px;
 }
 .footer-brand-name {
   font-family: var(--font-heading);
@@ -985,7 +986,12 @@ footer {
   .trust-inner { grid-template-columns: 1fr 1fr; gap: 48px; }
   .credibility-inner { grid-template-columns: 1fr 1fr; gap: 48px; }
   .contact-inner { grid-template-columns: 1fr 1fr; gap: 48px; }
-  .footer-grid { grid-template-columns: 1fr 1fr; gap: 36px; }
+  .footer-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 0.9fr 1fr 1.3fr;
+  gap: 40px;
+  margin-bottom: 48px;
+}
   .capabilities-grid { grid-template-columns: repeat(2, 1fr); }
   .pricing-grid { grid-template-columns: 1fr 1fr; }
   .pricing-card-gov { grid-template-columns: 1fr; gap: 24px; }
@@ -1012,12 +1018,22 @@ footer {
   .contact-inner { grid-template-columns: 1fr; gap: 40px; }
   .contact-form { padding: 24px 20px; }
   .form-row { grid-template-columns: 1fr; }
-  .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+  .footer-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 0.9fr 1fr 1.3fr;
+  gap: 40px;
+  margin-bottom: 48px;
+}
   .footer-bottom { flex-direction: column; align-items: flex-start; }
 }
 
 @media (max-width: 420px) {
-  .footer-grid { grid-template-columns: 1fr; }
+  .footer-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 0.9fr 1fr 1.3fr;
+  gap: 40px;
+  margin-bottom: 48px;
+}
   .hero-actions { flex-direction: column; align-items: flex-start; }
   .hero-actions .btn { width: 100%; justify-content: center; }
 }
