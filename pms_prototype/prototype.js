@@ -623,12 +623,7 @@ function patientShell(active) {
           '<span class="sidebar-footer-switch">Switch</span>',
         '</div>',
         '<div class="sidebar-footer-meta">' + patient.age + 'y &middot; ' + patient.gender + ' &middot; ' + patient.mrn + '</div>',
-        '<div class="theme-switch-bar">',
-          '<button type="button" class="theme-btn ' + (currentTheme==='precision'?'active':'') + '" onclick="event.stopPropagation();setTheme(\'precision\')">Precision</button>',
-          '<button type="button" class="theme-btn ' + (currentTheme==='layered'?'active':'') + '" onclick="event.stopPropagation();setTheme(\'layered\')">Layered</button>',
-          '<button type="button" class="theme-btn ' + (currentTheme==='editorial'?'active':'') + '" onclick="event.stopPropagation();setTheme(\'editorial\')">Editorial</button>',
-        '</div>',
-      '</div>',
+'</div>',
     '</aside>'
   ].join('');
   return html;
@@ -697,12 +692,7 @@ function workspaceShell(active, content) {
           '<span class="sidebar-footer-switch">Switch</span>',
         '</div>',
         '<div class="sidebar-footer-meta">' + patient.age + 'y &middot; ' + patient.gender + ' &middot; ' + patient.mrn + '</div>',
-        '<div class="theme-switch-bar">',
-          '<button type="button" class="theme-btn ' + (currentTheme==='precision'?'active':'') + '" onclick="event.stopPropagation();setTheme(\'precision\')">Precision</button>',
-          '<button type="button" class="theme-btn ' + (currentTheme==='layered'?'active':'') + '" onclick="event.stopPropagation();setTheme(\'layered\')">Layered</button>',
-          '<button type="button" class="theme-btn ' + (currentTheme==='editorial'?'active':'') + '" onclick="event.stopPropagation();setTheme(\'editorial\')">Editorial</button>',
-        '</div>',
-      '</div>',
+'</div>',
     '</aside>'
   ].join('');
 
