@@ -259,26 +259,26 @@
           <div class="kpi-grid-4">
             <div class="kpi-tile">
               <div class="kpi-tile-header"><span>Pure Tone (PTA)</span><span>5 dB Grid</span></div>
-              <div class="kpi-tile-value" id="kpiPtaVal">30 dB R / 36 dB L</div>
-              <div class="kpi-tile-desc">Mild-to-Moderate Sloping SNHL</div>
+              <div class="kpi-tile-value" id="kpiPtaVal">--</div>
+              <div class="kpi-tile-desc" id="kpiPtaTileDesc">Assessment Pending</div>
             </div>
 
             <div class="kpi-tile">
               <div class="kpi-tile-header"><span>Immittance / Tymp</span><span>226 Hz</span></div>
-              <div class="kpi-tile-value" id="kpiTympVal">Type A Bilateral</div>
-              <div class="kpi-tile-desc">Normal Middle Ear Compliance</div>
+              <div class="kpi-tile-value" id="kpiTympVal">--</div>
+              <div class="kpi-tile-desc" id="kpiTympTileDesc">Awaiting Tympanometry</div>
             </div>
 
             <div class="kpi-tile">
-              <div class="kpi-tile-header"><span>Speech Clarity</span><span>WRS @ 35dB SL</span></div>
-              <div class="kpi-tile-value" id="kpiSpeechVal">88% R / 76% L</div>
-              <div class="kpi-tile-desc">Concordant SRT &middot; +4.5 dB SNR Loss</div>
+              <div class="kpi-tile-header"><span>Speech Clarity</span><span>Diagnostic</span></div>
+              <div class="kpi-tile-value" id="kpiSpeechVal">--</div>
+              <div class="kpi-tile-desc" id="kpiSpeechTileDesc">Awaiting Speech Battery</div>
             </div>
 
             <div class="kpi-tile">
               <div class="kpi-tile-header"><span>Active Technology</span><span>Amplification</span></div>
-              <div class="kpi-tile-value" style="font-size:13.5px;" id="kpiTechVal">Oticon Real 1 miniRITE</div>
-              <div class="kpi-tile-desc">Bilateral Fitting &middot; NAL-NL2 Target</div>
+              <div class="kpi-tile-value" style="font-size:13.5px;" id="kpiTechVal">None Fitted</div>
+              <div class="kpi-tile-desc" id="kpiTechTileDesc">Pre-Evaluation Stage</div>
             </div>
           </div>
 
@@ -491,69 +491,42 @@
     function renderProfile() {
       const patientId = getActivePatientId();
       const p = window.HearIntelDB ? window.HearIntelDB.getPatient(patientId) : null;
-      if (!p) {
-        document.getElementById('profName').textContent = 'No Patient Selected';
-        document.getElementById('profAge').textContent = '--';
-        document.getElementById('profGender').textContent = '--';
-        document.getElementById('profMRN').textContent = '--';
-        document.getElementById('profPhone').textContent = '--';
-        document.getElementById('profFacility').textContent = '--';
-        document.getElementById('profStatusBadge').textContent = 'No Record';
-        document.getElementById('kpiPtaVal').textContent = '--';
-        document.getElementById('ptaRightVal').textContent = '--';
-        document.getElementById('ptaLeftVal').textContent = '--';
-        document.getElementById('profPrimaryDiag').textContent = 'No active medical record found in registry.';
-        document.getElementById('profPathwayBadge').textContent = 'EMPTY';
-        document.getElementById('profNextRecallText').textContent = 'None Scheduled';
-        document.getElementById('profNextRecallReason').textContent = 'Register a patient from the patient registry or click "Register Patient"';
-        document.getElementById('adminPhone').textContent = '--';
-        document.getElementById('adminEmail').textContent = '--';
-        document.getElementById('adminEmergency').textContent = '--';
-        document.getElementById('adminLanguage').textContent = '--';
-        document.getElementById('adminInsurance').textContent = '--';
-        document.getElementById('adminClinician').textContent = '--';
-        return;
+      if (!p) return;
+
+      // 1. Patient Header
+      document.getElementById('profName').textContent = p.name || p.fullName;
+      document.getElementById('profAge').textContent = (p.age != null ? p.age : '--') + ' yrs';
+      document.getElementById('profGender').textContent = p.gender || '--';
+      document.getElementById('profMRN').textContent = p.mrn || p.idNumber || 'LCC-26-00000';
+      document.getElementById('profPhone').textContent = p.phone || '--';
+      document.getElementById('profFacility').textContent = p.facility || 'Lagos Central Clinic';
+      
+      const statusBadge = document.getElementById('profStatusBadge');
+      if (statusBadge) {
+        statusBadge.textContent = p.status || 'Active';
+        statusBadge.className = 'badge ' + (p.statusType || 'neutral');
       }
 
-      document.getElementById('profName').textContent = p.name;
-      document.getElementById('profAge').textContent = p.age + ' yrs';
-      document.getElementById('profGender').textContent = p.gender;
-      document.getElementById('profMRN').textContent = p.mrn || p.idNumber || 'LCC-26-01248';
-      document.getElementById('profPhone').textContent = p.phone || '+234 803 219 4482';
-      document.getElementById('profFacility').textContent = p.facility || p.clinic || 'Lagos Central Clinic';
-      document.getElementById('profStatusBadge').textContent = p.status || 'Active Care Plan';
+      // Update Start Assessment Button URL
+      const startBtn = document.getElementById('startAssessmentBtn');
+      if (startBtn) {
+        startBtn.href = '03-start-encounter.html?patient=' + p.id;
+      }
 
-      const ptaR = Math.round(p.ptaRight || 30);
-      const ptaL = Math.round(p.ptaLeft || 36);
-
-      document.getElementById('kpiPtaVal').textContent = `${ptaR} dB R / ${ptaL} dB L`;
-      document.getElementById('ptaRightVal').textContent = ptaR;
-      document.getElementById('ptaLeftVal').textContent = ptaL;
-      document.getElementById('profRightPtaLegend').textContent = `• Right (${ptaR} dB)`;
-      document.getElementById('profLeftPtaLegend').textContent = `▲ Left (${ptaL} dB)`;
-
-      document.getElementById('profPrimaryDiag').textContent = p.primaryDiagnosis || 'Bilateral Sensorineural Hearing Loss, Mild-to-Moderate Sloping (ICD-10 H90.3)';
-      document.getElementById('profPathwayBadge').textContent = (p.pathwayLabel || 'HEARING AID') + ' PATHWAY';
-
-      const nextRecall = p.nextRecall || '26 Aug 2026';
-      const recallReason = p.recallReason || '3-Week Hearing Aid Real-Ear Verification & Aural Rehab Review';
-      document.getElementById('profNextRecallText').textContent = nextRecall;
-      document.getElementById('profNextRecallReason').textContent = recallReason;
-
-      // Admin block details
-      document.getElementById('adminPhone').textContent = p.phone || '+234 803 219 4482';
-      document.getElementById('adminEmail').textContent = p.email || 'amaia.o@example.com';
-      document.getElementById('adminEmergency').textContent = p.emergencyContact || 'Oluwaseun O. (Spouse) · +234 802 334 9110';
-      document.getElementById('adminLanguage').textContent = p.primaryLanguage || 'English / Yoruba';
-      document.getElementById('adminInsurance').textContent = p.insurance || 'AXA Mansard HMO (Gold Tier #AX-994218)';
+      // 2. Admin Block Details
+      document.getElementById('adminPhone').textContent = p.phone || '--';
+      document.getElementById('adminEmail').textContent = p.email || '--';
+      document.getElementById('adminEmergency').textContent = p.emergencyContact || '--';
+      document.getElementById('adminLanguage').textContent = p.primaryLanguage || 'English';
+      document.getElementById('adminInsurance').textContent = p.insurance || 'Direct Billing / Self-Pay';
       document.getElementById('adminClinician').textContent = p.assignedClinician || 'Dr. Chika Okafor, Au.D.';
 
-      // Safety Alerts
+      // 3. Safety Alerts
       const alertsContainer = document.getElementById('profSafetyBanners');
       if (p.alerts && p.alerts.length > 0) {
         alertsContainer.innerHTML = p.alerts.map(a => `
           <div class="safety-banner" style="background:var(--bg-subtle);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 12px;font-size:12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
-            <span style="font-weight:700;color:var(--text-primary);">&bull;</span>
+            <span style="font-weight:700;color:var(--status-danger);">&bull;</span>
             <span>${a}</span>
           </div>
         `).join('');
@@ -561,64 +534,123 @@
         alertsContainer.innerHTML = '';
       }
 
-      // Assessment count and table
-      document.getElementById('profAssCount').textContent = p.assessments ? p.assessments.length : 0;
+      // 4. Counts
+      const hasAssessments = p.assessments && p.assessments.length > 0;
+      document.getElementById('profAssCount').textContent = hasAssessments ? p.assessments.length : 0;
+      document.getElementById('profMediaCount').textContent = p.media ? p.media.length : 0;
+
+      // 5. EVALUATED vs INTAKE / EMPTY STATE DISPATCH
+      if (hasAssessments) {
+        // Patient has assessment history
+        const latest = p.assessments[0];
+        const ptaR = Math.round(latest.ptaRight != null ? latest.ptaRight : (p.ptaRight || 30));
+        const ptaL = Math.round(latest.ptaLeft != null ? latest.ptaLeft : (p.ptaLeft || 36));
+
+        document.getElementById('kpiPtaVal').textContent = `${ptaR} dB R / ${ptaL} dB L`;
+        document.getElementById('kpiPtaTileDesc').textContent = p.primaryDiagnosis || 'Symmetrical Sensorineural Loss';
+        
+        const tympText = (latest.tymp && typeof latest.tymp === 'object') 
+          ? (latest.tymp.right || 'Type A Bilateral') 
+          : (latest.tymp || 'Type A Bilateral');
+        document.getElementById('kpiTympVal').textContent = tympText;
+        document.getElementById('kpiTympTileDesc').textContent = 'Normal Middle Ear Compliance';
+
+        const wrsR = latest.speech ? (latest.speech.wrsRight || '88% R') : '88% R';
+        const wrsL = latest.speech ? (latest.speech.wrsLeft || '76% L') : '76% L';
+        document.getElementById('kpiSpeechVal').textContent = `${wrsR.split('@')[0].trim()} / ${wrsL.split('@')[0].trim()}`;
+        document.getElementById('kpiSpeechTileDesc').textContent = 'Concordant SRT &middot; Diagnostic Cross-Check';
+
+        const device = (p.devices && p.devices.length > 0) ? p.devices[0].makeModel : 'None Fitted';
+        document.getElementById('kpiTechVal').textContent = device;
+        document.getElementById('kpiTechTileDesc').textContent = (p.devices && p.devices.length > 0) ? 'Bilateral Fitting &middot; NAL-NL2' : 'Amplification Pending Evaluation';
+
+        // Diagnosis Card
+        document.getElementById('profPathwayBadge').textContent = (p.pathwayLabel || 'HEARING AID') + ' PATHWAY';
+        document.getElementById('profPrimaryDiag').textContent = p.primaryDiagnosis || 'Sensorineural Hearing Loss';
+        document.getElementById('profDiagChipsRow').style.display = 'grid';
+        document.getElementById('profIntakeNotice').style.display = 'none';
+        document.getElementById('profAbg').textContent = p.airBoneGap || '<10 dB (Pure SNHL)';
+        document.getElementById('profAsym').textContent = `${Math.abs(ptaR - ptaL)} dB (${Math.abs(ptaR - ptaL) <= 10 ? 'Symmetric WNL' : 'Asymmetric'})`;
+        document.getElementById('profConcord').textContent = 'Concordant (≤6 dB)';
+        document.getElementById('profDiagNotes').textContent = p.clinicalNote || latest.recommendations || 'Clinical diagnostic battery completed.';
+
+        // Audiogram
+        document.getElementById('profAudiogramWrapper').style.display = 'block';
+        document.getElementById('profAudiogramEmpty').style.display = 'none';
+        document.getElementById('profRightPtaLegend').textContent = `• Right (${ptaR} dB)`;
+        document.getElementById('profLeftPtaLegend').textContent = `▲ Left (${ptaL} dB)`;
+        
+        // Recall
+        document.getElementById('profNextRecallText').textContent = p.nextRecall || '26 Aug 2026';
+        document.getElementById('profNextRecallReason').textContent = p.recallReason || '3-Week Hearing Aid REM Verification & Review';
+        
+      } else {
+        // Brand New / Intake Patient (0 assessments)
+        document.getElementById('kpiPtaVal').textContent = '--';
+        document.getElementById('kpiPtaTileDesc').textContent = 'Assessment Pending';
+
+        document.getElementById('kpiTympVal').textContent = '--';
+        document.getElementById('kpiTympTileDesc').textContent = 'Awaiting Tympanometry';
+
+        document.getElementById('kpiSpeechVal').textContent = '--';
+        document.getElementById('kpiSpeechTileDesc').textContent = 'Awaiting Speech Battery';
+
+        document.getElementById('kpiTechVal').textContent = 'None Fitted';
+        document.getElementById('kpiTechTileDesc').textContent = 'Pre-Evaluation Stage';
+
+        // Diagnosis Card
+        document.getElementById('profPathwayBadge').textContent = 'INTAKE / ROUTINE';
+        document.getElementById('profPrimaryDiag').textContent = p.primaryDiagnosis || 'Initial Audiological Assessment Required';
+        document.getElementById('profDiagChipsRow').style.display = 'none';
+        document.getElementById('profIntakeNotice').style.display = 'block';
+        document.getElementById('profDiagNotes').textContent = 'Patient registered. Awaiting initial case history intake and comprehensive audiological battery.';
+
+        // Audiogram Empty State
+        document.getElementById('profAudiogramWrapper').style.display = 'none';
+        document.getElementById('profAudiogramEmpty').style.display = 'flex';
+        document.getElementById('profRightPtaLegend').textContent = '• Right (--)';
+        document.getElementById('profLeftPtaLegend').textContent = '▲ Left (--)';
+
+        // Recall
+        document.getElementById('profNextRecallText').textContent = 'Intake Completed';
+        document.getElementById('profNextRecallReason').textContent = 'Initial audiological diagnostic evaluation required';
+      }
+
+      // Assessment Table
       const assTbody = document.getElementById('profAssessmentsTable');
-      if (p.assessments && p.assessments.length > 0) {
+      if (hasAssessments) {
         assTbody.innerHTML = p.assessments.map(a => `
           <tr>
             <td><strong>#${a.number || 1}</strong></td>
             <td>${a.date}</td>
             <td>${a.type}</td>
             <td>${a.clinician}</td>
-            <td><span style="font-family:monospace;font-weight:600;">${Math.round(a.ptaRight || 30)} dB R / ${Math.round(a.ptaLeft || 36)} dB L</span></td>
-            <td>${a.diagnosis || 'Bilateral SNHL'}</td>
-            <td><span class="badge">${a.status}</span></td>
+            <td><span class="badge ${a.type.includes('Initial') ? 'neutral' : 'warning'}">${a.timeframe || 'Completed'}</span></td>
             <td style="text-align:right;">
-              <button class="btn" style="min-height:26px;font-size:11.5px;padding:0 8px;" onclick="openAssessmentReport('${p.id}', '${a.id}')">View Report</button>
+              <button class="btn" style="min-height:26px;padding:0 10px;font-size:11.5px;" onclick="openAssessmentReport('${p.id}', '${a.id || 'enc-12'}')">View Report</button>
             </td>
           </tr>
         `).join('');
       } else {
-        assTbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text-secondary);">No assessments recorded.</td></tr>`;
+        assTbody.innerHTML = '<tr><td colspan="6"><div class="empty-state" style="padding:28px 16px;"><div class="empty-state-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></div><div class="empty-state-title" style="font-size:14px;margin-top:6px;">No Assessment Encounters on Record</div><div class="empty-state-desc" style="font-size:12px;color:var(--text-secondary);margin-top:2px;">Click "+ Start New Assessment" to record case history, otoscopy, pure tone thresholds, and tympanometry.</div><div style="margin-top:14px;"><a class="btn primary" style="min-height:30px;font-size:12px;padding:0 14px;" href="03-start-encounter.html?patient=' + p.id + '">+ Start Assessment</a></div></div></td></tr>';
       }
 
-      // Care Plan threads
-      document.getElementById('profCarePlanList').innerHTML = p.carePlan && p.carePlan.length > 0
-        ? p.carePlan.map(cp => `
-          <div class="cp-thread">
-            <div class="cp-thread-header">
-              <div style="display:flex;align-items:center;gap:8px;">
-                <strong style="font-size:13px;color:var(--text-primary);">${cp.title}</strong>
-                <span class="badge">${cp.category}</span>
-              </div>
-              <span class="badge">${cp.status}</span>
-            </div>
-            <div class="cp-thread-body">
-              <p style="margin-bottom:6px;">${cp.details}</p>
-              <div style="font-size:12px;color:var(--brand-hover);font-weight:600;">${cp.nextStep}</div>
-            </div>
-          </div>
-        `).join('')
-        : `<div style="padding:24px;text-align:center;color:var(--text-secondary);border:1px dashed var(--border);border-radius:var(--radius);">No active Care Plan threads. Click "+ Add Thread" to begin a management pathway.</div>`;
-
-      // Media grid
-      document.getElementById('profMediaCount').textContent = p.media ? p.media.length : 0;
-      document.getElementById('profMediaGrid').innerHTML = p.media && p.media.length > 0
-        ? p.media.map(m => `
-          <div class="surface" style="padding:14px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;box-shadow:var(--shadow-subtle);" onclick="notify('Opening ${m.name}...')">
-            <div style="height:100px;background:var(--bg-subtle);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--brand-hover);border:1px solid var(--border-light);">${m.type}</div>
-            <div style="margin-top:10px;">
-              <strong style="font-size:13px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text-primary);">${m.name}</strong>
-              <div style="font-size:11px;color:var(--text-secondary);margin-top:2px;">${m.date} &middot; ${m.size}</div>
-            </div>
-          </div>
-        `).join('')
-        : `<div style="grid-column:1 / -1;padding:24px;text-align:center;color:var(--text-secondary);border:1px dashed var(--border);border-radius:var(--radius);">No media files attached.</div>`;
-
-      document.getElementById('startAssessmentBtn').href = '03-start-encounter.html?patient=' + p.id;
-      if (document.getElementById('newAssessBtn')) {
-        document.getElementById('newAssessBtn').href = '03-start-encounter.html?patient=' + p.id;
+      // Care Plan Table
+      const cpTbody = document.getElementById('carePlanTbody');
+      if (cpTbody) {
+        if (p.carePlan && p.carePlan.length > 0) {
+          cpTbody.innerHTML = p.carePlan.map(cp => `
+            <tr>
+              <td><strong>${cp.title}</strong><div style="font-size:11.5px;color:var(--text-secondary);margin-top:2px;">${cp.details || ''}</div></td>
+              <td>${cp.category}</td>
+              <td><span class="badge ${cp.badgeClass || 'neutral'}">${cp.status}</span></td>
+              <td style="font-size:12px;color:var(--text-secondary);">${cp.nextStep || '--'}</td>
+              <td>${cp.clinician || 'Dr. Chika Okafor, Au.D.'}</td>
+            </tr>
+          `).join('');
+        } else {
+          cpTbody.innerHTML = '<tr><td colspan="5"><div class="empty-state" style="padding:28px 16px;"><div class="empty-state-title" style="font-size:14px;">No Care Plans Configured</div><div class="empty-state-desc" style="font-size:12px;color:var(--text-secondary);">Add a care plan to track rehabilitation, medical referrals, or device management.</div></div></td></tr>';
+        }
       }
     }
 
