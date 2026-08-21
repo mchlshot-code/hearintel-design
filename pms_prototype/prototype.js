@@ -587,7 +587,7 @@ function patientShell(active) {
   const html = [
     '<aside class="sidebar">',
       '<div class="brand">',
-        '<div style="margin-bottom:6px;"><img src="logo.png?v=5.0" alt="HearIntel" style="height:28px;width:auto;display:block;"></div>',
+        '<div style="margin-bottom:8px;"><img src="logo.png?v=6.0" alt="HearIntel" style="height:34px;width:auto;display:block;"></div>',
         '<div class="brand-sub">Practice Management</div>',
       '</div>',
       '<nav class="nav-group">',
@@ -653,7 +653,7 @@ function workspaceShell(active, content) {
   const sidebarHtml = [
     '<aside class="sidebar">',
       '<div class="brand">',
-        '<div style="margin-bottom:6px;"><img src="logo.png?v=5.0" alt="HearIntel" style="height:28px;width:auto;display:block;"></div>',
+        '<div style="margin-bottom:8px;"><img src="logo.png?v=6.0" alt="HearIntel" style="height:34px;width:auto;display:block;"></div>',
         '<div class="brand-sub">Assessment</div>',
       '</div>',
       '<nav class="nav-group">',
