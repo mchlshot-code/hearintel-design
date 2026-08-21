@@ -364,7 +364,7 @@
             <strong style="font-size:13.5px;color:var(--text-primary);">Assessment Findings & Speech / Tinnitus Notes</strong>
             <span style="font-size:11px;color:var(--text-tertiary);font-weight:500;">(Optional — Auto-synthesizes from test findings)</span>
           </div>
-          <button class="btn" style="min-height:26px;font-size:11.5px;padding:0 8px;" onclick="resetImpressionDraft()">Reset to Auto-Draft</button>
+          <button class="btn" style="min-height:26px;font-size:11.5px;padding:0 8px;" onclick="updateSynthesizedImpression()">Auto-Synthesize</button>
         </div>
         <textarea id="speechImpressionText" rows="3" style="width:100%;padding:10px 12px;font-size:13px;line-height:1.5;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-subtle);color:var(--text-primary);font-family:inherit;box-shadow:inset 0 1px 2px rgba(0,0,0,0.02);" placeholder="Enter speech audiometry summary, discrimination index, or speech in noise notes..."></textarea>
       </div>
@@ -508,7 +508,7 @@
       document.getElementById('speechHeaderBadge').textContent = `WRS: ${wrsR}% R / ${wrsL}% L`;
 
       drawPiCurve();
-      updateSynthesizedImpression();
+
     }
 
     // ── QuickSIN Calculation ──
@@ -525,7 +525,6 @@
       else if (snrLoss > 2) sev = 'Mild SNR Loss (3-7 dB)';
       document.getElementById('sinSeverityBadge').textContent = sev;
 
-      updateSynthesizedImpression();
     }
 
     // ── THI Score Calculation ──
@@ -543,7 +542,7 @@
       else if (score > 16) grade = 'Grade 2 (Mild: 18-36)';
 
       document.getElementById('thiScoreBadge').textContent = `Score: ${score} / 100 (${grade})`;
-      updateSynthesizedImpression();
+
     }
 
     // ── Auto-Synthesized Impression ──
@@ -565,7 +564,7 @@
     function resetImpressionDraft() {
       const textarea = document.getElementById('speechImpressionText');
       delete textarea.dataset.userEdited;
-      updateSynthesizedImpression();
+
       notify('Impression notes reset to auto-synthesized draft.');
     }
 
