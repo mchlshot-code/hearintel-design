@@ -587,7 +587,7 @@ function patientShell(active) {
   const html = [
     '<aside class="sidebar">',
       '<div class="brand">',
-        '<div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;"><img src="favicon.png" alt="HearIntel" style="height:28px;width:auto;display:block;flex-shrink:0;"><span style="font-family:'Figtree',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.035em;color:#FFFFFF;line-height:1;">Hear<span style="color:#38BDF8;">Intel</span></span></div>',
+        '<div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;"><img src="favicon.png" alt="HearIntel" style="height:28px;width:auto;display:block;flex-shrink:0;"><span style="font-family:var(--font-heading, Figtree, sans-serif);font-size:20px;font-weight:800;letter-spacing:-0.035em;color:#FFFFFF;line-height:1;">Hear<span style="color:#38BDF8;">Intel</span></span></div>',
         '<div class="brand-sub">Practice Management</div>',
       '</div>',
       '<nav class="nav-group">',
@@ -653,7 +653,7 @@ function workspaceShell(active, content) {
   const sidebarHtml = [
     '<aside class="sidebar">',
       '<div class="brand">',
-        '<div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;"><img src="favicon.png" alt="HearIntel" style="height:28px;width:auto;display:block;flex-shrink:0;"><span style="font-family:'Figtree',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.035em;color:#FFFFFF;line-height:1;">Hear<span style="color:#38BDF8;">Intel</span></span></div>',
+        '<div style="display:flex;align-items:center;gap:9px;margin-bottom:6px;"><img src="favicon.png" alt="HearIntel" style="height:28px;width:auto;display:block;flex-shrink:0;"><span style="font-family:var(--font-heading, Figtree, sans-serif);font-size:20px;font-weight:800;letter-spacing:-0.035em;color:#FFFFFF;line-height:1;">Hear<span style="color:#38BDF8;">Intel</span></span></div>',
         '<div class="brand-sub">Assessment</div>',
       '</div>',
       '<nav class="nav-group">',
