@@ -587,7 +587,7 @@ function patientShell(active) {
   const html = [
     '<aside class="sidebar">',
       '<div class="brand">',
-        '<div style="margin-bottom:8px;"><div style="display:inline-flex;align-items:center;background:#FFFFFF;padding:5px 12px;border-radius:7px;box-shadow:0 1px 3px rgba(0,0,0,0.18);"><img src="logo.png?v=9.0" alt="HearIntel" style="height:22px;width:auto;display:block;"></div></div>',
+        '<div style="margin-bottom:12px;"><div style="display:inline-flex;align-items:center;padding:2px 4px;"><div style="color:#FFFFFF;font-size:22px;font-weight:800;letter-spacing:-0.03em;font-family:var(--font-heading);">Hear<span style="color:var(--brand);">Intel</span></div></div></div>',
         '<div class="brand-sub">Practice Management</div>',
       '</div>',
       '<nav class="nav-group">',
@@ -653,7 +653,7 @@ function workspaceShell(active, content) {
   const sidebarHtml = [
     '<aside class="sidebar">',
       '<div class="brand">',
-        '<div style="margin-bottom:8px;"><div style="display:inline-flex;align-items:center;background:#FFFFFF;padding:5px 12px;border-radius:7px;box-shadow:0 1px 3px rgba(0,0,0,0.18);"><img src="logo.png?v=9.0" alt="HearIntel" style="height:22px;width:auto;display:block;"></div></div>',
+        '<div style="margin-bottom:12px;"><div style="display:inline-flex;align-items:center;padding:2px 4px;"><div style="color:#FFFFFF;font-size:22px;font-weight:800;letter-spacing:-0.03em;font-family:var(--font-heading);">Hear<span style="color:var(--brand);">Intel</span></div></div></div>',
         '<div class="brand-sub">Assessment</div>',
       '</div>',
       '<nav class="nav-group">',

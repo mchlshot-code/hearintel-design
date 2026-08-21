@@ -174,19 +174,19 @@
           <div class="param-row">
             <div class="param-box">
               <label>Peak Pres (daPa)</label>
-              <input type="number" id="adPres" value="-20" step="5" oninput="onParamInput('R')">
+              <input type="number" id="adPres" value="" step="5" oninput="onParamInput('R')">
             </div>
             <div class="param-box">
               <label>Compliance (mL)</label>
-              <input type="number" id="adComp" value="0.78" step="0.05" oninput="onParamInput('R')">
+              <input type="number" id="adComp" value="" step="0.05" oninput="onParamInput('R')">
             </div>
             <div class="param-box">
               <label>Volume ECV (mL)</label>
-              <input type="number" id="adEcv" value="1.15" step="0.05" oninput="onParamInput('R')">
+              <input type="number" id="adEcv" value="" step="0.05" oninput="onParamInput('R')">
             </div>
             <div class="param-box">
               <label>Gradient (daPa)</label>
-              <input type="number" id="adGrad" value="85" step="5" oninput="onParamInput('R')">
+              <input type="number" id="adGrad" value="" step="5" oninput="onParamInput('R')">
             </div>
           </div>
         </div>
@@ -221,19 +221,19 @@
           <div class="param-row">
             <div class="param-box">
               <label>Peak Pres (daPa)</label>
-              <input type="number" id="asPres" value="-30" step="5" oninput="onParamInput('L')">
+              <input type="number" id="asPres" value="" step="5" oninput="onParamInput('L')">
             </div>
             <div class="param-box">
               <label>Compliance (mL)</label>
-              <input type="number" id="asComp" value="0.72" step="0.05" oninput="onParamInput('L')">
+              <input type="number" id="asComp" value="" step="0.05" oninput="onParamInput('L')">
             </div>
             <div class="param-box">
               <label>Volume ECV (mL)</label>
-              <input type="number" id="asEcv" value="1.08" step="0.05" oninput="onParamInput('L')">
+              <input type="number" id="asEcv" value="" step="0.05" oninput="onParamInput('L')">
             </div>
             <div class="param-box">
               <label>Gradient (daPa)</label>
-              <input type="number" id="asGrad" value="90" step="5" oninput="onParamInput('L')">
+              <input type="number" id="asGrad" value="" step="5" oninput="onParamInput('L')">
             </div>
           </div>
         </div>
@@ -260,14 +260,14 @@
           <tbody>
             <tr>
               <td><strong style="color:var(--right-ear);">Right (AD)</strong></td>
-              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="85" id="artR_i500"></td>
-              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="85" id="artR_i1k"></td>
-              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="90" id="artR_i2k"></td>
-              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="90" id="artR_c500"></td>
-              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="90" id="artR_c1k"></td>
-              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="95" id="artR_c2k"></td>
+              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="" id="artR_i500"></td>
+              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="" id="artR_i1k"></td>
+              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="" id="artR_i2k"></td>
+              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="" id="artR_c500"></td>
+              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="" id="artR_c1k"></td>
+              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="" id="artR_c2k"></td>
               <td>
-                <select id="decayR" onchange="updateSynthesizedImpression()" style="padding:3px 6px;font-size:12px;">
+                <select id="decayR"  style="padding:3px 6px;font-size:12px;">
                   <option selected>Negative (No Decay)</option>
                   <option>Positive (>50% Decay - Retrocochlear)</option>
                   <option>Absent Reflex (Unable to test)</option>
@@ -277,14 +277,14 @@
             </tr>
             <tr>
               <td><strong style="color:var(--left-ear);">Left (AS)</strong></td>
-              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="90" id="artL_i500"></td>
-              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="90" id="artL_i1k"></td>
-              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="95" id="artL_i2k"></td>
-              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="95" id="artL_c500"></td>
-              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="95" id="artL_c1k"></td>
-              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="100" id="artL_c2k"></td>
+              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="" id="artL_i500"></td>
+              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="" id="artL_i1k"></td>
+              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="" id="artL_i2k"></td>
+              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="" id="artL_c500"></td>
+              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="" id="artL_c1k"></td>
+              <td><input style="width:48px;padding:3px 6px;text-align:center;font-family:monospace;" value="" id="artL_c2k"></td>
               <td>
-                <select id="decayL" onchange="updateSynthesizedImpression()" style="padding:3px 6px;font-size:12px;">
+                <select id="decayL"  style="padding:3px 6px;font-size:12px;">
                   <option selected>Negative (No Decay)</option>
                   <option>Positive (>50% Decay - Retrocochlear)</option>
                   <option>Absent Reflex (Unable to test)</option>
@@ -356,9 +356,18 @@
 
     // State
     let tympData = {
-      R: { pres: -20, comp: 0.78, ecv: 1.15, grad: 85, type: 'A', preset: 'A' },
-      L: { pres: -30, comp: 0.72, ecv: 1.08, grad: 90, type: 'A', preset: 'A' }
+      R: { pres: 0, comp: 0, ecv: 0, grad: 0, type: '', preset: '' },
+      L: { pres: 0, comp: 0, ecv: 0, grad: 0, type: '', preset: '' }
     };
+    
+    // Inject mock data for demo patients
+    const _tymp_pid = (typeof getActivePatientId === 'function') ? getActivePatientId() : '';
+    if (['amaia', 'david', 'emeka'].includes(_tymp_pid)) {
+      tympData = {
+        R: { pres: -20, comp: 0.78, ecv: 1.15, grad: 85, type: 'A', preset: 'A' },
+        L: { pres: -30, comp: 0.72, ecv: 1.08, grad: 90, type: 'A', preset: 'A' }
+      };
+    }
 
     // ── SVG Canvas Plotting (Gaussian Bell Curve with Normative Box) ──
     function drawTympanogram(ear) {
@@ -453,7 +462,7 @@
 
       updateClassification(ear);
       drawTympanogram(ear);
-      updateSynthesizedImpression();
+
     }
 
     // ── Presets ──
@@ -508,7 +517,7 @@
 
       updateClassification(ear);
       drawTympanogram(ear);
-      updateSynthesizedImpression();
+
     }
 
     function onParamInput(ear) {
@@ -520,7 +529,7 @@
 
       updateClassification(ear);
       drawTympanogram(ear);
-      updateSynthesizedImpression();
+
     }
 
     function updateClassification(ear) {
@@ -590,7 +599,7 @@
     function resetImpressionDraft() {
       const textarea = document.getElementById('tympImpressionText');
       delete textarea.dataset.userEdited;
-      updateSynthesizedImpression();
+
       notify('Impression notes reset to auto-synthesized draft.');
     }
 
@@ -608,7 +617,7 @@
       drawTympanogram('L');
       updateClassification('R');
       updateClassification('L');
-      updateSynthesizedImpression();
+
     });
   </script>
   <script>

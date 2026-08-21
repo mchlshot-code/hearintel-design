@@ -103,12 +103,13 @@
         <div class="form-grid" style="margin-bottom:12px;">
           <div class="field" style="grid-column:1 / -1;">
             <label for="chiefComplaint">Primary Chief Complaint *</label>
-            <input type="text" id="chiefComplaint" placeholder="e.g. Bilateral hearing difficulty, worse in noisy settings..." value="" oninput="autoSynthesizeIntake()">
+            <input type="text" id="chiefComplaint" placeholder="e.g. Bilateral hearing difficulty, worse in noisy settings..." value="" >
           </div>
           <div class="field">
             <label for="onsetPattern">Onset & Timeline *</label>
             <select id="onsetPattern" onchange="checkRedFlags()">
-              <option value="gradual" selected>Gradual (Progressive over ~2 years)</option>
+              <option value="" selected disabled>Select...</option>
+              <option value="gradual">Gradual (Progressive over ~2 years)</option>
               <option value="sudden">Sudden (<72 hours — Emergency Medical Red Flag)</option>
               <option value="rapid">Rapid Decline (Past 30-90 days)</option>
               <option value="fluctuating">Fluctuating / Episodic</option>
@@ -118,7 +119,8 @@
           <div class="field">
             <label for="laterality">Laterality & Symmetry *</label>
             <select id="laterality" onchange="checkRedFlags()">
-              <option value="bilateral" selected>Bilateral (Symmetric complaint)</option>
+              <option value="" selected disabled>Select...</option>
+              <option value="bilateral">Bilateral (Symmetric complaint)</option>
               <option value="asymmetric_left">Asymmetric (Left ear perceived worse)</option>
               <option value="asymmetric_right">Asymmetric (Right ear perceived worse)</option>
               <option value="unilateral_left">Unilateral Left Only</option>
@@ -215,8 +217,9 @@
         <div class="form-grid">
           <div class="field">
             <label for="noiseHistory">Noise Exposure History</label>
-            <select id="noiseHistory" onchange="autoSynthesizeIntake()">
-              <option selected>Occasional church, social & market crowd noise</option>
+            <select id="noiseHistory" >
+              <option value="" selected disabled>Select...</option>
+              <option>Occasional church, social & market crowd noise</option>
               <option>Chronic occupational noise (>85 dBA without hearing protection)</option>
               <option>Military / Firearm / Impulse acoustic trauma</option>
               <option>Recreational (Power tools / loud concerts)</option>
@@ -225,8 +228,9 @@
           </div>
           <div class="field">
             <label for="familyHistory">Family & Otological History</label>
-            <select id="familyHistory" onchange="autoSynthesizeIntake()">
-              <option selected>No hereditary hearing loss; past childhood otitis media resolved</option>
+            <select id="familyHistory" >
+              <option value="" selected disabled>Select...</option>
+              <option>No hereditary hearing loss; past childhood otitis media resolved</option>
               <option>Positive family history of early-onset bilateral SNHL</option>
               <option>History of recurrent PE tubes / tympanoplasty</option>
               <option>History of acoustic barotrauma / diving trauma</option>
@@ -243,8 +247,9 @@
         <div class="form-grid">
           <div class="field">
             <label for="deviceStatus">Current Amplification Status</label>
-            <select id="deviceStatus" onchange="autoSynthesizeIntake()">
-              <option selected>Bilateral BTE/RIC devices (Oticon Real 1, fitted 2024)</option>
+            <select id="deviceStatus" >
+              <option value="" selected disabled>Select...</option>
+              <option>Bilateral BTE/RIC devices (Oticon Real 1, fitted 2024)</option>
               <option>Unilateral Right Device Only</option>
               <option>Unilateral Left Device Only</option>
               <option>Aided in past, currently non-user (Dissatisfied)</option>
@@ -254,7 +259,8 @@
           <div class="field">
             <label for="dexterityVision">Manual Dexterity & Visual Acuity</label>
             <select id="dexterityVision">
-              <option selected>Normal dexterity and near vision (Suitable for all styles)</option>
+              <option value="" selected disabled>Select...</option>
+              <option>Normal dexterity and near vision (Suitable for all styles)</option>
               <option>Reduced manual dexterity (Rechargeable RIC / custom recommended)</option>
               <option>Visual impairment (Tactile controls / remote mic required)</option>
             </select>
@@ -297,7 +303,7 @@
       } else {
         selectedCosiGoals = selectedCosiGoals.filter(g => g !== goal);
       }
-      autoSynthesizeIntake();
+
     }
 
     function checkRedFlags() {
@@ -323,7 +329,6 @@
         alertBox.innerHTML = '<strong>Medical Clearance Status:</strong> No Medical Screening medical red flags identified. Patient safe to proceed with comprehensive audiological diagnostic battery.';
       }
 
-      autoSynthesizeIntake();
     }
 
     function autoSynthesizeIntake() {
@@ -350,7 +355,6 @@
       document.getElementById('btnSetup').href = '03-start-encounter.html?patient=' + pid;
       document.getElementById('btnNext').href = '05-workspace-otoscopy.html?patient=' + pid;
 
-      autoSynthesizeIntake();
       checkRedFlags();
     });
   </script>

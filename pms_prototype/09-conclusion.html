@@ -81,7 +81,7 @@
         <div class="field">
           <label for="primaryDiagnosis">Primary Audiological Diagnosis *</label>
           <select id="primaryDiagnosis" onchange="onDiagnosisChange(this.value)">
-            <option value="snhl_bilateral" selected>Bilateral Sensorineural Hearing Loss, Mild-to-Moderate (ICD-10 H90.3)</option>
+            <option value="snhl_bilateral">Bilateral Sensorineural Hearing Loss, Mild-to-Moderate (ICD-10 H90.3)</option>
             <option value="conductive_bilateral">Conductive Hearing Loss, Middle Ear Pathology (ICD-10 H90.0)</option>
             <option value="mixed_bilateral">Mixed Hearing Loss, Bilateral (ICD-10 H90.6)</option>
             <option value="asymmetric_snhl">Asymmetric Sensorineural Loss — Specialist Referral Indicated (ICD-10 H90.4)</option>
@@ -170,14 +170,14 @@
           <div class="grid two" style="margin-bottom:14px;">
             <div class="surface" style="padding:14px;background:#FFFFFF;">
               <h5 style="margin:0 0 10px;color:var(--right-ear);font-size:13px;font-weight:700;">Right Ear Device (AD)</h5>
-              <div class="field" style="margin-bottom:8px;"><label>Make & Model</label><input id="haRightModel" value="Oticon Real 1 miniRITE R"></div>
+              <div class="field" style="margin-bottom:8px;"><label>Make & Model</label><input id="haRightModel" value=""></div>
               <div class="field" style="margin-bottom:8px;"><label>Style</label><select><option selected>RIC (Receiver-in-Canal)</option><option>BTE (Behind-the-Ear)</option><option>ITE / ITC</option><option>CIC / IIC</option><option>CROS Transmitter</option></select></div>
               <div class="field"><label>Coupling / Earpiece</label><select><option selected>Open Bass Dome (8mm)</option><option>Custom Micro Mold (Select-A-Vent)</option><option>Power Dome</option></select></div>
             </div>
 
             <div class="surface" style="padding:14px;background:#FFFFFF;">
               <h5 style="margin:0 0 10px;color:var(--left-ear);font-size:13px;font-weight:700;">Left Ear Device (AS)</h5>
-              <div class="field" style="margin-bottom:8px;"><label>Make & Model</label><input id="haLeftModel" value="Oticon Real 1 miniRITE R"></div>
+              <div class="field" style="margin-bottom:8px;"><label>Make & Model</label><input id="haLeftModel" value=""></div>
               <div class="field" style="margin-bottom:8px;"><label>Style</label><select><option selected>RIC (Receiver-in-Canal)</option><option>BTE (Behind-the-Ear)</option><option>ITE / ITC</option><option>CIC / IIC</option><option>BiCROS Receiver</option></select></div>
               <div class="field"><label>Coupling / Earpiece</label><select><option selected>Open Bass Dome (8mm)</option><option>Custom Micro Mold (Select-A-Vent)</option><option>Power Dome</option></select></div>
             </div>
@@ -365,11 +365,11 @@
           <div class="form-grid">
             <div class="field">
               <label>Care Plan Title</label>
-              <input id="customCpTitle" value="Comprehensive Audiological Follow-up">
+              <input id="customCpTitle" value="">
             </div>
             <div class="field">
               <label>Action Protocol Notes</label>
-              <input id="customCpNotes" value="Multidisciplinary clinical review and diagnostic reassessment.">
+              <input id="customCpNotes" value="">
             </div>
           </div>
         </div>
@@ -383,7 +383,7 @@
           <div class="field">
             <label>Recall Schedule Interval *</label>
             <select id="recallIntervalSelect" onchange="updateRecallDate(this.value)">
-              <option value="21" selected>3 Weeks (Post-Fit Verification & Aural Rehab #1: 26 Aug 2026)</option>
+              <option value="21">3 Weeks (Post-Fit Verification & Aural Rehab #1: 26 Aug 2026)</option>
               <option value="14">2 Weeks (Acute Medical / Post-Treatment Follow-up)</option>
               <option value="90">3 Months (Tinnitus / Pediatric / Device Review)</option>
               <option value="180">6 Months (Mid-Year Acoustic Check & Clean)</option>
@@ -398,7 +398,7 @@
 
           <div class="field" style="grid-column:1 / -1;">
             <label>Scheduled Recall Objective & Action Items *</label>
-            <input type="text" id="targetRecallReason" value="3-Week Hearing Aid Real-Ear Verification & Aural Rehabilitation Review" style="font-size:13.5px;padding:8px 12px;">
+            <input type="text" id="targetRecallReason" value="" style="font-size:13.5px;padding:8px 12px;">
           </div>
         </div>
       </div>

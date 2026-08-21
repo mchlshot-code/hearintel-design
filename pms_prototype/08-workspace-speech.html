@@ -47,7 +47,7 @@
       color: var(--text-primary);
     }
     .tab-nav-btn.active {
-      background: var(--teal-500);
+      background: var(--brand);
       color: #FFFFFF;
       border-color: var(--brand);
       font-weight: 600;
@@ -293,12 +293,12 @@
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                 <div>
                   <label style="font-size:11.5px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Loudness Match (dB SL)</label>
-                  <input type="number" id="tinLoudness" value="6" step="1" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-family:monospace;font-size:13px;">
+                  <input type="number" id="tinLoudness" value="" step="1" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-family:monospace;font-size:13px;">
                   <span style="font-size:11px;color:var(--text-tertiary);">Sensation level above threshold</span>
                 </div>
                 <div>
                   <label style="font-size:11.5px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Minimum Masking Level (MML)</label>
-                  <input type="number" id="tinMml" value="48" step="2" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-family:monospace;font-size:13px;">
+                  <input type="number" id="tinMml" value="" step="2" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-family:monospace;font-size:13px;">
                   <span style="font-size:11px;color:var(--text-tertiary);">dB HL Broadband Noise</span>
                 </div>
               </div>
@@ -325,11 +325,11 @@
             <div class="thi-grid">
               <div class="thi-item">
                 <span>Difficult to concentrate?</span>
-                <select class="thi-select" onchange="calculateThi()"><option value="4">Yes (4)</option><option value="2" selected>Some (2)</option><option value="0">No (0)</option></select>
+                <select class="thi-select" onchange="calculateThi()"><option value="4">Yes (4)</option><option value="2">Some (2)</option><option value="0" selected>No (0)</option></select>
               </div>
               <div class="thi-item">
                 <span>Hard to hear people?</span>
-                <select class="thi-select" onchange="calculateThi()"><option value="4" selected>Yes (4)</option><option value="2">Some (2)</option><option value="0">No (0)</option></select>
+                <select class="thi-select" onchange="calculateThi()"><option value="4">Yes (4)</option><option value="2">Some (2)</option><option value="0" selected>No (0)</option></select>
               </div>
               <div class="thi-item">
                 <span>Does it make you angry?</span>
@@ -337,11 +337,11 @@
               </div>
               <div class="thi-item">
                 <span>Hard to fall asleep?</span>
-                <select class="thi-select" onchange="calculateThi()"><option value="4">Yes (4)</option><option value="2" selected>Some (2)</option><option value="0">No (0)</option></select>
+                <select class="thi-select" onchange="calculateThi()"><option value="4">Yes (4)</option><option value="2">Some (2)</option><option value="0" selected>No (0)</option></select>
               </div>
               <div class="thi-item">
                 <span>Interferes with social life?</span>
-                <select class="thi-select" onchange="calculateThi()"><option value="4">Yes (4)</option><option value="2" selected>Some (2)</option><option value="0">No (0)</option></select>
+                <select class="thi-select" onchange="calculateThi()"><option value="4">Yes (4)</option><option value="2">Some (2)</option><option value="0" selected>No (0)</option></select>
               </div>
               <div class="thi-item">
                 <span>Feel out of control?</span>
