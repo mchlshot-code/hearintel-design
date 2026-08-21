@@ -423,11 +423,11 @@
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
           <div>
             <strong style="font-size:13.5px;color:var(--text-primary);">Assessment Findings & Audiometric Summary</strong>
-            <span style="font-size:11px;color:var(--text-tertiary);font-weight:500;">(Optional — Auto-synthesizes from threshold battery)</span>
+            <button class="btn" style="min-height:22px;font-size:11px;padding:0 6px;margin-left:8px;" onclick="document.getElementById('ptaImpressionText').value = 'Bilateral mild-to-moderate sloping sensorineural hearing loss. Right ear PTA: 30 dB HL; Left ear PTA: 36 dB HL. Symmetrical air-bone gap profiles (<10 dB) confirming absence of middle ear conductive overlay. Speech banana correlation demonstrates preserved vowel audibility with high-frequency consonant attenuation.'">Auto-Synthesize</button>
           </div>
           <button class="btn" style="min-height:26px;font-size:11.5px;padding:0 8px;" onclick="notify('Audiometric impression saved to record.')">Save Notes</button>
         </div>
-        <textarea id="ptaImpressionText" rows="3" style="width:100%;padding:10px 12px;font-size:13px;line-height:1.5;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-subtle);color:var(--text-primary);font-family:inherit;box-shadow:inset 0 1px 2px rgba(0,0,0,0.02);">Bilateral mild-to-moderate sloping sensorineural hearing loss. Right ear PTA: 30 dB HL; Left ear PTA: 36 dB HL. Symmetrical air-bone gap profiles (<10 dB) confirming absence of middle ear conductive overlay. Speech banana correlation demonstrates preserved vowel audibility with high-frequency consonant attenuation.</textarea>
+        <textarea id="ptaImpressionText" rows="3" style="width:100%;padding:10px 12px;font-size:13px;line-height:1.5;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-subtle);color:var(--text-primary);font-family:inherit;box-shadow:inset 0 1px 2px rgba(0,0,0,0.02);"></textarea>
       </div>
 
       <!-- Step Navigation Footer -->
@@ -469,15 +469,27 @@
 
     // Threshold Data Store
     let ptaData = {
-      acR: { 125: 15, 250: 15, 500: 20, 750: 25, 1000: 30, 1500: 30, 2000: 35, 3000: 40, 4000: 45, 6000: 50, 8000: 55 },
-      bcR: { 250: 10, 500: 15, 1000: 25, 2000: 30, 3000: 35, 4000: 40 },
-      acL: { 125: 20, 250: 20, 500: 25, 750: 30, 1000: 35, 1500: 35, 2000: 40, 3000: 45, 4000: 55, 6000: 60, 8000: 65 },
-      bcL: { 250: 15, 500: 20, 1000: 30, 2000: 35, 3000: 45, 4000: 50 },
+      acR: {}, bcR: {}, acL: {}, bcL: {},
       flags: {
         mask: { acR:{}, bcR:{}, acL:{}, bcL:{} },
         nr: { acR:{}, bcR:{}, acL:{}, bcL:{} }
       }
     };
+    
+    // Inject mock data for demo patients
+    const _pta_pid = (typeof getActivePatientId === 'function') ? getActivePatientId() : '';
+    if (['amaia', 'david', 'emeka'].includes(_pta_pid)) {
+      ptaData = {
+        acR: { 125: 15, 250: 15, 500: 20, 750: 25, 1000: 30, 1500: 30, 2000: 35, 3000: 40, 4000: 45, 6000: 50, 8000: 55 },
+        bcR: { 250: 10, 500: 15, 1000: 25, 2000: 30, 3000: 35, 4000: 40 },
+        acL: { 125: 20, 250: 20, 500: 25, 750: 30, 1000: 35, 1500: 35, 2000: 40, 3000: 45, 4000: 55, 6000: 60, 8000: 65 },
+        bcL: { 250: 15, 500: 20, 1000: 30, 2000: 35, 3000: 45, 4000: 50 },
+        flags: {
+          mask: { acR:{}, bcR:{}, acL:{}, bcL:{} },
+          nr: { acR:{}, bcR:{}, acL:{}, bcL:{} }
+        }
+      };
+    }
 
     function getX(fIdx) {
       return PAD_LEFT + (fIdx / (FREQS.length - 1)) * PLOT_WIDTH;

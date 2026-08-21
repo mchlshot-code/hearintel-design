@@ -302,7 +302,7 @@
                   Bilateral Sensorineural Hearing Loss, Mild-to-Moderate Sloping (ICD-10 H90.3)
                 </div>
 
-                <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;margin-bottom:12px;">
+                <div id="profDiagChipsRow" style="display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;margin-bottom:12px;">
                   <div style="padding:9px 11px;background:var(--bg-subtle);border-radius:var(--radius-sm);border:1px solid var(--border-light);font-size:12px;">
                     <div style="color:var(--text-secondary);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:2px;">Air-Bone Gap</div>
                     <div style="font-weight:700;font-family:monospace;font-size:13px;" id="profAbg">&lt;10 dB (Sensorineural)</div>
@@ -317,6 +317,9 @@
                   </div>
                 </div>
 
+                <div id="profIntakeNotice" style="display:none;padding:11px 13px;background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.2);border-radius:var(--radius-sm);color:#A16207;font-size:13px;font-weight:600;margin-bottom:12px;text-align:center;">
+                  Awaiting Initial Audiological Evaluation
+                </div>
                 <div style="font-size:13px;color:var(--text-secondary);line-height:1.55;background:var(--bg-subtle);padding:11px 13px;border-radius:var(--radius-sm);border:1px solid var(--border-light);" id="profDiagNotes">
                   Bilateral mild-to-moderate sloping sensorineural hearing loss with high-frequency slope. Immittance confirms normal middle ear compliance and pressure bilaterally (Type A). Speech audiometry shows 88% WRS (Right) and 76% WRS (Left) with mild SNR loss (+4.5 dB). Findings support bilateral digital amplification and directional noise reduction.
                 </div>
@@ -349,7 +352,7 @@
                     <strong style="color:var(--left-ear);" id="profLeftPtaLegend">&#9650; Left (36 dB)</strong>
                   </span>
                 </div>
-                <div style="padding:12px 14px;background:#FFFFFF;">
+                <div id="profAudiogramWrapper" style="padding:12px 14px;background:#FFFFFF;">
                   <svg viewBox="0 0 480 210" id="profAudiogramSvg" style="width:100%;display:block;">
                     <rect width="480" height="210" fill="#FFFFFF"/>
                     <rect x="40" y="20" width="420" height="26" fill="rgba(0,137,123,0.05)"/>
@@ -396,6 +399,15 @@
                       <span style="color:#2563EB;font-weight:700;">Left: </span><strong style="color:#0F172A;" id="ptaLeftVal">36</strong> dB HL
                     </div>
                   </div>
+                </div>
+                <div id="profAudiogramEmpty" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;background:#FAFAFA;color:var(--text-secondary);">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:0.4;margin-bottom:12px;">
+                    <path d="M3 3v18h18"/>
+                    <path d="m19 9-5 5-4-4-3 3"/>
+                  </svg>
+                  <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">No Audiogram Available</div>
+                  <div style="font-size:12px;text-align:center;max-width:250px;">A pure-tone audiogram has not been recorded for this patient yet.</div>
+                  <a class="btn primary" style="margin-top:16px;font-size:12px;min-height:30px;padding:0 14px;" id="startAssessmentBtnEmpty" href="03-start-encounter.html">+ Start Assessment</a>
                 </div>
               </div>
 

@@ -148,7 +148,7 @@
             <div>
               <label style="font-size:11.5px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em;display:block;margin-bottom:5px;">ABR Diagnostic Result Pattern</label>
               <select id="abrPatternSelect" onchange="updateAbrFindings()" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-weight:600;color:var(--text-primary);">
-                <option value="normal" selected>Normal Morphology & Latencies (I-V &le; 4.5ms, IT5 &le; 0.3ms)</option>
+                <option value="normal">Normal Morphology & Latencies (I-V &le; 4.5ms, IT5 &le; 0.3ms)</option>
                 <option value="cochlear">Cochlear SNHL (Prolonged absolute Wave V with normal I-V interval)</option>
                 <option value="retrocochlear">Retrocochlear Delay / Asymmetry (Prolonged I-V > 4.5ms or IT5 &ge; 0.4ms)</option>
                 <option value="ansd">Auditory Neuropathy Spectrum (Desynchronized/Absent Waves with CM)</option>
@@ -159,11 +159,11 @@
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
               <div>
                 <label style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:4px;">Wave V Latency (80 dB)</label>
-                <input type="text" id="abrWaveV" value="5.62 ms (R) / 5.68 ms (L)" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;font-family:monospace;font-weight:600;" oninput="updateAbrFindings()">
+                <input type="text" id="abrWaveV" value="" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;font-family:monospace;font-weight:600;" oninput="updateAbrFindings()">
               </div>
               <div>
                 <label style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:4px;">Estimated Threshold (ePTA)</label>
-                <input type="text" id="abrThreshold" value="30 dB eHL (R) / 35 dB eHL (L)" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;font-family:monospace;font-weight:600;" oninput="updateAbrFindings()">
+                <input type="text" id="abrThreshold" value="" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;font-family:monospace;font-weight:600;" oninput="updateAbrFindings()">
               </div>
             </div>
 
@@ -206,7 +206,7 @@
             <div>
               <label style="font-size:11.5px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em;display:block;margin-bottom:5px;">OAE Diagnostic Result Pattern</label>
               <select id="oaePatternSelect" onchange="updateOaeFindings()" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-weight:600;color:var(--text-primary);">
-                <option value="rolloff" selected>High-Frequency Roll-off (Pass 1k-3k Hz, Refer >3k Hz)</option>
+                <option value="rolloff">High-Frequency Roll-off (Pass 1k-3k Hz, Refer >3k Hz)</option>
                 <option value="pass">Pass Bilaterally (Robust Outer Hair Cell Function across 1k-8k Hz)</option>
                 <option value="refer">Refer / Absent Broadly (Severe Outer Hair Cell Dysfunction)</option>
                 <option value="unilateral">Unilateral Asymmetry (Pass Right, Absent Left)</option>
@@ -216,11 +216,11 @@
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
               <div>
                 <label style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:4px;">Right Ear (AD) Status</label>
-                <input type="text" id="oaeStatusR" value="Pass (1k-3k Hz) / SNR > 20 dB" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;font-weight:600;" oninput="updateOaeFindings()">
+                <input type="text" id="oaeStatusR" value="" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;font-weight:600;" oninput="updateOaeFindings()">
               </div>
               <div>
                 <label style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:4px;">Left Ear (AS) Status</label>
-                <input type="text" id="oaeStatusL" value="Pass (1k-2k Hz), Refer >2k Hz" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;font-weight:600;" oninput="updateOaeFindings()">
+                <input type="text" id="oaeStatusL" value="" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;font-weight:600;" oninput="updateOaeFindings()">
               </div>
             </div>
 
@@ -263,7 +263,7 @@
             <div>
               <label style="font-size:11.5px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em;display:block;margin-bottom:5px;">ASSR Diagnostic Result Pattern</label>
               <select id="assrPatternSelect" onchange="updateAssrFindings()" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-weight:600;color:var(--text-primary);">
-                <option value="concordant" selected>Concordant Sensory Threshold Profile (Sloping SNHL)</option>
+                <option value="concordant">Concordant Sensory Threshold Profile (Sloping SNHL)</option>
                 <option value="normal">Normal Objective Thresholds (&le;20 dB eHL all octaves)</option>
                 <option value="severe">Severe-to-Profound Threshold Profile</option>
               </select>
@@ -272,11 +272,11 @@
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
               <div>
                 <label style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:4px;">Right Estimated PTA</label>
-                <input type="text" id="assrPtaR" value="33 dB eHL (Mild SNHL)" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;font-family:monospace;font-weight:600;" oninput="updateAssrFindings()">
+                <input type="text" id="assrPtaR" value="" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;font-family:monospace;font-weight:600;" oninput="updateAssrFindings()">
               </div>
               <div>
                 <label style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:4px;">Left Estimated PTA</label>
-                <input type="text" id="assrPtaL" value="36 dB eHL (Mild-Mod SNHL)" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;font-family:monospace;font-weight:600;" oninput="updateAssrFindings()">
+                <input type="text" id="assrPtaL" value="" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;font-family:monospace;font-weight:600;" oninput="updateAssrFindings()">
               </div>
             </div>
 
@@ -319,7 +319,7 @@
             <div>
               <label style="font-size:11.5px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em;display:block;margin-bottom:5px;">ECochG & Vestibular Result Pattern</label>
               <select id="vempPatternSelect" onchange="updateVempFindings()" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-weight:600;color:var(--text-primary);">
-                <option value="normal" selected>Normal ECochG & Symmetric VEMP (SP/AP &lt; 0.40, Asymmetry &lt; 35%)</option>
+                <option value="normal">Normal ECochG & Symmetric VEMP (SP/AP &lt; 0.40, Asymmetry &lt; 35%)</option>
                 <option value="hydrops">Endolymphatic Hydrops / Meniere's Pattern (Elevated SP/AP &ge; 0.45)</option>
                 <option value="sscd">Superior Canal Dehiscence (Enhanced cVEMP amplitude / low threshold)</option>
                 <option value="vestibular_loss">Unilateral Vestibular Loss (Absent/Attenuated VEMP)</option>
@@ -329,11 +329,11 @@
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
               <div>
                 <label style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:4px;">ECochG SP/AP Ratio</label>
-                <input type="text" id="vempSpAp" value="0.28 (Normal <0.40)" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;font-family:monospace;font-weight:600;" oninput="updateVempFindings()">
+                <input type="text" id="vempSpAp" value="" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;font-family:monospace;font-weight:600;" oninput="updateVempFindings()">
               </div>
               <div>
                 <label style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;display:block;margin-bottom:4px;">cVEMP Saccular Asymmetry</label>
-                <input type="text" id="vempAsym" value="12% (Symmetric WNL)" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;font-family:monospace;font-weight:600;" oninput="updateVempFindings()">
+                <input type="text" id="vempAsym" value="" style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;font-family:monospace;font-weight:600;" oninput="updateVempFindings()">
               </div>
             </div>
 
@@ -415,7 +415,6 @@
         notes.textContent = 'Desynchronized / absent ABR waveforms in the presence of preserved cochlear microphonic / robust DPOAEs. Consistent with Auditory Neuropathy Spectrum Disorder (ANSD).';
       }
 
-      textarea.value = `Auditory Brainstem Response (ABR) assessment findings: ${notes.textContent} Digital equipment reports archived to Patient Media.`;
     }
 
     function updateOaeFindings() {
