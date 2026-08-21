@@ -587,7 +587,7 @@ function patientShell(active) {
   const html = [
     '<aside class="sidebar">',
       '<div class="brand">',
-        '<div style="margin-bottom:6px;"><img src="logo.png?v=3.0" alt="HearIntel" style="height:26px;width:auto;display:block;"></div>',
+        '<div style="margin-bottom:6px;display:inline-flex;background:#FFFFFF;padding:4px 10px;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.2);"><img src="logo.png?v=4.0" alt="HearIntel" style="height:22px;width:auto;display:block;"></div>',
         '<div class="brand-sub">Practice Management</div>',
       '</div>',
       '<nav class="nav-group">',
@@ -653,7 +653,7 @@ function workspaceShell(active, content) {
   const sidebarHtml = [
     '<aside class="sidebar">',
       '<div class="brand">',
-        '<div style="margin-bottom:6px;"><img src="logo.png?v=3.0" alt="HearIntel" style="height:26px;width:auto;display:block;"></div>',
+        '<div style="margin-bottom:6px;display:inline-flex;background:#FFFFFF;padding:4px 10px;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.2);"><img src="logo.png?v=4.0" alt="HearIntel" style="height:22px;width:auto;display:block;"></div>',
         '<div class="brand-sub">Assessment</div>',
       '</div>',
       '<nav class="nav-group">',
