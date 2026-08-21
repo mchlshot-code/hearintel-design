@@ -490,7 +490,29 @@
     function renderProfile() {
       const patientId = getActivePatientId();
       const p = window.HearIntelDB ? window.HearIntelDB.getPatient(patientId) : null;
-      if (!p) return;
+      if (!p) {
+        document.getElementById('profName').textContent = 'No Patient Selected';
+        document.getElementById('profAge').textContent = '--';
+        document.getElementById('profGender').textContent = '--';
+        document.getElementById('profMRN').textContent = '--';
+        document.getElementById('profPhone').textContent = '--';
+        document.getElementById('profFacility').textContent = '--';
+        document.getElementById('profStatusBadge').textContent = 'No Record';
+        document.getElementById('kpiPtaVal').textContent = '--';
+        document.getElementById('ptaRightVal').textContent = '--';
+        document.getElementById('ptaLeftVal').textContent = '--';
+        document.getElementById('profPrimaryDiag').textContent = 'No active medical record found in registry.';
+        document.getElementById('profPathwayBadge').textContent = 'EMPTY';
+        document.getElementById('profNextRecallText').textContent = 'None Scheduled';
+        document.getElementById('profNextRecallReason').textContent = 'Register a patient from the patient registry or click "Register Patient"';
+        document.getElementById('adminPhone').textContent = '--';
+        document.getElementById('adminEmail').textContent = '--';
+        document.getElementById('adminEmergency').textContent = '--';
+        document.getElementById('adminLanguage').textContent = '--';
+        document.getElementById('adminInsurance').textContent = '--';
+        document.getElementById('adminClinician').textContent = '--';
+        return;
+      }
 
       document.getElementById('profName').textContent = p.name;
       document.getElementById('profAge').textContent = p.age + ' yrs';
