@@ -139,176 +139,56 @@
                 <h2 style="font-size:13.5px;font-weight:700;text-transform:uppercase;color:var(--text-primary);margin:0;">1. Otoscopic & Physical Clearance</h2>
                 <span class="badge" id="otoTriageBadge">Cleared Bilaterally</span>
               </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-                <div>
-                  <label style="font-size:11px;font-weight:700;color:var(--right-ear);text-transform:uppercase;display:block;margin-bottom:4px;">Right Ear (AD) Canal & TM</label>
-                  <select id="otoTriageR" onchange="evaluateScreening()" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;">
-                    <option value="clear">Clear / Intact TM</option>
-                    <option value="wax">Partial Cerumen (<50%)</option>
-                    <option value="occluded">Occluding Cerumen (Refer for Removal)</option>
-                    <option value="abnormal">Perforation / Inflammation</option>
-                  </select>
-                </div>
-                <div>
-                  <label style="font-size:11px;font-weight:700;color:var(--left-ear);text-transform:uppercase;display:block;margin-bottom:4px;">Left Ear (AS) Canal & TM</label>
-                  <select id="otoTriageL" onchange="evaluateScreening()" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px;">
-                    <option value="clear">Clear / Intact TM</option>
-                    <option value="wax">Partial Cerumen (<50%)</option>
-                    <option value="occluded">Occluding Cerumen (Refer for Removal)</option>
-                    <option value="abnormal">Perforation / Inflammation</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <!-- 2. Pure Tone Sweep (Adult & Pediatric) -->
-            <div class="surface protocol-section visible" id="sweepSection" style="padding:18px 20px;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-card);">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border-light);">
-                <div>
-                  <h2 style="font-size:13.5px;font-weight:700;text-transform:uppercase;color:var(--text-primary);margin:0;">2. Pure Tone Sweep Screener</h2>
-                  <div style="font-size:11.5px;color:var(--text-secondary);margin-top:2px;" id="sweepIntensityLabel">Presentation Level: 25 dB HL · Adult 3-Frequency Battery</div>
-                </div>
-                <span class="badge" id="sweepOutcomeBadge" style="background:var(--bg-subtle);color:var(--text-secondary);border:1px solid var(--border);">Not Started</span>
-              </div>
-
-              <!-- Right Ear -->
+              <!-- Stage 1: OAE -->
               <div style="margin-bottom:14px;">
-                <div style="font-size:12px;font-weight:700;color:var(--right-ear);text-transform:uppercase;margin-bottom:6px;">Right Ear (AD)</div>
-                <div class="sweep-btn-group" id="sweepGroupR">
-                  <div class="sweep-tile untested" id="sweep_r_500" onclick="toggleSweep('r', 500)" style="display:none;">
-                    <div class="sweep-freq-title">500 Hz</div>
-                    <div class="sweep-status-label">UNTESTED</div>
+                <div style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--border-light);">Stage 1 &mdash; OAE (TEOAE / DPOAE)</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                  <div>
+                    <label style="font-size:11px;font-weight:700;color:var(--right-ear);text-transform:uppercase;display:block;margin-bottom:6px;">Right Ear (AD)</label>
+                    <div style="display:flex;gap:8px;">
+                      <button type="button" class="hhie-opt active" id="oae_r_pass" onclick="setOAE('r','pass',this)">Pass</button>
+                      <button type="button" class="hhie-opt" id="oae_r_refer" onclick="setOAE('r','refer',this)">Refer</button>
+                      <button type="button" class="hhie-opt" id="oae_r_incomplete" onclick="setOAE('r','incomplete',this)">Incomplete</button>
+                    </div>
                   </div>
-                  <div class="sweep-tile untested" id="sweep_r_1000" onclick="toggleSweep('r', 1000)">
-                    <div class="sweep-freq-title">1000 Hz</div>
-                    <div class="sweep-status-label">UNTESTED</div>
-                  </div>
-                  <div class="sweep-tile untested" id="sweep_r_2000" onclick="toggleSweep('r', 2000)">
-                    <div class="sweep-freq-title">2000 Hz</div>
-                    <div class="sweep-status-label">UNTESTED</div>
-                  </div>
-                  <div class="sweep-tile untested" id="sweep_r_4000" onclick="toggleSweep('r', 4000)">
-                    <div class="sweep-freq-title">4000 Hz</div>
-                    <div class="sweep-status-label">UNTESTED</div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Left Ear -->
-              <div>
-                <div style="font-size:12px;font-weight:700;color:var(--left-ear);text-transform:uppercase;margin-bottom:6px;">Left Ear (AS)</div>
-                <div class="sweep-btn-group" id="sweepGroupL">
-                  <div class="sweep-tile untested" id="sweep_l_500" onclick="toggleSweep('l', 500)" style="display:none;">
-                    <div class="sweep-freq-title">500 Hz</div>
-                    <div class="sweep-status-label">UNTESTED</div>
-                  </div>
-                  <div class="sweep-tile untested" id="sweep_l_1000" onclick="toggleSweep('l', 1000)">
-                    <div class="sweep-freq-title">1000 Hz</div>
-                    <div class="sweep-status-label">UNTESTED</div>
-                  </div>
-                  <div class="sweep-tile untested" id="sweep_l_2000" onclick="toggleSweep('l', 2000)">
-                    <div class="sweep-freq-title">2000 Hz</div>
-                    <div class="sweep-status-label">UNTESTED</div>
-                  </div>
-                  <div class="sweep-tile untested" id="sweep_l_4000" onclick="toggleSweep('l', 4000)">
-                    <div class="sweep-freq-title">4000 Hz</div>
-                    <div class="sweep-status-label">UNTESTED</div>
+                  <div>
+                    <label style="font-size:11px;font-weight:700;color:var(--left-ear);text-transform:uppercase;display:block;margin-bottom:6px;">Left Ear (AS)</label>
+                    <div style="display:flex;gap:8px;">
+                      <button type="button" class="hhie-opt active" id="oae_l_pass" onclick="setOAE('l','pass',this)">Pass</button>
+                      <button type="button" class="hhie-opt" id="oae_l_refer" onclick="setOAE('l','refer',this)">Refer</button>
+                      <button type="button" class="hhie-opt" id="oae_l_incomplete" onclick="setOAE('l','incomplete',this)">Incomplete</button>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div style="margin-top:10px;font-size:11px;color:var(--text-tertiary);">Click each tile to mark Heard or Missed. Tap again to reset to Untested.</div>
-            </div>
-
-            <!-- 2b. Occupational STS Section -->
-            <div class="surface protocol-section" id="stsSection" style="padding:18px 20px;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-card);">
-              <div style="margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border-light);">
-                <h2 style="font-size:13.5px;font-weight:700;text-transform:uppercase;color:var(--text-primary);margin:0;">2. Standard Threshold Shift (STS) Check</h2>
-                <div style="font-size:11.5px;color:var(--text-secondary);margin-top:2px;">Average shift ≥10 dB at 2k, 3k, 4k Hz vs. baseline audiogram constitutes an OSHA STS event.</div>
-              </div>
-
-              <div style="font-size:12px;font-weight:700;color:var(--right-ear);text-transform:uppercase;margin-bottom:6px;">Right Ear (AD)</div>
-              <div class="sts-grid">
-                <div class="sts-field">
-                  <label>Baseline 2k Hz (dB HL)</label>
-                  <input type="number" id="sts_r_base_2k" placeholder="e.g. 25" oninput="evaluateScreening()">
-                </div>
-                <div class="sts-field">
-                  <label>Baseline 3k Hz (dB HL)</label>
-                  <input type="number" id="sts_r_base_3k" placeholder="e.g. 30" oninput="evaluateScreening()">
-                </div>
-                <div class="sts-field">
-                  <label>Baseline 4k Hz (dB HL)</label>
-                  <input type="number" id="sts_r_base_4k" placeholder="e.g. 35" oninput="evaluateScreening()">
-                </div>
-                <div class="sts-field">
-                  <label>Current 2k Hz (dB HL)</label>
-                  <input type="number" id="sts_r_curr_2k" placeholder="e.g. 35" oninput="evaluateScreening()">
-                </div>
-                <div class="sts-field">
-                  <label>Current 3k Hz (dB HL)</label>
-                  <input type="number" id="sts_r_curr_3k" placeholder="e.g. 40" oninput="evaluateScreening()">
-                </div>
-                <div class="sts-field">
-                  <label>Current 4k Hz (dB HL)</label>
-                  <input type="number" id="sts_r_curr_4k" placeholder="e.g. 48" oninput="evaluateScreening()">
-                </div>
-              </div>
-              <div style="font-size:12px;font-weight:700;color:var(--left-ear);text-transform:uppercase;margin:12px 0 6px;">Left Ear (AS)</div>
-              <div class="sts-grid">
-                <div class="sts-field">
-                  <label>Baseline 2k Hz (dB HL)</label>
-                  <input type="number" id="sts_l_base_2k" placeholder="e.g. 25" oninput="evaluateScreening()">
-                </div>
-                <div class="sts-field">
-                  <label>Baseline 3k Hz (dB HL)</label>
-                  <input type="number" id="sts_l_base_3k" placeholder="e.g. 30" oninput="evaluateScreening()">
-                </div>
-                <div class="sts-field">
-                  <label>Baseline 4k Hz (dB HL)</label>
-                  <input type="number" id="sts_l_base_4k" placeholder="e.g. 35" oninput="evaluateScreening()">
-                </div>
-                <div class="sts-field">
-                  <label>Current 2k Hz (dB HL)</label>
-                  <input type="number" id="sts_l_curr_2k" placeholder="e.g. 35" oninput="evaluateScreening()">
-                </div>
-                <div class="sts-field">
-                  <label>Current 3k Hz (dB HL)</label>
-                  <input type="number" id="sts_l_curr_3k" placeholder="e.g. 40" oninput="evaluateScreening()">
-                </div>
-                <div class="sts-field">
-                  <label>Current 4k Hz (dB HL)</label>
-                  <input type="number" id="sts_l_curr_4k" placeholder="e.g. 48" oninput="evaluateScreening()">
-                </div>
-              </div>
-              <div id="stsFlagBanner" style="display:none;margin-top:12px;padding:10px 12px;background:#FEF2F2;border:1px solid #DC2626;border-radius:var(--radius-sm);font-size:12.5px;color:#991B1B;font-weight:600;">OSHA STS Event Detected — Retest within 30 days and notify employer</div>
-            </div>
-
-            <!-- 2c. Newborn OAE / A-ABR Section -->
-            <div class="surface protocol-section" id="newbornSection" style="padding:18px 20px;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-card);">
-              <div style="margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border-light);">
-                <h2 style="font-size:13.5px;font-weight:700;text-transform:uppercase;color:var(--text-primary);margin:0;">2. OAE / A-ABR Newborn Screening</h2>
-                <div style="font-size:11.5px;color:var(--text-secondary);margin-top:2px;">UNHS 1-3-6 Benchmark — Screen before 1 month, confirm by 3 months, intervene by 6 months.</div>
-              </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-                <div>
-                  <label style="font-size:11px;font-weight:700;color:var(--right-ear);text-transform:uppercase;display:block;margin-bottom:6px;">Right Ear (AD) — TEOAE / A-ABR</label>
-                  <div style="display:flex;gap:8px;">
-                    <button type="button" class="hhie-opt active" id="oae_r_pass" onclick="setOAE('r','pass',this)">Pass</button>
-                    <button type="button" class="hhie-opt" id="oae_r_refer" onclick="setOAE('r','refer',this)">Refer</button>
-                    <button type="button" class="hhie-opt" id="oae_r_incomplete" onclick="setOAE('r','incomplete',this)">Incomplete</button>
+              <!-- Stage 2: A-ABR gate (shown only when OAE does not pass) -->
+              <div id="abrStage" style="display:none;background:var(--bg-subtle);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:14px;">
+                <div style="font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--border-light);">Stage 2 &mdash; A-ABR <span style="font-weight:500;text-transform:none;font-size:10.5px;color:var(--text-tertiary);">(OAE did not pass on one or both ears)</span></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                  <div>
+                    <label style="font-size:11px;font-weight:700;color:var(--right-ear);text-transform:uppercase;display:block;margin-bottom:6px;">Right Ear (AD)</label>
+                    <div style="display:flex;gap:8px;">
+                      <button type="button" class="hhie-opt" id="abr_r_pass" onclick="setABR('r','pass',this)">Pass</button>
+                      <button type="button" class="hhie-opt" id="abr_r_refer" onclick="setABR('r','refer',this)">Refer</button>
+                      <button type="button" class="hhie-opt" id="abr_r_incomplete" onclick="setABR('r','incomplete',this)">Incomplete</button>
+                      <button type="button" class="hhie-opt" id="abr_r_na" onclick="setABR('r','na',this)" style="font-size:10px;">N/A</button>
+                    </div>
+                  </div>
+                  <div>
+                    <label style="font-size:11px;font-weight:700;color:var(--left-ear);text-transform:uppercase;display:block;margin-bottom:6px;">Left Ear (AS)</label>
+                    <div style="display:flex;gap:8px;">
+                      <button type="button" class="hhie-opt" id="abr_l_pass" onclick="setABR('l','pass',this)">Pass</button>
+                      <button type="button" class="hhie-opt" id="abr_l_refer" onclick="setABR('l','refer',this)">Refer</button>
+                      <button type="button" class="hhie-opt" id="abr_l_incomplete" onclick="setABR('l','incomplete',this)">Incomplete</button>
+                      <button type="button" class="hhie-opt" id="abr_l_na" onclick="setABR('l','na',this)" style="font-size:10px;">N/A</button>
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <label style="font-size:11px;font-weight:700;color:var(--left-ear);text-transform:uppercase;display:block;margin-bottom:6px;">Left Ear (AS) — TEOAE / A-ABR</label>
-                  <div style="display:flex;gap:8px;">
-                    <button type="button" class="hhie-opt active" id="oae_l_pass" onclick="setOAE('l','pass',this)">Pass</button>
-                    <button type="button" class="hhie-opt" id="oae_l_refer" onclick="setOAE('l','refer',this)">Refer</button>
-                    <button type="button" class="hhie-opt" id="oae_l_incomplete" onclick="setOAE('l','incomplete',this)">Incomplete</button>
-                  </div>
-                </div>
+                <div style="font-size:10.5px;color:var(--text-tertiary);margin-top:8px;">Use N/A if that ear passed OAE and A-ABR is not required for it.</div>
               </div>
-              <div class="oae-card" style="margin-top:14px;">
+
+              <div class="oae-card" style="margin-top:4px;">
                 <div style="font-size:11.5px;font-weight:700;color:var(--text-secondary);margin-bottom:6px;">Equipment Report Upload (optional)</div>
                 <input type="file" accept="image/*,application/pdf" id="oaeUploadInput" onchange="handleOaeUpload(event)" style="font-size:12px;">
               </div>
@@ -371,6 +251,7 @@
     };
     const hhieScores = {};
     const oaeResults = { r: 'pass', l: 'pass' };
+    const abrResults = { r: null, l: null };
 
     // ── Validated HHIE-S 10-Item Question Set ──────────────────────────────────
     const HHIE_QUESTIONS = [
@@ -481,9 +362,38 @@
       evaluateScreening();
     }
 
-    // ── OAE Pass/Refer (Newborn) ───────────────────────────────────────────────
+    // ── OAE / A-ABR Two-Stage Gate Logic ───────────────────────────────
     function setOAE(ear, result, btn) {
       oaeResults[ear] = result;
+      const btns = btn.parentElement.querySelectorAll('.hhie-opt');
+      btns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      // Show A-ABR stage if either ear did not pass OAE
+      const abrStage = document.getElementById('abrStage');
+      if (abrStage) {
+        const needsAbr = oaeResults.r !== 'pass' || oaeResults.l !== 'pass';
+        abrStage.style.display = needsAbr ? 'block' : 'none';
+        // Auto-set N/A for ears that passed OAE; clear N/A if now referring
+        ['r','l'].forEach(e => {
+          if (oaeResults[e] === 'pass') {
+            abrResults[e] = 'na';
+            const naBtn = document.getElementById('abr_' + e + '_na');
+            if (naBtn) {
+              naBtn.parentElement.querySelectorAll('.hhie-opt').forEach(b => b.classList.remove('active'));
+              naBtn.classList.add('active');
+            }
+          } else if (abrResults[e] === 'na') {
+            abrResults[e] = null;
+            const naBtn = document.getElementById('abr_' + e + '_na');
+            if (naBtn) naBtn.classList.remove('active');
+          }
+        });
+      }
+      evaluateScreening();
+    }
+
+    function setABR(ear, result, btn) {
+      abrResults[ear] = result;
       const btns = btn.parentElement.querySelectorAll('.hhie-opt');
       btns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
@@ -670,11 +580,36 @@
         }
       }
 
-      // Newborn OAE evaluation
+      // Newborn two-stage OAE -> A-ABR evaluation
       if (currentProtocol === 'newborn') {
-        if (oaeResults.r === 'refer' || oaeResults.l === 'refer') {
-          outcome = 'refer';
-          reasons.push('OAE/A-ABR refer result — diagnostic ABR before 3 months required');
+        const oaeRefer = oaeResults.r === 'refer' || oaeResults.l === 'refer';
+        const oaeIncomplete = oaeResults.r === 'incomplete' || oaeResults.l === 'incomplete';
+        const needsAbr = oaeRefer || oaeIncomplete;
+
+        if (needsAbr) {
+          const rNeedsAbr = oaeResults.r !== 'pass';
+          const lNeedsAbr = oaeResults.l !== 'pass';
+          const abrRRefer = rNeedsAbr && abrResults.r === 'refer';
+          const abrLRefer = lNeedsAbr && abrResults.l === 'refer';
+          const abrRIncomplete = rNeedsAbr && (abrResults.r === 'incomplete' || abrResults.r === null);
+          const abrLIncomplete = lNeedsAbr && (abrResults.l === 'incomplete' || abrResults.l === null);
+
+          if (abrRRefer || abrLRefer) {
+            outcome = 'refer';
+            const earList = [abrRRefer ? 'AD' : null, abrLRefer ? 'AS' : null].filter(Boolean).join(' & ');
+            reasons.push('A-ABR refer (' + earList + ') — diagnostic ABR required before 3 months');
+          } else if (abrRIncomplete || abrLIncomplete) {
+            outcome = 'rescreen';
+            reasons.push('A-ABR result pending on referred ear(s) — re-screen required within UNHS 1-3-6 window');
+          } else {
+            // All required A-ABR results are pass/N/A
+            if (oaeIncomplete) {
+              // OAE was incomplete, A-ABR passed: still needs OAE confirmation
+              outcome = 'rescreen';
+              reasons.push('OAE incomplete — re-screen required before 1 month of age');
+            }
+            // oaeRefer + abrPass = discharged (vernix/debris artifact), outcome stays 'pass'
+          }
         }
       }
 
@@ -690,7 +625,11 @@
         if (outcome === 'pass') {
           dispTitle.textContent = 'Hearing Screening Passed';
           dispTitle.style.color = '#15803D';
-          dispDesc.textContent = 'All screening criteria met. ' + (rescreenText[currentProtocol] || '');
+          dispDesc.textContent = 'All screening criteria met. ' + (rescreenText[currentProtocol] || '') + (reasons.length ? ' Note: ' + reasons.join('; ') + '.' : '');
+        } else if (outcome === 'rescreen') {
+          dispTitle.textContent = 'Re-screen Required';
+          dispTitle.style.color = '#B45309';
+          dispDesc.textContent = reasons.join(' ') + ' Schedule re-screen promptly. UNHS 1-3-6: screen by 1 month, confirm by 3 months, intervene by 6 months.';
         } else {
           dispTitle.textContent = 'Diagnostic Referral Indicated';
           dispTitle.style.color = '#B91C1C';
