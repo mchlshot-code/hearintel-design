@@ -198,63 +198,43 @@
               </div>
             </div>
 
-            <div class="alert-strip" id="speechClinicalAdviceAlert" style="margin:0;">
-              <strong>Amplification Prognosis:</strong> Excellent speech audibility expected in right ear. Left ear benefits from frequency lowering and binaural directional processing.
-            </div>
+            
           </div>
         </div>
 
       </div>
 
       <!-- ── TAB 2: SPEECH-IN-NOISE (QUICKSIN) ── -->
-      <div id="sectionNoise" style="display:none;">
-        <div class="speech-grid">
-          
-          <div class="card-box">
-            <h3 style="font-size:13px;font-weight:700;color:var(--text-primary);text-transform:uppercase;margin-bottom:12px;">QuickSIN Test Battery (IEEE Sentences in 4-Talker Babble)</h3>
-            <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;">
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                <div>
-                  <label style="font-size:11.5px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Presentation Level (dB HL)</label>
-                  <input type="number" id="quickSinLevel" value="" placeholder="70" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-family:monospace;font-size:13px;">
-                </div>
-                <div>
-                  <label style="font-size:11.5px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Total Words Correct (out of 30)</label>
-                  <input type="number" id="quickSinWords" value="" placeholder="--" min="0" max="30" oninput="calculateQuickSin()" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-family:monospace;font-size:13px;">
-                </div>
+      <div id="sectionNoise" style="display:none;margin-bottom:20px;">
+        <div class="card-box" style="max-width:680px;">
+          <h3 style="font-size:13px;font-weight:700;color:var(--text-primary);text-transform:uppercase;margin-bottom:12px;">QuickSIN Test Battery (IEEE Sentences in 4-Talker Babble)</h3>
+          <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <div>
+                <label style="font-size:11.5px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Presentation Level (dB HL)</label>
+                <input type="number" id="quickSinLevel" value="" placeholder="70" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-family:monospace;font-size:13px;">
               </div>
+              <div>
+                <label style="font-size:11.5px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Total Words Correct (out of 30)</label>
+                <input type="number" id="quickSinWords" value="" placeholder="--" min="0" max="30" oninput="calculateQuickSin()" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-family:monospace;font-size:13px;">
+              </div>
+            </div>
 
-              <div style="padding:12px 14px;background:var(--bg-subtle);border-radius:var(--radius);border:1px solid var(--border-light);margin-top:6px;">
-                <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-                  <span>Calculated SNR-50:</span>
-                  <strong id="sinSnr50" style="font-family:monospace;">4.5 dB SNR</strong>
-                </div>
-                <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-                  <span>SNR Loss Score (25.5 - Total):</span>
-                  <strong id="sinSnrLoss" style="font-family:monospace;">+4.5 dB SNR Loss</strong>
-                </div>
-                <div style="display:flex;justify-content:space-between;">
-                  <span>Severity Classification:</span>
-                  <span class="badge" id="sinSeverityBadge">Mild SNR Loss (3-7 dB)</span>
-                </div>
+            <div style="padding:12px 14px;background:var(--bg-subtle);border-radius:var(--radius);border:1px solid var(--border-light);margin-top:6px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                <span>Calculated SNR-50:</span>
+                <strong id="sinSnr50" style="font-family:monospace;">4.5 dB SNR</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                <span>SNR Loss Score (25.5 - Total):</span>
+                <strong id="sinSnrLoss" style="font-family:monospace;">+4.5 dB SNR Loss</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;">
+                <span>Severity Classification:</span>
+                <span class="badge" id="sinSeverityBadge">Mild SNR Loss (3-7 dB)</span>
               </div>
             </div>
           </div>
-
-          <div style="display:flex;flex-direction:column;gap:12px;">
-            <div class="surface" style="padding:16px 18px;background:var(--bg-subtle);">
-              <h4 style="font-size:12px;font-weight:700;text-transform:uppercase;color:var(--text-secondary);margin-bottom:8px;">Technology & Assistive Recommendations</h4>
-              <div style="font-size:13px;line-height:1.55;">
-                <p style="margin-bottom:8px;"><strong>Mild SNR Loss (+4.5 dB):</strong> Patient understands well in quiet but experiences moderate difficulty in restaurants, group conferences, and worship centers.</p>
-                <ul style="margin:0 0 0 16px;padding:0;color:var(--text-secondary);">
-                  <li>Adaptive directional multi-microphone processing indicated.</li>
-                  <li>Binaural spatial noise cancellation protocol.</li>
-                  <li>Remote wireless microphone (e.g. PartnerMic / Roger) recommended for complex group settings.</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
         </div>
       </div>
 
@@ -349,9 +329,7 @@
               </div>
             </div>
 
-            <div style="padding:10px 12px;background:var(--bg-subtle);border-radius:var(--radius);border:1px solid var(--border-light);margin-top:12px;font-size:12px;line-height:1.45;">
-              <strong>Management Pathway:</strong> Sound enrichment via hearing aid amplification + fractal relaxation sound generator indicated. Sleep hygiene counseling recommended.
-            </div>
+            
           </div>
 
         </div>
@@ -362,9 +340,8 @@
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
           <div>
             <strong style="font-size:13.5px;color:var(--text-primary);">Assessment Findings & Speech / Tinnitus Notes</strong>
-            <span style="font-size:11px;color:var(--text-tertiary);font-weight:500;">(Optional — Auto-synthesizes from test findings)</span>
           </div>
-          <button class="btn" style="min-height:26px;font-size:11.5px;padding:0 8px;" onclick="updateSynthesizedImpression()">Auto-Synthesize</button>
+          <button class="btn" style="min-height:26px;font-size:11.5px;padding:0 8px;" onclick="notify('Speech & Tinnitus findings saved to patient record.')">Save Notes</button>
         </div>
         <textarea id="speechImpressionText" rows="3" style="width:100%;padding:10px 12px;font-size:13px;line-height:1.5;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-subtle);color:var(--text-primary);font-family:inherit;box-shadow:inset 0 1px 2px rgba(0,0,0,0.02);" placeholder="Enter speech audiometry summary, discrimination index, or speech in noise notes..."></textarea>
       </div>

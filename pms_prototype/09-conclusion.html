@@ -109,9 +109,9 @@
         <div class="field" style="grid-column:1 / -1;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
             <label for="interpretation">Comprehensive Clinical Findings Synthesis</label>
-            <button type="button" class="btn" style="min-height:24px;font-size:11px;padding:0 8px;" onclick="autoSynthesizeNarrative()">Re-generate Synthesis</button>
+            
           </div>
-          <textarea id="interpretation" rows="3" style="width:100%;padding:10px 12px;font-size:13px;line-height:1.5;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-subtle);color:var(--text-primary);font-family:inherit;" placeholder="Enter clinical findings synthesis or click \'Re-generate Synthesis\' above..."></textarea>
+          <textarea id="interpretation" rows="3" style="width:100%;padding:10px 12px;font-size:13px;line-height:1.5;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-subtle);color:var(--text-primary);font-family:inherit;" placeholder="Enter clinical findings synthesis and diagnostic impressions..."></textarea>
         </div>
       </div>
 
@@ -444,12 +444,7 @@
     }
 
     function onDiagnosisChange(val) {
-      // Auto-suggest pathway based on diagnosis
-      if (val.includes('snhl_bilateral')) showPathway('ha');
-      else if (val.includes('asymmetric_snhl') || val.includes('sudden_snhl') || val.includes('conductive_bilateral')) showPathway('referral');
-      else if (val.includes('tinnitus_disorder') || val.includes('hyperacusis')) showPathway('tinnitus');
-      else if (val.includes('normal_hearing')) showPathway('surveillance');
-      else if (val.includes('capd')) showPathway('aural-rehab');
+      // Diagnosis recorded
     }
 
     function updateRecallDate(daysStr) {
