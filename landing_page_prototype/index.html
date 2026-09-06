@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="icon" type="image/png" href="./favicon.png?v=3.0">
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=2.0">
+  <link rel="stylesheet" href="styles.css?v=3.1">
 </head>
 <body>
 
@@ -25,7 +25,7 @@
 
       <ul class="nav-links" role="list">
         <li><a href="#product" onclick="navClose()">Product</a></li>
-        <li><a href="#trust" onclick="navClose()">Trust &amp; Compliance</a></li>
+        <li><a href="#capabilities" onclick="navClose()">Capabilities</a></li>
         <li><a href="#pricing" onclick="navClose()">Pricing</a></li>
       </ul>
 
@@ -41,11 +41,10 @@
 <!-- Mobile drawer -->
 <div class="nav-drawer" id="navDrawer" aria-hidden="true">
   <a href="#product" onclick="navClose()">Product</a>
-  <a href="#trust" onclick="navClose()">Trust &amp; Compliance</a>
+  <a href="#capabilities" onclick="navClose()">Capabilities</a>
   <a href="#pricing" onclick="navClose()">Pricing</a>
   <a href="#contact" class="btn btn-primary" onclick="navClose()">Request a Demo</a>
 </div>
-
 
 <main id="main">
 
@@ -123,10 +122,10 @@
         <p class="section-eyebrow">HPMS</p>
         <h2 class="section-headline">A complete clinical workspace for audiologists.</h2>
         <p class="section-body">
-          Every tool an audiologist needs — patient management, diagnostic assessments, clinical documentation, and practice administration — in a single, structured system built for how audiology actually works.
+          Every task an audiologist needs — patient management, diagnostic assessments, clinical documentation, and practice administration — in a single, structured system built for how audiology is actually run.
         </p>
         <div class="capability-tags">
-          <span class="capability-tag">Patient Registry</span>
+          <span class="capability-tag">Patient registry</span>
           <span class="capability-tag">Audiograms (PTA)</span>
           <span class="capability-tag">Tympanometry</span>
           <span class="capability-tag">OAE Testing</span>
@@ -228,151 +227,6 @@
     </div>
 
     <div class="capabilities-cta reveal">
-      <a href="#contact" class="btn btn-primary">Request a Demo</a>
-    </div>
-  </div>
-</section>
-
-
-<!-- ══════════════════════════════════════════
-     TRUST & COMPLIANCE
-══════════════════════════════════════════ -->
-<section id="trust" aria-label="Trust and compliance">
-  <div class="container">
-    <div class="trust-inner">
-      <div class="reveal">
-        <p class="section-eyebrow light">Trust &amp; Compliance</p>
-        <h2 class="trust-headline">Health data protection by design, not by policy.</h2>
-        <p class="trust-sub">
-          HearIntel handles clinical records and registry data. The architecture reflects that responsibility — not as a compliance checkbox, but as a foundational requirement.
-        </p>
-        <p class="trust-sub">
-          These are not marketing claims. They are architectural decisions that shape every access path in the system.
-        </p>
-        <p class="trust-future">
-          As HearIntel's compliance architecture matures, this section will become a dedicated Trust Center with full documentation of data flows, access governance, and audit mechanisms.
-        </p>
-      </div>
-
-      <ul class="trust-principles reveal reveal-delay-1" aria-label="Architecture principles">
-        <li class="trust-principle">
-          <span class="trust-number">01</span>
-          <div class="trust-principle-text">
-            <strong>Consent-gated cross-facility access</strong>
-            A patient's record is only visible to another facility when the patient has actively consented — in person, or through a verifiable consent act. Subscription tier does not determine access to patient data.
-          </div>
-        </li>
-        <li class="trust-principle">
-          <span class="trust-number">02</span>
-          <div class="trust-principle-text">
-            <strong>De-identification before Registry entry</strong>
-            Clinical records are de-identified before any data reaches the Hearing Health Registry. The de-identification happens in the pipeline — not as a post-hoc filter.
-          </div>
-        </li>
-        <li class="trust-principle">
-          <span class="trust-number">03</span>
-          <div class="trust-principle-text">
-            <strong>No re-identification path from Registry data</strong>
-            There is no user-facing function that links a Registry record back to an identified HPMS patient. That path does not exist in the system by design.
-          </div>
-        </li>
-        <li class="trust-principle">
-          <span class="trust-number">04</span>
-          <div class="trust-principle-text">
-            <strong>Licence-verified clinical sign-off</strong>
-            Diagnosis, management plans, and care-plan authorization require a verified audiology licence. The system enforces this at the application layer, not through convention.
-          </div>
-        </li>
-        <li class="trust-principle">
-          <span class="trust-number">05</span>
-          <div class="trust-principle-text">
-            <strong>Server-verified session context on every request</strong>
-            Facility identity and role are resolved server-side from a verified session — never accepted from the request body. Cross-tenant access is structurally prevented, not policy-dependent.
-          </div>
-        </li>
-      </ul>
-    </div>
-  </div>
-</section>
-
-
-<!-- ══════════════════════════════════════════
-     CREDIBILITY
-══════════════════════════════════════════ -->
-<section id="credibility" class="section" aria-label="Credibility and evidence">
-  <div class="container">
-    <div class="credibility-inner">
-      <div class="credibility-text reveal">
-        <p class="section-eyebrow">Credibility</p>
-        <h2 class="section-headline">Real evidence. No manufactured proof.</h2>
-        <p class="section-body">
-          HearIntel is an early-stage product. The evidence presented here is accurate. Where something doesn't yet exist — a large customer base, published outcomes — it is not invented. As real evidence becomes available, it will appear here.
-        </p>
-      </div>
-
-      <div class="credibility-evidence">
-        <div class="evidence-card reveal">
-          <p class="evidence-card-label">Domain Expertise</p>
-          <h3 class="evidence-card-title">Built with Practicing Audiologists</h3>
-          <p class="evidence-card-body">HearIntel's clinical workflow, assessment structure, and terminology reflect direct involvement from qualified audiology practitioners. The product is designed for how audiology is actually practised — not for how it is described in documentation.</p>
-        </div>
-
-        <div class="evidence-card reveal reveal-delay-1">
-          <p class="evidence-card-label">Standards &amp; Calibration</p>
-          <h3 class="evidence-card-title">Clinical Standards &amp; Regulatory Alignment</h3>
-          <p class="evidence-card-body">Designed in alignment with Medical Laboratory Science Council (MLSCN) audiological guidelines and calibrated to ISO 8253-1 / ANSI S3.6 pure tone and electrophysiological diagnostic standards.</p>
-        </div>
-
-        <div class="rollout-notice reveal reveal-delay-2">
-          <p><strong>Phased, honest rollout.</strong> HearIntel is currently in pilot stage. We are not claiming a large installed base or published clinical outcomes that do not yet exist. This statement will be updated — with specifics — as deployment progresses.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ══════════════════════════════════════════
-     ROADMAP
-══════════════════════════════════════════ -->
-<section id="roadmap" class="section" aria-label="Product roadmap">
-  <div class="container">
-    <div class="roadmap-header reveal">
-      <p class="section-eyebrow">Roadmap</p>
-      <h2 class="section-headline">Where HearIntel is going.</h2>
-      <p class="section-body" style="margin-top:14px;">HearIntel is being built as infrastructure — not a product that ships once. The roadmap reflects that ambition without pretending that future capabilities already exist.</p>
-    </div>
-
-    <div class="roadmap-track">
-      <div class="roadmap-phase current reveal">
-        <div class="roadmap-dot current"><div class="roadmap-dot-inner"></div></div>
-        <div>
-          <p class="roadmap-phase-tag">Phase 1 — Current</p>
-          <h3 class="roadmap-phase-title">Pilot Deployment</h3>
-          <p class="roadmap-phase-body">Initial deployment and validation with early clinical partners. Establishing the foundational HPMS workflow and building toward the first Registry data contribution.</p>
-        </div>
-      </div>
-
-      <div class="roadmap-phase next reveal reveal-delay-1">
-        <div class="roadmap-dot next"><div class="roadmap-dot-inner"></div></div>
-        <div>
-          <p class="roadmap-phase-tag">Phase 2 — Next</p>
-          <h3 class="roadmap-phase-title">Multi-State Expansion</h3>
-          <p class="roadmap-phase-body">Expansion across additional facilities and states. Registry contributions begin to aggregate at scale. Research access pathways established with appropriate governance.</p>
-        </div>
-      </div>
-
-      <div class="roadmap-phase future reveal reveal-delay-2">
-        <div class="roadmap-dot future"><div class="roadmap-dot-inner"></div></div>
-        <div>
-          <p class="roadmap-phase-tag">Phase 3 — Future</p>
-          <h3 class="roadmap-phase-title">National &amp; Regional</h3>
-          <p class="roadmap-phase-body">Expansion toward broader national and regional hearing-health infrastructure. HearIntel becomes the data layer for population-level hearing health policy and evidence generation.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="roadmap-cta reveal">
       <a href="#contact" class="btn btn-primary">Request a Demo</a>
     </div>
   </div>
@@ -577,13 +431,11 @@
           </div>
 
           <div class="form-field">
-            <label for="message">Message <span style="font-size:10.5px;font-weight:400;color:rgba(255,255,255,0.30);margin-left:4px;">Optional</span></label>
-            <textarea id="message" name="message" placeholder="Tell us about your practice, your context, or what you are hoping to see."></textarea>
+            <label for="message">How can HearIntel support your practice? <span class="opt">(Optional)</span></label>
+            <textarea id="message" name="message" rows="3" placeholder="Tell us about your facility, patient volume, or research interests..."></textarea>
           </div>
 
-          <div class="form-submit">
-            <button type="submit" class="btn btn-primary">Request a Demo</button>
-          </div>
+          <button type="submit" class="btn btn-primary form-submit">Send Request</button>
         </form>
       </div>
 
@@ -595,65 +447,33 @@
 
 
 <!-- ══════════════════════════════════════════
-     FOOTER
+     SIMPLIFIED FOOTER
 ══════════════════════════════════════════ -->
-<footer>
+<footer class="footer-simplified">
   <div class="container">
-    <div class="footer-grid">
-
-      <!-- Brand Column -->
-      <div>
-        <div class="footer-brand-name" style="margin-bottom:14px;"><div style="display:inline-flex;align-items:center;padding:5px 0;"><div style="color:#FFFFFF;font-size:24px;font-weight:800;letter-spacing:-0.03em;font-family:var(--font-heading, 'Figtree', sans-serif);">Hear<span style="color:var(--brand-light, #38BDF8);">Intel</span></div></div></div>
-        <p class="footer-brand-desc">Clinical infrastructure for hearing healthcare in Africa.</p>
-        <div style="margin-top:14px;font-size:11.5px;color:var(--ink-text-3);">
-          Lagos, Nigeria &middot; Purpose-built for audiologists
+    <div class="footer-main-row">
+      <div class="footer-brand-side">
+        <div class="footer-brand-name" style="margin-bottom:8px;">
+          <div style="display:inline-flex;align-items:center;padding:0;">
+            <div style="color:#FFFFFF;font-size:22px;font-weight:800;letter-spacing:-0.03em;font-family:var(--font-heading, 'Figtree', sans-serif);">Hear<span style="color:var(--brand-light, #38BDF8);">Intel</span></div>
+          </div>
         </div>
+        <p class="footer-tagline">Clinical infrastructure for hearing healthcare.</p>
       </div>
 
-      <!-- Product Column -->
-      <div>
-        <p class="footer-col-title">Product</p>
-        <ul class="footer-col-links">
-          <li><a href="#product">HPMS Workspace</a></li>
-          <li><a href="#product">Hearing Health Registry</a></li>
-          <li><a href="#capabilities">Capabilities</a></li>
-          <li><a href="#trust">Trust &amp; Compliance</a></li>
-          <li><a href="#pricing">Pricing Plans</a></li>
-        </ul>
-      </div>
-
-      <!-- Legal & Governance Column -->
-      <div>
-        <p class="footer-col-title">Governance &amp; Legal</p>
-        <ul class="footer-col-links">
-          <li><a href="#trust">Data Protection</a></li>
-          <li><a href="#trust">Consent Architecture</a></li>
-          <li><a href="#">Privacy Policy</a></li>
-          <li><a href="#">Terms of Service</a></li>
-          <li><a href="#">Security Overview</a></li>
-        </ul>
-      </div>
-
-      <!-- Newsletter Column -->
-      <div>
-        <p class="footer-col-title">Stay Informed</p>
-        <p style="font-family:var(--font-sans);font-size:13px;color:rgba(255,255,255,0.5);line-height:1.5;margin-bottom:0;">
-          Updates on HearIntel's clinical rollout, new features, and registry milestones.
-        </p>
-        <div class="newsletter-form">
-          <input type="email" class="newsletter-input" placeholder="your@email.com" aria-label="Email for newsletter">
-          <button class="newsletter-btn" type="button" onclick="subscribeNewsletter(this)">Subscribe</button>
-        </div>
-        <p class="newsletter-note">No marketing spam. No third-party sharing. Unsubscribe any time.</p>
-      </div>
-
+      <ul class="footer-quick-links">
+        <li><a href="#product">Product</a></li>
+        <li><a href="#capabilities">Capabilities</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#contact">Request Demo</a></li>
+      </ul>
     </div>
 
-    <div class="footer-bottom">
+    <div class="footer-bottom-row">
       <p class="footer-copyright">&copy; 2026 HearIntel Technologies. All rights reserved.</p>
-      <div style="font-size:12px;color:var(--ink-text-3);display:flex;gap:16px;">
+      <div class="footer-standards">
         <span>MLSCN Guideline Aligned</span>
-        <span>&middot;</span>
+        <span class="dot-sep">&middot;</span>
         <span>ISO 8253-1 Calibrated</span>
       </div>
     </div>
@@ -667,7 +487,6 @@
 <script>
 // ── Nav scroll + active ──
 var nav = document.getElementById('nav');
-var navSections = [];
 
 window.addEventListener('scroll', function() {
   if (window.scrollY > 60) {
@@ -681,7 +500,7 @@ window.addEventListener('scroll', function() {
 function updateActiveNav() {
   var links = document.querySelectorAll('.nav-links a');
   var scrollPos = window.scrollY + 100;
-  var sections = ['product', 'trust', 'pricing'];
+  var sections = ['product', 'capabilities', 'pricing'];
   var current = '';
   sections.forEach(function(id) {
     var el = document.getElementById(id);
@@ -714,7 +533,7 @@ function navClose() {
 document.querySelectorAll('a[href^="#"]').forEach(function(a) {
   a.addEventListener('click', function(e) {
     var href = this.getAttribute('href');
-    if (href === '#') return;
+    if (href === '#' || !href) return;
     var target = document.querySelector(href);
     if (target) {
       e.preventDefault();
@@ -747,21 +566,6 @@ function setContactPlan(plan) {
     setTimeout(function() { roleEl.value = roleMap[plan]; }, 200);
   }
 }
-
-// ── URL param pre-select (e.g. ?plan=clinic or ?role=researcher) ──
-(function() {
-  var params = new URLSearchParams(window.location.search);
-  var plan = params.get('plan');
-  var role = params.get('role');
-  var roleEl = document.getElementById('role');
-  if (!roleEl) return;
-  if (role) {
-    roleEl.value = role;
-  } else if (plan) {
-    var map = { solo: 'clinic', clinic: 'clinic', hospital: 'clinic', government: 'government', research: 'researcher' };
-    if (map[plan]) roleEl.value = map[plan];
-  }
-})();
 
 // ── Form validation + submission ──
 document.getElementById('demoForm').addEventListener('submit', function(e) {
@@ -799,20 +603,6 @@ document.getElementById('demoForm').addEventListener('submit', function(e) {
     if (wrapper) wrapper.classList.remove('invalid');
   });
 });
-
-// ── Newsletter ──
-function subscribeNewsletter(btn) {
-  var input = btn.previousElementSibling;
-  if (!input || !input.value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value)) {
-    input.style.borderColor = '#DC2626';
-    return;
-  }
-  input.style.borderColor = '';
-  btn.textContent = 'Subscribed';
-  btn.disabled = true;
-  btn.style.background = '#059669';
-  input.value = '';
-}
 </script>
 
 </body>
