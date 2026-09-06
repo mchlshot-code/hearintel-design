@@ -281,7 +281,7 @@ button { cursor: pointer; }
 }
 .nav-drawer a:hover { color: #FFFFFF; }
 .nav-drawer a:last-child { border-bottom: none; }
-.nav-drawer .btn-primary { margin-top: 16px; width: 100%; justify-content: center; }
+.nav-drawer .btn-primary { margin-top: 8px; display: inline-block !important; width: auto !important; border-bottom: none !important; }
 
 /* ======================================================
    HERO
