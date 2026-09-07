@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clinical PMS — Assessment Overview Hub</title>
+  <link rel="icon" type="image/png" href="favicon.png?v=3.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <div data-shell="assessment"></div>
+    <main class="main">
+      <section class="page hub-page">
+
+        <!-- Patient Header Hero Card -->
+        <div class="hub-hero-card">
+          <div class="hub-hero-info">
+            <div class="hub-hero-facility">Lagos Central Clinic &middot; Diagnostic Audiology Suite</div>
+            <h1 class="hub-hero-title">
+              <span id="hubPatientName">Amaia O.</span>
+              <span class="badge" id="hubPatientBadge" style="font-size:11px;">Active Care Plan</span>
+            </h1>
+            <div class="hub-hero-meta">
+              <span id="hubPatientAge">46 yrs</span>
+              <span class="meta-bullet">&middot;</span>
+              <span id="hubPatientGender">Female</span>
+              <span class="meta-bullet">&middot;</span>
+              <span>MRN: <strong style="font-family:var(--font-mono);color:var(--text-primary);" id="hubPatientMRN">LCC-26-01248</strong></span>
+              <span class="meta-bullet">&middot;</span>
+              <span>Sound Suite: <strong>Booth 1</strong></span>
+            </div>
+          </div>
+          <div class="hub-hero-actions">
+            <a class="btn" id="btnBackToRecord" href="02-profile.html?patient=amaia">
+              &larr; Patient Record
+            </a>
+            <a class="btn primary" id="btnStartFullAssessment" href="04-workspace-history.html?patient=amaia&mode=full">
+              Start Full Assessment &rarr;
+            </a>
+          </div>
+        </div>
+
+        <!-- Section Header -->
+        <div class="hub-section-header">
+          <div>
+            <div class="eyebrow" style="margin-bottom:2px;">Diagnostic Battery &amp; Module Hub</div>
+            <h2 class="hub-section-title">Assessment Overview</h2>
+            <p class="hub-section-sub">Direct access to individual assessment modules. Open any test directly or trigger an additive reassessment.</p>
+          </div>
+          <div style="font-size:11.5px;color:var(--text-tertiary);font-family:var(--font-sans);">
+            7 Specialized Diagnostic Modules
+          </div>
+        </div>
+
+        <!-- 7 Modules Grid -->
+        <div class="hub-grid" id="hubModulesGrid">
+          <!-- Populated dynamically via JS -->
+        </div>
+
+      </section>
+    </main>
+  </div>
+
+  <div class="toast"></div>
+
+  <script src="data.js"></script>
+  <script src="prototype.js"></script>
+  <script>
+    const HUB_MODULES = [
+      {
+        key: 'history',
+        num: '1',
+        title: 'History',
+        fullName: 'Case History & Symptoms',
+        url: '04-workspace-history.html'
+      },
+      {
+        key: 'otoscopy',
+        num: '2',
+        title: 'Otoscopy',
+        fullName: 'Otoscopy & Visual Inspection',
+        url: '05-workspace-otoscopy.html'
+      },
+      {
+        key: 'pta',
+        num: '3',
+        title: 'Pure Tone (PTA)',
+        fullName: 'Pure Tone Air & Bone Conduction',
+        url: '06-workspace-pta.html'
+      },
+      {
+        key: 'immittance',
+        num: '4',
+        title: 'Immittance',
+        fullName: 'Tympanometry & Acoustic Reflexes',
+        url: '07-workspace-immittance.html'
+      },
+      {
+        key: 'speech',
+        num: '5',
+        title: 'Speech',
+        fullName: 'Speech Audiometry (SRT / WRS)',
+        url: '08-workspace-speech.html'
+      },
+      {
+        key: 'electrophysiology',
+        num: '6',
+        title: 'E-Physiology',
+        fullName: 'Auditory Evoked Potentials (ABR / OAE)',
+        url: '12-workspace-electrophysiology.html'
+      },
+      {
+        key: 'conclusion',
+        num: '7',
+        title: 'Management',
+        fullName: 'Diagnosis & Clinical Care Plan',
+        url: '09-conclusion.html'
+      }
+    ];
+
+    function renderAssessmentHub() {
+      const patientId = getActivePatientId();
+      const patient = (window.HearIntelDB && window.HearIntelDB.getPatient(patientId)) || {
+        name: 'Amaia O.',
+        mrn: 'LCC-26-01248',
+        age: 46,
+        gender: 'Female',
+        statusType: 'success',
+        status: 'Active Care Plan'
+      };
+
+      // Populate Patient Header
+      document.getElementById('hubPatientName').textContent = patient.name;
+      document.getElementById('hubPatientMRN').textContent = patient.mrn;
+      document.getElementById('hubPatientAge').textContent = patient.age + ' yrs';
+      document.getElementById('hubPatientGender').textContent = patient.gender;
+      document.getElementById('btnBackToRecord').href = '02-profile.html?patient=' + patientId;
+      document.getElementById('btnStartFullAssessment').href = '04-workspace-history.html?patient=' + patientId + '&mode=full';
+
+      const badge = document.getElementById('hubPatientBadge');
+      badge.textContent = patient.status || 'Active Care Plan';
+      badge.className = 'badge ' + (patient.statusType || 'success');
+
+      // Populate 7 Cards Grid
+      const grid = document.getElementById('hubModulesGrid');
+      grid.innerHTML = HUB_MODULES.map(m => {
+        const statusInfo = getModuleStatus(patient, m.key, false);
+        const targetUrl = m.url + '?patient=' + patientId;
+        const instances = getTestInstances(m.key, patientId);
+        const runCountText = instances.length > 1 ? ` &middot; ${instances.length} runs on file` : '';
+        const metaText = statusInfo.date 
+          ? `Last performed: ${statusInfo.date}${runCountText}` 
+          : statusInfo.label;
+
+        return `
+          <div class="hub-card" id="hubCard-${m.key}">
+            <div>
+              <div class="hub-card-header">
+                <span class="hub-step-num">${m.num}</span>
+                <span class="hub-status-pill ${statusInfo.status}">
+                  <span>${statusInfo.icon}</span>
+                  <span>${statusInfo.label}</span>
+                </span>
+              </div>
+              <div class="hub-card-body">
+                <div class="hub-module-name">${m.num} ${m.title}</div>
+                <div class="hub-module-meta">${metaText}</div>
+              </div>
+            </div>
+            <div class="hub-card-actions">
+              <a class="hub-btn-open" href="${targetUrl}" id="open-${m.key}">
+                Open
+              </a>
+              <button type="button" class="hub-btn-reassess" onclick="handleHubReassess('${m.key}', '${targetUrl}')" id="reassess-${m.key}">
+                + Reassess
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    document.addEventListener('DOMContentLoaded', renderAssessmentHub);
+  </script>
+</body>
+</html>

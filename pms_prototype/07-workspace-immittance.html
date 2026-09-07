@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HearIntel — Immittance & Tympanometry</title>
+  <title>Clinical PMS — Immittance & Tympanometry</title>
   <link rel="icon" type="image/png" href="favicon.png?v=3.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -311,7 +311,7 @@
       <!-- Footer Nav -->
       <div class="footer-nav">
         <a class="btn" id="prevStepBtn" href="06-workspace-pta.html?patient=amaia">← Previous: Pure Tone (PTA)</a>
-        <a class="btn primary" id="nextStepBtn" href="08-workspace-speech.html?patient=amaia">Next: Speech Audiometry →</a>
+        <button type="button" class="btn primary" id="btnSaveModule" onclick="saveActiveModule()">Save</button>
       </div>
 
     </div>
@@ -611,14 +611,17 @@
     document.addEventListener('DOMContentLoaded', function() {
       const pid = getActivePatientId();
       document.getElementById('prevStepBtn').href = '06-workspace-pta.html?patient=' + pid;
-      document.getElementById('nextStepBtn').href = '08-workspace-speech.html?patient=' + pid;
+      // (Next button removed — navigation handled by Hub & tab rail)
 
       drawTympanogram('R');
       drawTympanogram('L');
       updateClassification('R');
       updateClassification('L');
 
-    });
+    
+    // Autosave: persist form fields per patient/module/instance
+    initModuleAutosave('immittance', ['adPres', 'adComp', 'adEcv', 'adGrad', 'asPres', 'asComp', 'asEcv', 'asGrad', 'artR_i500', 'artR_i1k', 'artR_i2k', 'artR_c500', 'artR_c1k', 'artR_c2k', 'decayR', 'artL_i500', 'artL_i1k', 'artL_i2k', 'artL_c500', 'artL_c1k', 'artL_c2k', 'decayL', 'tympImpressionText']);
+  });
   </script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {

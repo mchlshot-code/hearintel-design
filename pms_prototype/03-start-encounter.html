@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HearIntel — Assessment Setup</title>
+  <title>Clinical PMS — Assessment Setup</title>
   <link rel="icon" type="image/png" href="favicon.png?v=3.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -109,7 +109,7 @@
       const patientId = document.getElementById('encPatientSelect').value;
       notify('Launching assessment suite for ' + patientId.toUpperCase());
       setTimeout(() => {
-        location.href = '04-workspace-history.html?patient=' + patientId;
+        location.href = '03-assessment-hub.html?patient=' + patientId;
       }, 500);
     }
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HearIntel — Otoscopy Examination</title>
+  <title>Clinical PMS — Otoscopy Examination</title>
   <link rel="icon" type="image/png" href="favicon.png?v=3.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -192,7 +192,7 @@
       <!-- Footer Nav -->
       <div class="footer-nav">
         <a class="btn" id="btnHistory" href="04-workspace-history.html?patient=amaia">← Case History</a>
-        <a class="btn primary" id="btnPta" href="06-workspace-pta.html?patient=amaia">Next: Pure Tone Audiometry →</a>
+        <button type="button" class="btn primary" id="btnSaveModule" onclick="saveActiveModule()">Save</button>
       </div>
 
     </div>
@@ -241,8 +241,11 @@
     document.addEventListener('DOMContentLoaded', function() {
       const pid = getActivePatientId();
       document.getElementById('btnHistory').href = '04-workspace-history.html?patient=' + pid;
-      document.getElementById('btnPta').href = '06-workspace-pta.html?patient=' + pid;
-    });
+      // (Next button removed — navigation handled by Hub & tab rail)
+    
+    // Autosave: persist form fields per patient/module/instance
+    initModuleAutosave('otoscopy', ['adCanalSelect', 'adTmSelect', 'asCanalSelect', 'asTmSelect', 'otoscopyImpressionText']);
+  });
   </script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HearIntel — Speech Audiometry & Tinnitus Battery</title>
+  <title>Clinical PMS — Speech Audiometry & Tinnitus Battery</title>
   <link rel="icon" type="image/png" href="favicon.png?v=3.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -349,7 +349,7 @@
       <!-- Step Navigation Footer -->
       <div class="footer-nav">
         <a class="btn" id="prevStepBtn" href="07-workspace-immittance.html?patient=amaia">← Previous: Immittance</a>
-        <a class="btn primary" id="nextStepBtn" href="12-workspace-electrophysiology.html?patient=amaia">Next: Electrophysiology →</a>
+        <button type="button" class="btn primary" id="btnSaveModule" onclick="saveActiveModule()">Save</button>
       </div>
 
     </div>
@@ -553,12 +553,15 @@
     document.addEventListener('DOMContentLoaded', function() {
       const pid = getActivePatientId();
       document.getElementById('prevStepBtn').href = '07-workspace-immittance.html?patient=' + pid;
-      document.getElementById('nextStepBtn').href = '12-workspace-electrophysiology.html?patient=' + pid;
+      // (Next button removed — navigation handled by Hub & tab rail)
 
       calculateSpeechIndices();
       calculateQuickSin();
       calculateThi();
-    });
+    
+    // Autosave: persist form fields per patient/module/instance
+    initModuleAutosave('speech', ['adSrtInput', 'adWrsInput', 'adWrs90Input', 'adMclInput', 'adUclInput', 'asSrtInput', 'asWrsInput', 'asWrs90Input', 'asMclInput', 'asUclInput', 'quickSinLevel', 'quickSinWords', 'tinLaterality', 'tinPitch', 'tinLoudness', 'tinMml', 'tinResidual', 'speechImpressionText']);
+  });
   </script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {

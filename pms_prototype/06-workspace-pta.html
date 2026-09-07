@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HearIntel — Pure Tone Audiometry (PTA)</title>
+  <title>Clinical PMS — Pure Tone Audiometry (PTA)</title>
   <link rel="icon" type="image/png" href="favicon.png?v=3.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -433,7 +433,7 @@
       <!-- Step Navigation Footer -->
       <div class="footer-nav">
         <a class="btn" id="btnPrev" href="05-workspace-otoscopy.html?patient=amaia">← Previous: Otoscopy</a>
-        <a class="btn primary" id="btnNext" href="07-workspace-immittance.html?patient=amaia">Next: Immittance & Tympanometry →</a>
+        <button type="button" class="btn primary" id="btnSaveModule" onclick="saveActiveModule()">Save</button>
       </div>
 
     </div>
@@ -981,12 +981,15 @@
     document.addEventListener('DOMContentLoaded', function() {
       const pid = getActivePatientId();
       document.getElementById('btnPrev').href = '05-workspace-otoscopy.html?patient=' + pid;
-      document.getElementById('btnNext').href = '07-workspace-immittance.html?patient=' + pid;
+      // (Next button removed — navigation handled by Hub & tab rail)
 
       drawAudiogram();
       renderMatrixCells();
       updateCalculations();
-    });
+    
+    // Autosave: persist form fields per patient/module/instance
+    initModuleAutosave('pta', ['chkMasked', 'chkNR', 'chkSpeechBanana', 'transducerSelect', 'ptaImpressionText']);
+  });
   </script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {

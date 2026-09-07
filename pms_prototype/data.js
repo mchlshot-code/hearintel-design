@@ -1,5 +1,5 @@
 /**
- * HearIntel PMS — Shared Clinical Data Store & State Engine
+ * Clinical PMS — Shared Clinical Data Store & State Engine
  * Multi-Encounter Longitudinal EMR Dataset (3 Verified Patient Records)
  */
 const HearIntelDB = (function() {
@@ -382,5 +382,5 @@ const HearIntelDB = (function() {
 })();
 
 if (typeof window !== 'undefined') {
-  window.HearIntelDB = HearIntelDB;
+  window.ClinicalPMSDB = window.HearIntelDB = HearIntelDB;
 }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HearIntel — Electrophysiological Assessments</title>
+  <title>Clinical PMS — Electrophysiological Assessments</title>
   <link rel="icon" type="image/png" href="favicon.png?v=3.0">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -361,7 +361,7 @@
       <!-- Step Navigation Footer -->
       <div class="footer-nav" style="display:flex;justify-content:space-between;align-items:center;padding-top:16px;border-top:1px solid var(--border-light);">
         <a class="btn" id="btnPrev" href="08-workspace-speech.html?patient=amaia">← Previous: Speech & Tinnitus</a>
-        <a class="btn primary" id="btnNext" href="09-conclusion.html?patient=amaia">Next: Diagnosis & Management →</a>
+        <button type="button" class="btn primary" id="btnSaveModule" onclick="saveActiveModule()">Save</button>
       </div>
 
     </div>
@@ -450,8 +450,11 @@
     document.addEventListener('DOMContentLoaded', function() {
       const pid = getActivePatientId();
       document.getElementById('btnPrev').href = '08-workspace-speech.html?patient=' + pid;
-      document.getElementById('btnNext').href = '09-conclusion.html?patient=' + pid;
-    });
+      // (Next button removed — navigation handled by Hub & tab rail)
+    
+    // Autosave: persist form fields per patient/module/instance
+    initModuleAutosave('electrophysiology', ['abrPatternSelect', 'abrWaveV', 'abrThreshold', 'oaePatternSelect', 'oaeStatusR', 'oaeStatusL', 'assrPatternSelect', 'assrPtaR', 'assrPtaL', 'vempPatternSelect', 'vempSpAp', 'vempAsym', 'assessmentFindingsText']);
+  });
   </script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {

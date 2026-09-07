@@ -566,7 +566,7 @@ function patientShell(active) {
   const isProfile    = active === 'profile';
   const isAssessment = ['assessment','history','otoscopy','pta','immittance','speech','conclusion','electrophysiology'].includes(active);
   const showPatientSub = isRegistry || isProfile || isAssessment || active === 'media';
-  const assessHref = '04-workspace-history.html?patient=' + patientId;
+  const assessHref = '03-assessment-hub.html?patient=' + patientId;
 
   const patientSub = showPatientSub
     ? '<div class="nav-sub">'
@@ -587,7 +587,7 @@ function patientShell(active) {
   const html = [
     '<aside class="sidebar">',
       '<div class="brand">',
-        '<div style="margin-bottom:12px;"><div style="display:inline-flex;align-items:center;padding:2px 4px;"><div style="color:#FFFFFF;font-size:22px;font-weight:800;letter-spacing:-0.03em;font-family:var(--font-heading);">Hear<span style="color:var(--brand);">Intel</span></div></div></div>',
+        '<div style="margin-bottom:12px;"><div style="display:inline-flex;align-items:center;padding:2px 4px;"><div style="color:#FFFFFF;font-size:22px;font-weight:800;letter-spacing:-0.03em;font-family:var(--font-heading);">Clinical<span style="color:var(--brand);"> PMS</span></div></div></div>',
         '<div class="brand-sub">Practice Management</div>',
       '</div>',
       '<nav class="nav-group">',
@@ -629,26 +629,370 @@ function patientShell(active) {
   return html;
 }
 
+
+// ── CLINICAL MODULE DEFINITIONS & REASSESSMENT ARCHITECTURE ──
+const MODULE_NAMES = {
+  'history': 'Case History Intake',
+  'otoscopy': 'Otoscopy Examination',
+  'pta': 'Pure Tone Audiometry (PTA)',
+  'immittance': 'Immittance & Tympanometry',
+  'speech': 'Speech Audiometry',
+  'electrophysiology': 'Electrophysiology (ABR/OAE)',
+  'conclusion': 'Diagnosis & Care Plan'
+};
+
+const MODULE_SHORT_NAMES = {
+  'history': 'History',
+  'otoscopy': 'Otoscopy',
+  'pta': 'PTA',
+  'immittance': 'Immittance',
+  'speech': 'Speech',
+  'electrophysiology': 'E-Physiology',
+  'conclusion': 'Management'
+};
+
+function getModuleStatus(patient, moduleKey, isActive) {
+  if (!patient) return { status: 'not-started', icon: '○', label: 'Not Started', date: '' };
+
+  const latestAssess = (patient.assessments && patient.assessments[0]) || null;
+  const testInstances = (patient.testInstances && patient.testInstances[moduleKey]) || [];
+  
+  // Check red flag status
+  const hasRedFlag = (sessionStorage.getItem('red_flag_' + patient.id) === 'true') || 
+                     (sessionStorage.getItem('rf_active_' + patient.id) === 'true');
+
+  if (moduleKey === 'history') {
+    if (hasRedFlag && !isGateOverridden('history', patient.id)) {
+      return { status: 'attention', icon: '!', label: 'Needs Attention', date: 'Flagged' };
+    }
+    if (latestAssess || testInstances.length > 0) {
+      const d = testInstances[0]?.date || latestAssess?.date || '20 May 2026';
+      return { status: 'done', icon: '✓', label: 'Done', date: d };
+    }
+  }
+
+  if (moduleKey === 'otoscopy') {
+    if (latestAssess?.otoscopy || testInstances.length > 0) {
+      const d = testInstances[0]?.date || latestAssess?.date || '20 May 2026';
+      return { status: 'done', icon: '✓', label: 'Done', date: d };
+    }
+  }
+
+  if (moduleKey === 'pta') {
+    if (latestAssess?.ptaRight !== undefined || testInstances.length > 0) {
+      const d = testInstances[0]?.date || latestAssess?.date || '20 May 2026';
+      return { status: 'done', icon: '✓', label: 'Done', date: d };
+    }
+  }
+
+  if (moduleKey === 'immittance') {
+    if (latestAssess?.tymp || testInstances.length > 0) {
+      const d = testInstances[0]?.date || latestAssess?.date || '20 May 2026';
+      return { status: 'done', icon: '✓', label: 'Done', date: d };
+    }
+  }
+
+  if (moduleKey === 'speech') {
+    if (latestAssess?.speech || testInstances.length > 0) {
+      const d = testInstances[0]?.date || latestAssess?.date || '20 May 2026';
+      return { status: 'done', icon: '✓', label: 'Done', date: d };
+    }
+  }
+
+  if (moduleKey === 'electrophysiology') {
+    if (testInstances.length > 0 || (patient.media && patient.media.some(m => m.category === 'Electrophysiology'))) {
+      const d = testInstances[0]?.date || '20 May 2026';
+      return { status: 'done', icon: '✓', label: 'Done', date: d };
+    }
+  }
+
+  if (moduleKey === 'conclusion') {
+    if (latestAssess?.recommendations || patient.carePlan?.length > 0 || testInstances.length > 0) {
+      const d = testInstances[0]?.date || latestAssess?.date || '20 May 2026';
+      return { status: 'done', icon: '✓', label: 'Done', date: d };
+    }
+  }
+
+  if (isActive) {
+    return { status: 'in-progress', icon: '●', label: 'In Progress', date: 'Active' };
+  }
+
+  return { status: 'not-started', icon: '○', label: 'Not Started', date: '' };
+}
+
+function isGateOverridden(moduleKey, patientId) {
+  return sessionStorage.getItem('safety_override_' + patientId + '_' + moduleKey) === 'true';
+}
+
+function overrideClinicalGate(moduleKey) {
+  const patientId = getActivePatientId();
+  sessionStorage.setItem('safety_override_' + patientId + '_' + moduleKey, 'true');
+  const gateEl = document.getElementById('clinicalSafetyGate');
+  if (gateEl) {
+    gateEl.style.transition = 'opacity 180ms ease, transform 180ms ease';
+    gateEl.style.opacity = '0';
+    gateEl.style.transform = 'translateY(-4px)';
+    setTimeout(() => {
+      gateEl.outerHTML = `
+        <div class="alert-strip info" style="margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:12px;color:var(--text-secondary);">
+            ✓ <strong>Clinical Gate Overridden:</strong> Attending audiologist authorized continuation of ${MODULE_SHORT_NAMES[moduleKey] || moduleKey.toUpperCase()}.
+          </span>
+          <span style="font-size:11px;font-family:var(--font-mono);color:var(--text-tertiary);">Override Logged</span>
+        </div>
+      `;
+    }, 180);
+  }
+  notify(`Clinical safety gate overridden for ${MODULE_SHORT_NAMES[moduleKey] || moduleKey}. Authorized by clinician.`);
+}
+
+function renderClinicalSafetyGate(moduleKey, patientId) {
+  if (!['pta', 'immittance', 'speech'].includes(moduleKey)) return '';
+  if (isGateOverridden(moduleKey, patientId)) return '';
+
+  const hasRedFlag = (sessionStorage.getItem('red_flag_' + patientId) === 'true') ||
+                     (sessionStorage.getItem('rf_active_' + patientId) === 'true');
+
+  if (!hasRedFlag) return '';
+
+  return `
+    <div class="alert-strip danger clinical-safety-gate" id="clinicalSafetyGate" style="margin-bottom:14px;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:240px;">
+          <div style="font-weight:700;font-size:12.5px;margin-bottom:3px;color:var(--status-alert-text);display:flex;align-items:center;gap:6px;">
+            <span>⚠</span> Clinical Safety Warning: Unresolved Medical Red Flag
+          </div>
+          <div style="font-size:12px;line-height:1.5;color:var(--text-primary);">
+            Case history indicates acute symptoms (e.g. sudden onset / pain / drainage) requiring otologic clearance prior to diagnostic acoustic stimulation.
+          </div>
+          <div style="font-size:11px;color:var(--text-secondary);margin-top:4px;">
+            <strong>Prerequisite Missing:</strong> Formal Medical Red Flag Clearance from ENT or supervising physician.
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <a class="btn" href="04-workspace-history.html?patient=${patientId}" style="font-size:11.5px;padding:5px 10px;">Review History</a>
+          <button class="btn" style="padding:5px 12px;font-size:11.5px;background:var(--surface);border:1px solid var(--border);color:var(--status-alert-text);font-weight:600;" onclick="overrideClinicalGate('${moduleKey}')">
+            Authorized Override
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function getTestInstances(moduleKey, patientId) {
+  const patient = (window.HearIntelDB && window.HearIntelDB.getPatient(patientId));
+  if (!patient) return [];
+  if (!patient.testInstances) patient.testInstances = {};
+  if (!patient.testInstances[moduleKey]) {
+    const latestAssess = (patient.assessments && patient.assessments[0]) || null;
+    const date = latestAssess?.date || '20 May 2026';
+    const shortName = MODULE_SHORT_NAMES[moduleKey] || moduleKey.toUpperCase();
+    patient.testInstances[moduleKey] = [
+      {
+        id: moduleKey + '-inst-1',
+        instanceNumber: 1,
+        name: `${shortName} — Baseline (${date})`,
+        date: date,
+        clinician: 'Dr. Chika Okafor, Au.D.',
+        status: 'completed',
+        isDefaultName: true
+      }
+    ];
+    if (window.HearIntelDB && window.HearIntelDB.savePatient) {
+      window.HearIntelDB.savePatient(patient);
+    }
+  }
+  return patient.testInstances[moduleKey];
+}
+
+function getActiveInstanceIndex(moduleKey, patientId) {
+  const key = 'active_inst_' + patientId + '_' + moduleKey;
+  const idx = sessionStorage.getItem(key);
+  return idx !== null ? parseInt(idx, 10) : 0;
+}
+
+function setActiveInstanceIndex(moduleKey, patientId, index) {
+  const key = 'active_inst_' + patientId + '_' + moduleKey;
+  sessionStorage.setItem(key, index.toString());
+}
+
+function handleReassess(moduleKey) {
+  const patientId = getActivePatientId();
+  const patient = (window.HearIntelDB && window.HearIntelDB.getPatient(patientId));
+  const instances = getTestInstances(moduleKey, patientId);
+  const nextNum = instances.length + 1;
+  const shortName = MODULE_SHORT_NAMES[moduleKey] || moduleKey.toUpperCase();
+  const today = '7 Sep 2026';
+  const defaultName = `${shortName} — Reassessment ${nextNum} — ${today}`;
+
+  const newInstance = {
+    id: `${moduleKey}-inst-${nextNum}`,
+    instanceNumber: nextNum,
+    name: defaultName,
+    date: today,
+    clinician: 'Dr. Chika Okafor, Au.D.',
+    status: 'in-progress',
+    isDefaultName: true
+  };
+
+  instances.push(newInstance);
+  if (patient) {
+    patient.testInstances[moduleKey] = instances;
+    if (window.HearIntelDB && window.HearIntelDB.savePatient) {
+      window.HearIntelDB.savePatient(patient);
+    }
+  }
+  setActiveInstanceIndex(moduleKey, patientId, instances.length - 1);
+  notify(`Reassessment initiated: ${defaultName}. Prior results preserved in history.`);
+  if (typeof location !== 'undefined' && location.reload) {
+    location.reload();
+  }
+}
+
+function handleHubReassess(moduleKey, targetUrl) {
+  const patientId = getActivePatientId();
+  const patient = (window.HearIntelDB && window.HearIntelDB.getPatient(patientId));
+  const instances = getTestInstances(moduleKey, patientId);
+  const nextNum = instances.length + 1;
+  const shortName = MODULE_SHORT_NAMES[moduleKey] || moduleKey.toUpperCase();
+  const today = '7 Sep 2026';
+  const defaultName = `${shortName} — Reassessment ${nextNum} — ${today}`;
+
+  const newInstance = {
+    id: `${moduleKey}-inst-${nextNum}`,
+    instanceNumber: nextNum,
+    name: defaultName,
+    date: today,
+    clinician: 'Dr. Chika Okafor, Au.D.',
+    status: 'in-progress',
+    isDefaultName: true
+  };
+
+  instances.push(newInstance);
+  if (patient) {
+    if (!patient.testInstances) patient.testInstances = {};
+    patient.testInstances[moduleKey] = instances;
+    if (window.HearIntelDB && window.HearIntelDB.savePatient) {
+      window.HearIntelDB.savePatient(patient);
+    }
+  }
+  setActiveInstanceIndex(moduleKey, patientId, instances.length - 1);
+  notify(`Reassessment initiated for ${MODULE_NAMES[moduleKey] || shortName}.`);
+  setTimeout(() => {
+    location.href = targetUrl;
+  }, 250);
+}
+
+
+function saveInstanceName(moduleKey, inputEl) {
+  const patientId = getActivePatientId();
+  const patient = (window.HearIntelDB && window.HearIntelDB.getPatient(patientId));
+  const instances = getTestInstances(moduleKey, patientId);
+  const activeIdx = getActiveInstanceIndex(moduleKey, patientId);
+  const currentInst = instances[activeIdx];
+  if (!currentInst) return;
+
+  const val = inputEl.value.trim();
+  const shortName = MODULE_SHORT_NAMES[moduleKey] || moduleKey.toUpperCase();
+  const fallback = currentInst.instanceNumber === 1 
+    ? `${shortName} — ${currentInst.date}` 
+    : `${shortName} — Reassessment ${currentInst.instanceNumber} — ${currentInst.date}`;
+
+  if (val) {
+    currentInst.name = val;
+    currentInst.isDefaultName = false;
+  } else {
+    currentInst.name = fallback;
+    currentInst.isDefaultName = true;
+    inputEl.value = fallback;
+  }
+  if (patient) {
+    patient.testInstances[moduleKey] = instances;
+    if (window.HearIntelDB && window.HearIntelDB.savePatient) {
+      window.HearIntelDB.savePatient(patient);
+    }
+  }
+  notify(`Instance title saved: "${currentInst.name}"`);
+}
+
+function switchTestInstance(moduleKey, targetIndex) {
+  const patientId = getActivePatientId();
+  setActiveInstanceIndex(moduleKey, patientId, parseInt(targetIndex, 10));
+  notify(`Switched to test instance #${parseInt(targetIndex, 10) + 1}.`);
+  location.reload();
+}
+
+function renderTestInstanceStrip(moduleKey, patientId) {
+  const instances = getTestInstances(moduleKey, patientId);
+  const activeIdx = getActiveInstanceIndex(moduleKey, patientId);
+  const currentInst = instances[activeIdx] || instances[0];
+  const shortName = MODULE_SHORT_NAMES[moduleKey] || moduleKey.toUpperCase();
+  const isRepeat = instances.length > 1;
+
+  const defaultPlaceholder = currentInst.instanceNumber === 1 
+    ? `${shortName} — ${currentInst.date}` 
+    : `${shortName} — Reassessment ${currentInst.instanceNumber} — ${currentInst.date}`;
+
+  const displayVal = currentInst.name || defaultPlaceholder;
+
+  return `
+    <div class="test-instance-strip">
+      <div class="test-instance-group">
+        <label class="test-instance-label" for="testInstanceInput">
+          Instance:
+        </label>
+        <input type="text" id="testInstanceInput" class="test-instance-input"
+          value="${displayVal}" 
+          placeholder="${defaultPlaceholder}" 
+          onblur="saveInstanceName('${moduleKey}', this)"
+          title="Optional custom name for this test instance">
+        <span style="font-size:11px;color:var(--text-tertiary);font-family:var(--font-sans);">(Optional label)</span>
+      </div>
+
+      <div class="test-instance-actions">
+        ${isRepeat ? `
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="font-size:11px;color:var(--text-secondary);font-weight:500;">Run:</span>
+            <select onchange="switchTestInstance('${moduleKey}', this.value)" style="font-size:11.5px;padding:3px 8px;border:1px solid var(--border);border-radius:var(--radius-xs);background:var(--surface);color:var(--text-primary);cursor:pointer;">
+              ${instances.map((inst, i) => `
+                <option value="${i}" ${i === activeIdx ? 'selected' : ''}>
+                  #${inst.instanceNumber}: ${inst.name}
+                </option>
+              `).join('')}
+            </select>
+          </div>
+        ` : ''}
+        <button class="btn-reassess" onclick="handleReassess('${moduleKey}')" title="Run another test instance without overwriting prior result">
+          + Reassess
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+
 function workspaceShell(active, content) {
   const patientId = getActivePatientId();
   const patient = (window.HearIntelDB && window.HearIntelDB.getPatient(patientId)) || { name: 'Amaia O.', mrn: 'LCC-26-01248', age: 46, gender: 'Female' };
   const currentTheme = getActiveTheme();
-  const assessHref = '04-workspace-history.html?patient=' + patientId;
+  const assessHref = '03-assessment-hub.html?patient=' + patientId;
 
+  // Unconditional, decoupled navigation steps
   const steps = [
-    ['04-workspace-history.html?patient=' + patientId, 'History',          '1', active === 'history'],
-    ['05-workspace-otoscopy.html?patient=' + patientId, 'Otoscopy',         '2', active === 'otoscopy'],
-    ['06-workspace-pta.html?patient=' + patientId,      'Pure Tone (PTA)',  '3', active === 'pta'],
-    ['07-workspace-immittance.html?patient=' + patientId,'Immittance',      '4', active === 'immittance'],
-    ['08-workspace-speech.html?patient=' + patientId,   'Speech',           '5', active === 'speech'],
-    ['12-workspace-electrophysiology.html?patient=' + patientId, 'E-Physiology', '6', active === 'electrophysiology'],
-    ['09-conclusion.html?patient=' + patientId,         'Management',       '7', active === 'conclusion'],
+    ['04-workspace-history.html?patient=' + patientId, 'History',          '1', active === 'history', 'history'],
+    ['05-workspace-otoscopy.html?patient=' + patientId, 'Otoscopy',         '2', active === 'otoscopy', 'otoscopy'],
+    ['06-workspace-pta.html?patient=' + patientId,      'Pure Tone (PTA)',  '3', active === 'pta', 'pta'],
+    ['07-workspace-immittance.html?patient=' + patientId,'Immittance',      '4', active === 'immittance', 'immittance'],
+    ['08-workspace-speech.html?patient=' + patientId,   'Speech',           '5', active === 'speech', 'speech'],
+    ['12-workspace-electrophysiology.html?patient=' + patientId, 'E-Physiology', '6', active === 'electrophysiology', 'electrophysiology'],
+    ['09-conclusion.html?patient=' + patientId,         'Management',       '7', active === 'conclusion', 'conclusion'],
   ];
 
   const sidebarHtml = [
     '<aside class="sidebar">',
       '<div class="brand">',
-        '<div style="margin-bottom:12px;"><div style="display:inline-flex;align-items:center;padding:2px 4px;"><div style="color:#FFFFFF;font-size:22px;font-weight:800;letter-spacing:-0.03em;font-family:var(--font-heading);">Hear<span style="color:var(--brand);">Intel</span></div></div></div>',
+        '<div style="margin-bottom:12px;"><div style="display:inline-flex;align-items:center;padding:2px 4px;"><div style="color:#FFFFFF;font-size:22px;font-weight:800;letter-spacing:-0.03em;font-family:var(--font-heading);">Clinical<span style="color:var(--brand);"> PMS</span></div></div></div>',
         '<div class="brand-sub">Assessment</div>',
       '</div>',
       '<nav class="nav-group">',
@@ -662,7 +1006,7 @@ function workspaceShell(active, content) {
           '<span class="nav-label">Patients</span>',
         '</a>',
         '<div class="nav-sub">',
-          '<a class="nav-sub-item" href="01-registry.html">Registry</a>',
+          '<a class="nav-sub-item" href="01-registry.html">Directory</a>',
           '<a class="nav-sub-item" href="02-profile.html?patient=' + patientId + '">Patient Record</a>',
           '<a class="nav-sub-item active" href="' + assessHref + '">Assessment</a>',
         '</div>',
@@ -692,16 +1036,25 @@ function workspaceShell(active, content) {
           '<span class="sidebar-footer-switch">Switch</span>',
         '</div>',
         '<div class="sidebar-footer-meta">' + patient.age + 'y &middot; ' + patient.gender + ' &middot; ' + patient.mrn + '</div>',
-'</div>',
+      '</div>',
     '</aside>'
   ].join('');
+
+  const safetyGateHtml = renderClinicalSafetyGate(active, patientId);
+  const instanceStripHtml = renderTestInstanceStrip(active, patientId);
 
   const workspaceHtml = [
     '<div class="workspace-main">',
       '<header class="encounter-header">',
-        '<div>',
-          '<div class="encounter-title">Active Clinical Diagnostic Assessment</div>',
-          '<div class="encounter-patient">' + patient.name + ' &middot; ' + patient.mrn + ' &middot; Booth 1 Sound Suite</div>',
+        '<div style="display:flex;align-items:center;gap:14px;">',
+          '<a class="btn" href="03-assessment-hub.html?patient=' + patientId + '" style="background:rgba(255,255,255,0.08);color:#FFFFFF;border:1px solid rgba(255,255,255,0.18);display:inline-flex;align-items:center;gap:6px;padding:4px 10px;font-size:11.5px;text-decoration:none;border-radius:var(--radius-sm);" title="Return to Assessment Overview Hub">',
+            '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>',
+            'Assessment Overview',
+          '</a>',
+          '<div>',
+            '<div class="encounter-title">Active Clinical Diagnostic Assessment</div>',
+            '<div class="encounter-patient">' + patient.name + ' &middot; ' + patient.mrn + ' &middot; Booth 1 Sound Suite</div>',
+          '</div>',
         '</div>',
         '<div class="encounter-actions">',
           '<a class="btn" href="02-profile.html?patient=' + patientId + '" style="background:rgba(255,255,255,0.08);color:#FFFFFF;border:1px solid rgba(255,255,255,0.15);">Exit Session</a>',
@@ -709,13 +1062,23 @@ function workspaceShell(active, content) {
       '</header>',
       '<nav class="steps-nav">',
         steps.map(function(s) {
-          return '<a class="step-item ' + (s[3] ? 'active' : '') + '" href="' + s[0] + '">' +
+          const statusInfo = getModuleStatus(patient, s[4], s[3]);
+          const statusClass = statusInfo.status;
+          return '<a class="step-item ' + (s[3] ? 'active ' : '') + statusClass + '" href="' + s[0] + '">' +
                    '<span class="step-num">' + s[2] + '</span>' +
-                   '<span class="step-label">' + s[1] + '</span>' +
+                   '<div class="step-content">' +
+                     '<span class="step-label">' + s[1] + '</span>' +
+                     '<span class="step-meta">' +
+                       '<span class="step-status-badge ' + statusClass + '">' + statusInfo.icon + '</span> ' +
+                       '<span>' + (statusInfo.date ? statusInfo.date : statusInfo.label) + '</span>' +
+                     '</span>' +
+                   '</div>' +
                  '</a>';
         }).join(''),
       '</nav>',
       '<div class="workspace-body">',
+        safetyGateHtml,
+        instanceStripHtml,
         content,
       '</div>',
     '</div>'
@@ -723,6 +1086,7 @@ function workspaceShell(active, content) {
 
   return sidebarHtml + workspaceHtml;
 }
+
 
 // ── Universal Shell Initializer ──
 document.addEventListener('DOMContentLoaded', function() {
@@ -1584,7 +1948,7 @@ function renderReportContent() {
       <div style="text-align:right;">
         <div class="sig-line"></div>
         <div style="font-size:12px;font-weight:700;color:#0F172A;">Electronic Clinical Verification</div>
-        <div style="font-size:11px;color:#64748B;">HearIntel Practice Management Engine v3.5</div>
+        <div style="font-size:11px;color:#64748B;">Clinical Practice Management Engine v3.5</div>
         <div style="font-size:10px;color:#94A3B8;margin-top:2px;">Confidential Medical Record &middot; ${reportGenDate}</div>
       </div>
     </div>
@@ -1828,7 +2192,7 @@ function renderSingleEncounterReport() {
       <div style="text-align:right;">
         <div class="sig-line"></div>
         <div style="font-size:12px;font-weight:700;color:#0F172A;">Electronic Clinical Verification</div>
-        <div style="font-size:11px;color:#64748B;">HearIntel PMS Engine v3.5 &middot; ${reportGenDate}</div>
+        <div style="font-size:11px;color:#64748B;">Clinical PMS Engine v3.5 &middot; ${reportGenDate}</div>
       </div>
     </div>
   `;
@@ -1857,4 +2221,187 @@ function saveReportToMedia() {
 
 function printReportDocument() {
   window.print();
+}
+
+
+
+// ============================================================================
+// PROTOTYPE AUTOSAVE ENGINE — localStorage persistence layer
+// NOTE FOR DEV TEAM: localStorage is a PROTOTYPE-ONLY stand-in.
+// Swap out getAutosaveKey / autosaveRead / autosaveWrite for API calls
+// when connecting to the real backend. The field IDs and instance-keyed
+// structure remain identical — only the storage primitives change.
+// ============================================================================
+
+/**
+ * Build a namespaced localStorage key scoped to patient + module + instance.
+ * Format: pms_as_{patientId}_{moduleKey}_{instanceIndex}_{fieldId}
+ */
+function getAutosaveKey(patientId, moduleKey, instanceIndex, fieldId) {
+  return 'pms_as_' + patientId + '_' + moduleKey + '_' + instanceIndex + '_' + fieldId;
+}
+
+function autosaveWrite(patientId, moduleKey, instanceIndex, fieldId, value) {
+  try {
+    localStorage.setItem(getAutosaveKey(patientId, moduleKey, instanceIndex, fieldId), value);
+  } catch(e) { /* storage full or private mode — fail silently in prototype */ }
+}
+
+function autosaveRead(patientId, moduleKey, instanceIndex, fieldId) {
+  try {
+    return localStorage.getItem(getAutosaveKey(patientId, moduleKey, instanceIndex, fieldId));
+  } catch(e) { return null; }
+}
+
+/** Reflects save state in the #autoSaveStatus element injected by initModuleAutosave */
+function setAutosaveStatus(state) {
+  const el = document.getElementById('autoSaveStatus');
+  if (!el) return;
+  if (state === 'saving') {
+    el.textContent = 'Saving…';
+    el.style.color = 'var(--text-tertiary)';
+  } else {
+    el.textContent = '\u2713 Saved';
+    el.style.color = 'var(--status-success)';
+  }
+}
+
+/**
+ * Core autosave initialiser. Call once on DOMContentLoaded in each module.
+ * @param {string} moduleKey   - matches MODULE_SHORT_NAMES key (e.g. 'otoscopy')
+ * @param {string[]} fieldIds  - list of input/select/textarea element IDs to persist
+ */
+function initModuleAutosave(moduleKey, fieldIds) {
+  window._currentActiveModuleFields = { moduleKey: moduleKey, fieldIds: fieldIds };
+  const patientId   = getActivePatientId();
+  const activeIdx   = getActiveInstanceIndex(moduleKey, patientId);
+
+  // ── Inject save-status indicator into the test-instance-strip if present ──
+  // Falls back to a fixed bottom-right pill if the strip isn't on this page.
+  (function injectSaveStatus() {
+    const strip = document.querySelector('.test-instance-actions');
+    const indicator = document.createElement('span');
+    indicator.id = 'autoSaveStatus';
+    indicator.style.cssText = [
+      'font-size:11px',
+      'font-weight:600',
+      'font-family:var(--font-sans)',
+      'color:var(--text-tertiary)',
+      'white-space:nowrap',
+      'transition:color 180ms ease'
+    ].join(';');
+    indicator.textContent = 'Autosave on';
+    if (strip) {
+      strip.appendChild(indicator);
+    } else {
+      // Floating fallback badge (mirrors .test-instance-strip styling)
+      indicator.style.cssText += ';position:fixed;bottom:18px;right:24px;' +
+        'background:var(--surface);border:1px solid var(--border);' +
+        'border-radius:var(--radius-xs);padding:4px 10px;z-index:900;box-shadow:var(--shadow-card)';
+      document.body.appendChild(indicator);
+    }
+  })();
+
+  let _debounceTimer = null;
+
+  function triggerSave(fieldId, value) {
+    setAutosaveStatus('saving');
+    clearTimeout(_debounceTimer);
+    _debounceTimer = setTimeout(function() {
+      autosaveWrite(patientId, moduleKey, activeIdx, fieldId, value);
+      setAutosaveStatus('saved');
+    }, 350); // 350ms debounce — fast enough, not annoying
+  }
+
+  // ── Restore persisted values ──
+  fieldIds.forEach(function(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const saved = autosaveRead(patientId, moduleKey, activeIdx, id);
+    if (saved !== null) {
+      if (el.type === 'checkbox') {
+        el.checked = saved === 'true';
+      } else {
+        el.value = saved;
+      }
+    }
+    // ── Wire event listeners ──
+    if (el.tagName === 'SELECT') {
+      el.addEventListener('change', function() { triggerSave(id, el.value); });
+    } else if (el.type === 'checkbox') {
+      el.addEventListener('change', function() { triggerSave(id, el.checked ? 'true' : 'false'); });
+    } else {
+      // textarea & text inputs: blur + short debounce on input
+      el.addEventListener('input',  function() { triggerSave(id, el.value); });
+      el.addEventListener('blur',   function() {
+        clearTimeout(_debounceTimer);
+        autosaveWrite(patientId, moduleKey, activeIdx, id, el.value);
+        setAutosaveStatus('saved');
+      });
+    }
+  });
+
+  // ── Persist dynamic PTA audiogram inputs (named input_{track}_{freq}) ──
+  if (moduleKey === 'pta') {
+    function hookPtaInputs() {
+      document.querySelectorAll('[id^="input_"]').forEach(function(el) {
+        if (el._asHooked) return;
+        el._asHooked = true;
+        const id = el.id;
+        const saved = autosaveRead(patientId, moduleKey, activeIdx, id);
+        if (saved !== null) el.value = saved;
+        el.addEventListener('change', function() { triggerSave(id, el.value); });
+        el.addEventListener('blur',   function() {
+          clearTimeout(_debounceTimer);
+          autosaveWrite(patientId, moduleKey, activeIdx, id, el.value);
+          setAutosaveStatus('saved');
+        });
+      });
+    }
+    // Run immediately and after a short delay (audiogram grid may render late)
+    hookPtaInputs();
+    setTimeout(hookPtaInputs, 800);
+  }
+
+  // ── Hook manual Save button if present ──
+  const saveBtn = document.getElementById('btnSaveModule');
+  if (saveBtn && !saveBtn._asHooked) {
+    saveBtn._asHooked = true;
+    saveBtn.addEventListener('click', saveActiveModule);
+  }
+}
+
+/**
+ * Flushes all autosave fields for the currently active module immediately
+ * and provides feedback on the Save button and notification toast.
+ */
+function saveActiveModule() {
+  const cfg = window._currentActiveModuleFields;
+  const patientId = getActivePatientId();
+  if (cfg) {
+    const activeIdx = getActiveInstanceIndex(cfg.moduleKey, patientId);
+    cfg.fieldIds.forEach(function(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const val = el.type === 'checkbox' ? (el.checked ? 'true' : 'false') : el.value;
+      autosaveWrite(patientId, cfg.moduleKey, activeIdx, id, val);
+    });
+    if (cfg.moduleKey === 'pta') {
+      document.querySelectorAll('[id^="input_"]').forEach(function(el) {
+        autosaveWrite(patientId, cfg.moduleKey, activeIdx, el.id, el.value);
+      });
+    }
+  }
+  setAutosaveStatus('saved');
+  const btn = document.getElementById('btnSaveModule');
+  if (btn) {
+    const origHtml = btn.innerHTML;
+    btn.innerHTML = 'Saved &#10003;';
+    btn.disabled = true;
+    setTimeout(function() {
+      btn.innerHTML = origHtml;
+      btn.disabled = false;
+    }, 1500);
+  }
+  notify('Changes saved to clinical record.');
 }
