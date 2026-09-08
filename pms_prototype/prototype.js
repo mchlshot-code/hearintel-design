@@ -180,6 +180,8 @@ function hasPmsPermission(permission) {
 }
 
 function canAccessPmsArea(area) {
+  var ctx = getPmsAuthContext();
+  if (ctx.role === 'lead_audiologist' || ctx.role === 'lead') return true;
   var required = PMS_ROUTE_PERMISSIONS[area] || [];
   if (!required.length) return true;
   return required.some(function(permission) { return hasPmsPermission(permission); });
@@ -195,6 +197,7 @@ function getPatientBranchId(patient) {
 function canAccessPatientClinicalRecord(patient, area) {
   var ctx = getPmsAuthContext();
   if (!patient) return false;
+  if (ctx.role === 'lead_audiologist' || ctx.role === 'lead') return true;
   if (hasPmsPermission('clinical.review') && (ctx.scopeType === 'organization' || ctx.scopeType === 'platform')) return true;
   if (!hasPmsPermission('clinical.view') && !hasPmsPermission('clinical.write')) return false;
   if (ctx.scopeType === 'organization' || ctx.scopeType === 'platform') return true;
@@ -204,6 +207,16 @@ function canAccessPatientClinicalRecord(patient, area) {
 
 function getPatientAccessState(patient, area) {
   var ctx = getPmsAuthContext();
+  if (ctx.role === 'lead_audiologist' || ctx.role === 'lead') {
+    return {
+      label: 'Clinical record authorized',
+      badgeClass: 'success',
+      clinicalAllowed: true,
+      identityVisible: true,
+      actionLabel: area === 'profile' ? 'Open Record' : 'Start Assessment',
+      reason: 'Lead Audiologist has universal clinical, administrative, and governance access.'
+    };
+  }
   var canFind = hasPmsPermission('patients.view') || hasPmsPermission('patients.register') || hasPmsPermission('patients.demographics');
   var canSeeIdentity = canFind || hasPmsPermission('clinical.view') || hasPmsPermission('clinical.write');
   var clinicalAllowed = canAccessPatientClinicalRecord(patient, area);
@@ -254,6 +267,8 @@ function getPatientAccessState(patient, area) {
 }
 
 function canAccessGovernance() {
+  var ctx = getPmsAuthContext();
+  if (ctx.role === 'lead_audiologist' || ctx.role === 'lead') return true;
   return hasPmsPermission('governance.manage') || hasPmsPermission('platform.manage');
 }
 
@@ -870,7 +885,7 @@ function renderRoleSwitcherHtml(authContext) {
   return '<div class="auth-context-card">'
     + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">'
     +   '<span class="auth-context-label" style="margin:0;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;">Active Role</span>'
-    +   '<select onchange="setPmsAuthPreset(this.value)" style="font-size:10px;font-weight:600;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:var(--surface);color:var(--brand-hover);cursor:pointer;" title="Switch simulated demo role">'
+    +   '<select onchange="setPmsAuthPreset(this.value)" style="font-size:10.5px;font-weight:700;padding:2px 6px;border:1px solid rgba(56,189,248,0.4);border-radius:4px;background:#0F172A;color:#38BDF8;cursor:pointer;" title="Switch simulated demo role">'
     +     '<option value="lead"' + (isLead ? ' selected' : '') + '>Lead Audiologist (All Access)</option>'
     +     '<option value="receptionist"' + (isRec ? ' selected' : '') + '>Front Desk (Receptionist)</option>'
     +     '<option value="audiologist"' + (isAud ? ' selected' : '') + '>Audiologist (Clinical Only)</option>'
@@ -878,9 +893,9 @@ function renderRoleSwitcherHtml(authContext) {
     +     '<option value="super_admin"' + (isSuper ? ' selected' : '') + '>Super Admin</option>'
     +   '</select>'
     + '</div>'
-    + '<div class="auth-context-name" style="font-weight:600;font-size:12.5px;">' + authContext.identityName + '</div>'
-    + '<div class="auth-context-role" style="font-size:11px;color:var(--text-secondary);">' + authContext.roleLabel + '</div>'
-    + '<div class="auth-context-scope" style="font-size:10.5px;color:var(--text-tertiary);margin-top:2px;">' + authContext.scopeLabel + ' &middot; ' + authContext.branchName + '</div>'
+    + '<div class="auth-context-name" style="font-weight:700;font-size:13px;color:#FFFFFF;">' + authContext.identityName + '</div>'
+    + '<div class="auth-context-role" style="margin-top:5px;display:inline-flex;align-items:center;border-radius:999px;padding:3px 9px;background:rgba(14,165,233,0.22);color:#38BDF8;border:1px solid rgba(56,189,248,0.45);font-size:10.5px;font-weight:700;letter-spacing:0.02em;">' + authContext.roleLabel + '</div>'
+    + '<div class="auth-context-scope" style="font-size:10.5px;color:rgba(255,255,255,0.55);margin-top:4px;">' + authContext.scopeLabel + ' &middot; ' + authContext.branchName + '</div>'
     + '</div>';
 }
 
@@ -897,10 +912,13 @@ function patientShell(active) {
   const assessHref = '03-assessment-hub.html?patient=' + patientId;
 
   const canClinical = hasPmsPermission('clinical.view') || hasPmsPermission('clinical.write');
+  const isFrontDesk = authContext.role === 'receptionist' || authContext.role === 'front_desk';
+  const showPatientRecordLink = !isFrontDesk;
+
   const patientSub = (showPatientSub && canAccessPmsArea('patients'))
     ? '<div class="nav-sub">'
     +   '<a class="nav-sub-item ' + (isRegistry  ? 'active' : '') + '" href="01-registry.html">Registry</a>'
-    +   '<a class="nav-sub-item ' + (isProfile   ? 'active' : '') + '" href="02-profile.html?patient=' + patientId + '">Patient Record</a>'
+    +   (showPatientRecordLink ? '<a class="nav-sub-item ' + (isProfile   ? 'active' : '') + '" href="02-profile.html?patient=' + patientId + '">Patient Record</a>' : '')
     +   (canClinical ? '<a class="nav-sub-item ' + (isAssessment ? 'active' : '') + '" href="' + assessHref + '">Assessment</a>' : '')
     + '</div>'
     : '';
@@ -920,9 +938,6 @@ function patientShell(active) {
         '<div class="brand-sub">Practice Management</div>',
       '</div>',
       renderRoleSwitcherHtml(authContext),
-        '<div class="auth-context-role">' + authContext.roleLabel + '</div>',
-        '<div class="auth-context-scope">' + authContext.scopeLabel + ' &middot; ' + authContext.branchName + '</div>',
-      '</div>',
       '<nav class="nav-group">',
         '<div class="nav-section">Clinical Ops</div>',
         canAccessPmsArea('dashboard') ? '<a class="nav-item ' + (active === 'dashboard' ? 'active' : '') + '" href="00-dashboard.html" title="Dashboard">'
@@ -1382,7 +1397,7 @@ function workspaceShell(active, content) {
         + '</a>' : '',
         canAccessPmsArea('patients') ? ('<div class="nav-sub">'
           + '<a class="nav-sub-item" href="01-registry.html">Registry</a>'
-          + '<a class="nav-sub-item" href="02-profile.html?patient=' + patientId + '">Patient Record</a>'
+          + ((authContext.role !== 'receptionist' && authContext.role !== 'front_desk') ? '<a class="nav-sub-item" href="02-profile.html?patient=' + patientId + '">Patient Record</a>' : '')
           + (canClinical ? '<a class="nav-sub-item active" href="' + assessHref + '">Assessment</a>' : '')
           + '</div>') : '',
         canAccessPmsArea('screening') ? '<a class="nav-item ' + (active === 'screening' ? 'active' : '') + '" href="13-workspace-screening.html?patient=' + patientId + '" title="Screening">'
