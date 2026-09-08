@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clinical PMS - Appointments & Room Schedule</title>
+  <title>Clinical PMS - Appointments &amp; Clinic Schedule</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <style>
-    /* Scheduler Specific Styles */
+    /* Scheduler & Calendar Styles */
     .schedule-header {
       display: flex;
       justify-content: space-between;
@@ -17,6 +17,38 @@
       flex-wrap: wrap;
       gap: 16px;
       margin-bottom: 20px;
+    }
+    .view-switcher-group {
+      display: inline-flex;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 3px;
+      gap: 3px;
+    }
+    .view-switch-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      padding: 6px 14px;
+      font-size: 12.5px;
+      font-weight: 600;
+      border-radius: var(--radius-xs);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 140ms ease;
+    }
+    .view-switch-btn:hover {
+      color: var(--text-primary);
+      background: rgba(0,0,0,0.03);
+    }
+    .view-switch-btn.active {
+      background: var(--surface);
+      color: var(--brand);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      font-weight: 700;
     }
     .date-nav-group {
       display: inline-flex;
@@ -26,6 +58,8 @@
       border-radius: var(--radius);
       padding: 3px;
       box-shadow: var(--shadow-subtle);
+      flex-wrap: wrap;
+      gap: 2px;
     }
     .date-nav-btn {
       background: transparent;
@@ -38,7 +72,7 @@
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       transition: all 120ms ease;
     }
     .date-nav-btn:hover {
@@ -52,15 +86,41 @@
       font-family: var(--font-heading);
       border-left: 1px solid var(--border-light);
       border-right: 1px solid var(--border-light);
+      min-width: 170px;
+      text-align: center;
     }
-    .booth-grid-container {
+    .quick-pills-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .quick-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 120ms ease;
+    }
+    .quick-pill:hover, .quick-pill.active {
+      background: var(--teal-50);
+      border-color: var(--brand);
+      color: var(--brand);
+    }
+
+    /* Day Room Grid Container */
+    .room-grid-container {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
       box-shadow: var(--shadow-card);
     }
-    .booth-grid-header {
+    .room-grid-header {
       display: grid;
       grid-template-columns: 85px repeat(3, minmax(280px, 1fr));
       border-bottom: 2px solid var(--border);
@@ -69,15 +129,15 @@
       top: 0;
       z-index: 10;
     }
-    .booth-col-header {
+    .room-col-header {
       padding: 12px 14px;
       border-right: 1px solid var(--border-light);
       display: flex;
       flex-direction: column;
       gap: 3px;
     }
-    .booth-col-header:last-child { border-right: none; }
-    .booth-title {
+    .room-col-header:last-child { border-right: none; }
+    .room-title {
       font-size: 13.5px;
       font-weight: 700;
       color: var(--text-primary);
@@ -85,7 +145,7 @@
       align-items: center;
       justify-content: space-between;
     }
-    .booth-hardware {
+    .room-subtitle {
       font-size: 11px;
       color: var(--text-tertiary);
       font-family: var(--font-mono);
@@ -145,7 +205,7 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 4px;
-      padding: 2px 6px;
+      padding: 2px 7px;
       font-size: 11px;
       font-weight: 600;
       color: var(--text-secondary);
@@ -156,6 +216,7 @@
       color: #fff;
       border-color: var(--brand);
     }
+
     /* Draggable Appointment Card */
     .apt-card {
       background: var(--surface);
@@ -164,9 +225,9 @@
       border-radius: var(--radius-sm);
       padding: 9px 11px;
       cursor: grab;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-      transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
-      user-select: none;
+      position: relative;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      transition: transform 120ms ease, box-shadow 120ms ease;
       display: flex;
       flex-direction: column;
       gap: 5px;
@@ -218,30 +279,6 @@
       font-size: 11px;
       color: var(--text-secondary);
     }
-    .apt-tag {
-      font-size: 10px;
-      font-weight: 700;
-      padding: 1px 5px;
-      border-radius: 3px;
-      background: var(--bg-subtle);
-      color: var(--text-secondary);
-      border: 1px solid var(--border-light);
-    }
-    .pulse-dot {
-      display: inline-block;
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #10B981;
-      margin-right: 4px;
-      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-      animation: pulse 1.6s infinite;
-    }
-    @keyframes pulse {
-      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-    }
     .apt-action-btn {
       background: var(--brand);
       color: #fff;
@@ -258,166 +295,402 @@
       text-decoration: none;
     }
     .apt-action-btn:hover {
-      background: var(--brand-hover);
+      background: var(--brand-dark);
+    }
+    .pulse-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10B981;
+      margin-right: 4px;
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      animation: pulse 1.6s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    /* Month Calendar Grid Styles */
+    .month-calendar-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+    }
+    .month-days-header {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      background: var(--bg-subtle);
+      border-bottom: 2px solid var(--border);
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      padding: 10px 0;
+      letter-spacing: 0.03em;
+    }
+    .month-days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      grid-auto-rows: minmax(115px, auto);
+      border-bottom: 1px solid var(--border-light);
+    }
+    .month-day-cell {
+      border-right: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-light);
+      padding: 8px;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      position: relative;
+      cursor: pointer;
+      transition: background 120ms ease;
+    }
+    .month-day-cell:nth-child(7n) { border-right: none; }
+    .month-day-cell:hover {
+      background: var(--teal-50);
+    }
+    .month-day-cell.other-month {
+      background: #fafbfb;
+      opacity: 0.55;
+    }
+    .month-day-cell.is-today {
+      background: #f0fdfa;
+      border-top: 3px solid var(--brand);
+    }
+    .month-day-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .month-day-num {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .month-day-cell.is-today .month-day-num {
+      color: var(--brand);
+      background: var(--teal-100);
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .month-apt-pill {
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 3px;
+      background: var(--bg-subtle);
+      border-left: 3px solid var(--brand);
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 2px;
+    }
+    .month-apt-pill.active { border-left-color: #10B981; }
+    .month-apt-pill.waiting { border-left-color: #F59E0B; }
+    .month-apt-pill.confirmed { border-left-color: #0284C7; }
+
+    /* Recall & Care Plan Register View */
+    .recall-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow-card);
+    }
+    .recall-category-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: var(--bg-subtle);
+      border-radius: var(--radius-sm);
+      margin-bottom: 12px;
+      border-left: 4px solid var(--brand);
+    }
+    .recall-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-bottom: 24px;
+    }
+    .recall-table th {
+      text-align: left;
+      padding: 9px 12px;
+      background: var(--bg-subtle);
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-bottom: 1px solid var(--border);
+    }
+    .recall-table td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border-light);
+      color: var(--text-primary);
+    }
+    .recall-table tr:hover td {
+      background: var(--teal-50);
     }
   </style>
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
-<body>
-  <div class="app-shell">
-  <div data-shell="appointments"></div>
-  <main class="main">
-      <section class="page" style="max-width:1400px;margin:0 auto;padding:24px 28px;">
+<body data-page="appointments">
+  <div class="shell">
+    <aside class="sidebar" data-shell="patient"></aside>
 
-        <!-- Top Overview & Controls Header -->
-        <div class="schedule-header">
-          <div>
-            <div class="eyebrow" style="margin-bottom:2px;display:flex;align-items:center;gap:6px;">
-              <span class="badge teal" style="font-size:10.5px;">Daily Schedule</span>
-              <span>Lagos Central Hearing Clinic &middot; Appointment Schedule</span>
-            </div>
-            <h1 class="page-title" style="margin:0 0 4px;font-size:24px;">Appointments &amp; Room Schedule</h1>
-            <p style="font-size:12.5px;color:var(--text-secondary);margin:0;">
-              Drag and drop appointments between rooms and time slots to reschedule.
-            </p>
+    <main class="main" style="padding: 28px 36px; max-width: 1560px; margin: 0 auto; width: 100%;">
+      <!-- Page Header & View Modes -->
+      <div class="schedule-header">
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+            <h1 class="page-title" style="margin:0;font-size:22px;letter-spacing:-0.02em;">Appointments &amp; Clinic Schedule</h1>
+            <span class="badge primary" style="font-size:11px;font-weight:600;">Active PMS</span>
           </div>
+          <p style="font-size:12.5px;color:var(--text-secondary);margin:0;">
+            Comprehensive clinical scheduling organized across consultation rooms, monthly calendars, and multi-year recall care plans.
+          </p>
+        </div>
 
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-            <div class="date-nav-group">
-              <button class="date-nav-btn" onclick="navDate(-1)" title="Previous Day">&#8592; Prev</button>
-              <div class="date-display" id="currentScheduleDate">Today</div>
-              <button class="date-nav-btn" onclick="navDate(1)" title="Next Day">Next &#8594;</button>
-              <button class="date-nav-btn" onclick="resetToToday()" style="color:var(--brand);">Today</button>
-            </div>
-
-            <button class="btn primary" onclick="openBookModal()" style="display:inline-flex;align-items:center;gap:6px;font-weight:600;">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-              Book Appointment
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <!-- View Switcher Tabs -->
+          <div class="view-switcher-group">
+            <button class="view-switch-btn active" id="btnViewDay" onclick="switchScheduleView('day')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+              Day Rooms
+            </button>
+            <button class="view-switch-btn" id="btnViewMonth" onclick="switchScheduleView('month')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+              Month Calendar
+            </button>
+            <button class="view-switch-btn" id="btnViewRecall" onclick="switchScheduleView('recall')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+              Recall Care Plans (Years)
             </button>
           </div>
+
+          <button class="btn primary" onclick="openBookModal()" style="display:inline-flex;align-items:center;gap:6px;font-weight:600;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Book Appointment
+          </button>
+        </div>
+      </div>
+
+      <!-- Metric KPI Cards -->
+      <div class="stat-row" style="margin-bottom:20px;">
+        <div class="stat-cell active" style="cursor:default;">
+          <div class="stat-label">Total Scheduled</div>
+          <div class="stat-value" id="kpiTotal">9</div>
+          <div class="stat-note" id="kpiTotalNote">Appointments booked for active date</div>
+        </div>
+        <div class="stat-cell" style="cursor:default;">
+          <div class="stat-label">In Consultation (Active)</div>
+          <div class="stat-value" style="color:#10B981;" id="kpiActive">2</div>
+          <div class="stat-note">Actively undergoing clinical assessment</div>
+        </div>
+        <div class="stat-cell" style="cursor:default;">
+          <div class="stat-label">Waiting Room (Checked In)</div>
+          <div class="stat-value" style="color:#F59E0B;" id="kpiWaiting">2</div>
+          <div class="stat-note">Patients arrived &amp; awaiting clinician call</div>
+        </div>
+        <div class="stat-cell" style="cursor:default;">
+          <div class="stat-label">Recalls &amp; Longitudinal Care</div>
+          <div class="stat-value" style="color:var(--brand);" id="kpiRecalls">8</div>
+          <div class="stat-note">Multi-month &amp; multi-year follow-ups</div>
+        </div>
+      </div>
+
+      <!-- Navigation & Controls Toolbar -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <!-- Left: Date Navigator & Jumpers -->
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <div class="date-nav-group">
+            <button class="date-nav-btn" onclick="navSchedule(-1)" title="Previous Step">&#8592; Prev</button>
+            <div class="date-display" id="currentScheduleDate">Today</div>
+            <button class="date-nav-btn" onclick="navSchedule(1)" title="Next Step">Next &#8594;</button>
+          </div>
+
+          <!-- Interactive Date Picker Jump -->
+          <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:inline-flex;align-items:center;gap:6px;">
+            Jump to Date:
+            <input type="date" id="datePickerJump" onchange="jumpToSelectedDate(this.value)" style="padding:5px 8px;font-size:12.5px;border:1px solid var(--border);border-radius:var(--radius-xs);background:var(--surface);color:var(--text-primary);">
+          </label>
+
+          <!-- Quick Navigation Presets -->
+          <div class="quick-pills-bar">
+            <button class="quick-pill active" onclick="setQuickDate('today')">Today</button>
+            <button class="quick-pill" onclick="setQuickDate('tomorrow')">Tomorrow</button>
+            <button class="quick-pill" onclick="setQuickDate('next-week')">Next Week</button>
+            <button class="quick-pill" onclick="setQuickDate('next-month')">Next Month</button>
+            <button class="quick-pill" onclick="setQuickDate('year-2027')">2027</button>
+          </div>
         </div>
 
-        <!-- Metric KPI Cards -->
-        <div class="stat-row" style="margin-bottom:20px;">
-          <div class="stat-cell active" style="cursor:default;">
-            <div class="stat-label">Total Scheduled</div>
-            <div class="stat-value" id="kpiTotal">9</div>
-            <div class="stat-note">Appointments booked today</div>
-          </div>
-          <div class="stat-cell" style="cursor:default;">
-            <div class="stat-label">In Room</div>
-            <div class="stat-value" style="color:#10B981;" id="kpiActive">2</div>
-            <div class="stat-note">Actively undergoing assessment</div>
-          </div>
-          <div class="stat-cell" style="cursor:default;">
-            <div class="stat-label">Checked In / Waiting</div>
-            <div class="stat-value" style="color:#F59E0B;" id="kpiWaiting">2</div>
-            <div class="stat-note">Ready for booth transfer</div>
-          </div>
-          <div class="stat-cell" style="cursor:default;">
-            <div class="stat-label">Booth Utilization</div>
-            <div class="stat-value" id="kpiUtil">82%</div>
-            <div class="stat-note">3 Specialized sound suites active</div>
-          </div>
+        <!-- Right: Filter Options & Status Legend -->
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:flex;align-items:center;gap:6px;">
+            Room:
+            <select id="roomFilter" onchange="filterSchedule()" style="padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:var(--radius-xs);background:var(--surface);">
+              <option value="all" selected>All Rooms (3)</option>
+              <option value="room1">Consultation Room 1 (Diagnostic)</option>
+              <option value="room2">Consultation Room 2 (Pediatric &amp; Specialized)</option>
+              <option value="room3">Consultation Room 3 (Hearing Aid &amp; Counseling)</option>
+            </select>
+          </label>
+          <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:flex;align-items:center;gap:6px;">
+            Clinician:
+            <select id="clinicianFilter" onchange="filterSchedule()" style="padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:var(--radius-xs);background:var(--surface);">
+              <option value="all" selected>All Clinicians</option>
+              <option value="chika">Dr. Chika Okafor, Au.D. (Lead)</option>
+              <option value="amina">Amina Bello, Au.D.</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <!-- VIEW 1: DAY SCHEDULE (ROOM MATRIX) -->
+      <div id="viewDayContainer">
+        <!-- Status Indicator Bar -->
+        <div style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:10px;gap:14px;font-size:12px;color:var(--text-tertiary);">
+          <span style="display:inline-flex;align-items:center;gap:4px;"><span class="pulse-dot"></span> In Consultation</span>
+          <span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:7px;height:7px;border-radius:50%;background:#F59E0B;display:inline-block;"></span> Waiting Room</span>
+          <span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:7px;height:7px;border-radius:50%;background:#0284C7;display:inline-block;"></span> Confirmed</span>
+          <span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:7px;height:7px;border-radius:50%;background:var(--text-tertiary);display:inline-block;"></span> Completed</span>
         </div>
 
-        <!-- Filter & Control Bar -->
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:12px;">
-          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-            <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:flex;align-items:center;gap:6px;">
-              Room Filter:
-              <select id="boothFilter" onchange="filterSchedule()" style="padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:var(--radius-xs);background:var(--surface);">
-                <option value="all" selected>All Rooms (3)</option>
-                <option value="booth1">Room 1 (Diagnostic)</option>
-                <option value="booth2">Room 2 (Pediatric / ABR)</option>
-                <option value="fitting">Consult &amp; Fitting Suite</option>
-              </select>
-            </label>
-            <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:flex;align-items:center;gap:6px;">
-              Clinician:
-              <select id="clinicianFilter" onchange="filterSchedule()" style="padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:var(--radius-xs);background:var(--surface);">
-                <option value="all" selected>All Clinicians</option>
-                <option value="chika">Dr. Chika Okafor, Au.D. (Lead)</option>
-                <option value="amina">Amina Bello, Au.D.</option>
-              </select>
-            </label>
-          </div>
-
-          <div style="font-size:12px;color:var(--text-tertiary);display:flex;align-items:center;gap:12px;">
-            <span style="display:inline-flex;align-items:center;gap:4px;"><span class="pulse-dot"></span> In Room</span>
-            <span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:7px;height:7px;border-radius:50%;background:#F59E0B;display:inline-block;"></span> Waiting</span>
-            <span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:7px;height:7px;border-radius:50%;background:#0284C7;display:inline-block;"></span> Confirmed</span>
-            <span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:7px;height:7px;border-radius:50%;background:var(--text-tertiary);display:inline-block;"></span> Completed</span>
-          </div>
-        </div>
-
-        <!-- Master Sound Booth Grid -->
-        <div class="booth-grid-container">
-          <div class="booth-grid-header">
-            <div class="booth-col-header" style="background:var(--bg-subtle);justify-content:center;text-align:center;">
+        <div class="room-grid-container">
+          <div class="room-grid-header">
+            <div class="room-col-header" style="background:var(--bg-subtle);justify-content:center;text-align:center;">
               <span style="font-size:11.5px;font-weight:700;color:var(--text-secondary);">TIME</span>
             </div>
-            <div class="booth-col-header" id="col-booth1">
-              <div class="booth-title">
-                <span>Room 1</span>
+            <div class="room-col-header" id="col-room1">
+              <div class="room-title">
+                <span>Consultation Room 1</span>
                 <span class="badge neutral" style="font-size:10px;">Diagnostic</span>
               </div>
-              <div class="booth-hardware">Otometrics Madsen Astera &middot; Titan Tymp</div>
+              <div class="room-subtitle">Comprehensive Diagnostic Audiometry Suite</div>
             </div>
-            <div class="booth-col-header" id="col-booth2">
-              <div class="booth-title">
-                <span>Room 2</span>
-                <span class="badge neutral" style="font-size:10px;">Pediatric &amp; E-Phys</span>
+            <div class="room-col-header" id="col-room2">
+              <div class="room-title">
+                <span>Consultation Room 2</span>
+                <span class="badge neutral" style="font-size:10px;">Pediatric &amp; Specialized</span>
               </div>
-              <div class="booth-hardware">Interacoustics Eclipse ABR &middot; VRA Setup</div>
+              <div class="room-subtitle">Pediatric VRA, Play Audiometry &amp; E-Phys</div>
             </div>
-            <div class="booth-col-header" id="col-fitting">
-              <div class="booth-title">
-                <span>Consult &amp; Fitting Suite</span>
-                <span class="badge neutral" style="font-size:10px;">Fitting</span>
+            <div class="room-col-header" id="col-room3">
+              <div class="room-title">
+                <span>Consultation Room 3</span>
+                <span class="badge neutral" style="font-size:10px;">Fitting &amp; Counseling</span>
               </div>
-              <div class="booth-hardware">Audioscan Verifit 2 &middot; Oticon/Phonak Hi-Pro</div>
+              <div class="room-subtitle">Hearing Device Verification &amp; Real-Ear Measurement</div>
             </div>
           </div>
 
           <div id="scheduleGridBody">
-            <!-- Dynamic Time Slot Rows -->
+            <!-- Rendered dynamically -->
           </div>
         </div>
+      </div>
 
-      </section>
+      <!-- VIEW 2: MONTH CALENDAR GRID -->
+      <div id="viewMonthContainer" style="display:none;">
+        <div class="month-calendar-container">
+          <div class="month-days-header">
+            <div>SUN</div><div>MON</div><div>TUE</div><div>WED</div><div>THU</div><div>FRI</div><div>SAT</div>
+          </div>
+          <div class="month-days-grid" id="monthCalendarGridBody">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 3: LONGITUDINAL RECALL CARE PLANS (YEARS) -->
+      <div id="viewRecallContainer" style="display:none;">
+        <div class="recall-container">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div>
+              <h2 style="font-size:16px;font-weight:700;margin:0 0 4px;color:var(--text-primary);">Longitudinal Patient Recall Register</h2>
+              <p style="font-size:12.5px;color:var(--text-secondary);margin:0;">
+                Multi-month and multi-year recall intervals for audiometric monitoring, device reassessments, and pediatric milestones.
+              </p>
+            </div>
+            <button class="btn primary" onclick="openBookModalForRecall()" style="font-size:12px;font-weight:600;">+ Add Recall Care Plan</button>
+          </div>
+
+          <div id="recallRegisterBody">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </div>
     </main>
   </div>
 
   <!-- Booking Modal -->
   <div class="modal-backdrop" id="bookAppointmentModal" onclick="if(event.target===this)closeModal('bookAppointmentModal')">
-    <div class="modal-dialog" style="max-width:540px;">
+    <div class="modal-dialog" style="max-width:560px;">
       <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border-light);">
         <div>
-          <h3 style="margin:0;font-size:15px;color:var(--text-primary);">Book Clinical Appointment</h3>
-          <p style="margin:2px 0 0;font-size:11.5px;color:var(--text-secondary);">Schedule patient into a dedicated sound booth or consult suite.</p>
+          <h3 class="modal-title" style="margin:0;font-size:16px;font-weight:700;color:var(--text-primary);">Schedule Clinical Appointment</h3>
+          <p style="margin:2px 0 0;font-size:11.5px;color:var(--text-secondary);">Book patient into a consultation room and clinical slot.</p>
         </div>
         <button class="btn ghost" onclick="closeModal('bookAppointmentModal')" style="font-size:16px;padding:0 8px;">&times;</button>
       </div>
+
       <form id="bookForm" onsubmit="handleBookSubmit(event)" style="padding:20px;">
-        <div class="form-grid" style="grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-grid" style="grid-template-columns:1fr 1fr;gap:14px;">
+          <!-- Patient Selection + Quick Register Link -->
           <div class="field" style="grid-column:1 / -1;">
-            <label for="bookPatientSelect">Patient *</label>
-            <select id="bookPatientSelect" required style="font-size:13px;padding:8px 10px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+              <label for="bookPatientSelect" style="margin:0;font-weight:600;font-size:12px;">Patient *</label>
+              <button type="button" class="btn ghost" onclick="openNewPatientFromBooking()" style="font-size:11.5px;padding:2px 8px;color:var(--brand);text-decoration:underline;cursor:pointer;">
+                + Register New Patient
+              </button>
+            </div>
+            <select id="bookPatientSelect" required style="font-size:13px;padding:8px 10px;width:100%;border:1px solid var(--border);border-radius:var(--radius-xs);background:var(--surface);">
               <!-- Populated from HearIntelDB -->
             </select>
           </div>
+
+          <!-- Appointment Date with Quick Presets -->
+          <div class="field" style="grid-column:1 / -1;">
+            <label for="bookDateInput" style="display:block;margin-bottom:4px;font-weight:600;font-size:12px;">Appointment Date *</label>
+            <input type="date" id="bookDateInput" required style="font-size:13px;padding:8px 10px;width:100%;border:1px solid var(--border);border-radius:var(--radius-xs);background:var(--surface);color:var(--text-primary);margin-bottom:6px;">
+            <div style="display:flex;gap:5px;flex-wrap:wrap;">
+              <button type="button" class="quick-pill" onclick="setBookDatePreset(0)">Today</button>
+              <button type="button" class="quick-pill" onclick="setBookDatePreset(1)">Tomorrow</button>
+              <button type="button" class="quick-pill" onclick="setBookDatePreset(7)">+1 Wk</button>
+              <button type="button" class="quick-pill" onclick="setBookDatePreset(30)">+1 Mo</button>
+              <button type="button" class="quick-pill" onclick="setBookDatePreset(90)">+3 Mo (Recall)</button>
+              <button type="button" class="quick-pill" onclick="setBookDatePreset(180)">+6 Mo (Recall)</button>
+              <button type="button" class="quick-pill" onclick="setBookDatePreset(365)">+1 Yr (2027 Annual)</button>
+            </div>
+          </div>
+
+          <!-- Room Selection -->
           <div class="field">
-            <label for="bookBoothSelect">Sound Suite / Room *</label>
-            <select id="bookBoothSelect" required style="font-size:13px;padding:8px 10px;">
-              <option value="booth1">Room 1 (Diagnostic)</option>
-              <option value="booth2">Room 2 (Pediatric / ABR)</option>
-              <option value="fitting">Consult &amp; Fitting Suite</option>
+            <label for="bookRoomSelect" style="display:block;margin-bottom:4px;font-weight:600;font-size:12px;">Consultation Room *</label>
+            <select id="bookRoomSelect" required style="font-size:13px;padding:8px 10px;width:100%;border:1px solid var(--border);border-radius:var(--radius-xs);background:var(--surface);">
+              <option value="room1">Consultation Room 1 (Diagnostic)</option>
+              <option value="room2">Consultation Room 2 (Pediatric &amp; Specialized)</option>
+              <option value="room3">Consultation Room 3 (Hearing Aid &amp; Counseling)</option>
             </select>
           </div>
+
+          <!-- Start Time Selection -->
           <div class="field">
-            <label for="bookTimeSelect">Start Time *</label>
-            <select id="bookTimeSelect" required style="font-size:13px;padding:8px 10px;">
+            <label for="bookTimeSelect" style="display:block;margin-bottom:4px;font-weight:600;font-size:12px;">Start Time *</label>
+            <select id="bookTimeSelect" required style="font-size:13px;padding:8px 10px;width:100%;border:1px solid var(--border);border-radius:var(--radius-xs);background:var(--surface);">
               <option value="08:00">08:00 AM</option>
               <option value="09:00" selected>09:00 AM</option>
               <option value="10:00">10:00 AM</option>
@@ -427,37 +700,59 @@
               <option value="14:00">02:00 PM</option>
               <option value="15:00">03:00 PM</option>
               <option value="16:00">04:00 PM</option>
+              <option value="17:00">05:00 PM</option>
             </select>
           </div>
+
+          <!-- Duration -->
           <div class="field">
-            <label for="bookDurationSelect">Duration</label>
-            <select id="bookDurationSelect" style="font-size:13px;padding:8px 10px;">
+            <label for="bookDurationSelect" style="display:block;margin-bottom:4px;font-weight:600;font-size:12px;">Duration</label>
+            <select id="bookDurationSelect" style="font-size:13px;padding:8px 10px;width:100%;border:1px solid var(--border);border-radius:var(--radius-xs);background:var(--surface);">
               <option value="30 min">30 min (Quick Check / Screen)</option>
-              <option value="45 min">45 min (Tymp / Follow-up)</option>
+              <option value="45 min">45 min (Tymp / Verification)</option>
               <option value="60 min" selected>60 min (Standard Evaluation)</option>
-              <option value="90 min">90 min (Comprehensive Battery)</option>
+              <option value="90 min">90 min (Comprehensive Battery / ABR)</option>
             </select>
           </div>
+
+          <!-- Attending Clinician -->
           <div class="field">
-            <label for="bookClinicianSelect">Clinician *</label>
-            <select id="bookClinicianSelect" required style="font-size:13px;padding:8px 10px;">
+            <label for="bookClinicianSelect" style="display:block;margin-bottom:4px;font-weight:600;font-size:12px;">Clinician *</label>
+            <select id="bookClinicianSelect" required style="font-size:13px;padding:8px 10px;width:100%;border:1px solid var(--border);border-radius:var(--radius-xs);background:var(--surface);">
               <option value="Dr. Chika Okafor, Au.D.">Dr. Chika Okafor, Au.D. (Lead)</option>
               <option value="Amina Bello, Au.D.">Amina Bello, Au.D.</option>
             </select>
           </div>
+
+          <!-- Procedure / Reason -->
           <div class="field" style="grid-column:1 / -1;">
-            <label for="bookProcedureInput">Procedure / Reason *</label>
-            <input type="text" id="bookProcedureInput" required placeholder="e.g. Diagnostic Battery + PTA, REM Fine-Tuning" style="font-size:13px;padding:8px 10px;">
+            <label for="bookProcedureInput" style="display:block;margin-bottom:4px;font-weight:600;font-size:12px;">Procedure / Clinical Reason *</label>
+            <input type="text" id="bookProcedureInput" required placeholder="e.g. Comprehensive Diagnostic Battery + PTA, REM Fine-Tuning" style="font-size:13px;padding:8px 10px;width:100%;border:1px solid var(--border);border-radius:var(--radius-xs);background:var(--surface);">
           </div>
-          <div class="field" style="grid-column:1 / -1;">
-            <label for="bookStatusSelect">Initial Status</label>
-            <select id="bookStatusSelect" style="font-size:13px;padding:8px 10px;">
+
+          <!-- Status & Recall Flag -->
+          <div class="field">
+            <label for="bookStatusSelect" style="display:block;margin-bottom:4px;font-weight:600;font-size:12px;">Initial Status</label>
+            <select id="bookStatusSelect" style="font-size:13px;padding:8px 10px;width:100%;border:1px solid var(--border);border-radius:var(--radius-xs);background:var(--surface);">
               <option value="Confirmed" selected>Confirmed</option>
               <option value="Checked In">Checked In (Waiting Room)</option>
-              <option value="In Room">In Room (Active Now)</option>
+              <option value="In Room">In Consultation (Active)</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="bookRecallSelect" style="display:block;margin-bottom:4px;font-weight:600;font-size:12px;">Recall / Care Plan Tier</label>
+            <select id="bookRecallSelect" style="font-size:13px;padding:8px 10px;width:100%;border:1px solid var(--border);border-radius:var(--radius-xs);background:var(--surface);">
+              <option value="None" selected>None (Standard Clinical Slot)</option>
+              <option value="1-Month Follow-Up">1-Month Post-Fitting Review</option>
+              <option value="3-Month Follow-Up">3-Month Speech Verification</option>
+              <option value="6-Month Review">6-Month Pediatric / Medical Review</option>
+              <option value="Annual Battery">1-Year Annual Diagnostic Battery</option>
+              <option value="Multi-Year Plan">Multi-Year Technology Renewal</option>
             </select>
           </div>
         </div>
+
         <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border-light);">
           <button type="button" class="btn" onclick="closeModal('bookAppointmentModal')">Cancel</button>
           <button type="submit" class="btn primary">Schedule Appointment</button>
@@ -468,7 +763,7 @@
 
   <!-- Appointment Details & Action Modal -->
   <div class="modal-backdrop" id="aptDetailModal" onclick="if(event.target===this)closeModal('aptDetailModal')">
-    <div class="modal-dialog" style="max-width:500px;">
+    <div class="modal-dialog" style="max-width:520px;">
       <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border-light);">
         <div style="display:flex;align-items:center;gap:8px;">
           <h3 id="detailPatientName" style="margin:0;font-size:15px;color:var(--text-primary);">Appointment</h3>
@@ -477,14 +772,18 @@
         <button class="btn ghost" onclick="closeModal('aptDetailModal')" style="font-size:16px;padding:0 8px;">&times;</button>
       </div>
       <div style="padding:20px;">
-        <div style="background:var(--bg-subtle);border-radius:var(--radius-sm);padding:12px;margin-bottom:14px;border:1px solid var(--border-light);">
+        <div style="background:var(--bg-subtle);border-radius:var(--radius-sm);padding:14px;margin-bottom:14px;border:1px solid var(--border-light);">
           <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;">
             <span style="color:var(--text-secondary);">Procedure:</span>
             <strong id="detailProcedure" style="color:var(--text-primary);"></strong>
           </div>
           <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;">
-            <span style="color:var(--text-secondary);">Room / Suite:</span>
-            <strong id="detailBooth" style="color:var(--text-primary);"></strong>
+            <span style="color:var(--text-secondary);">Date:</span>
+            <strong id="detailDate" style="color:var(--text-primary);"></strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;">
+            <span style="color:var(--text-secondary);">Consultation Room:</span>
+            <strong id="detailRoom" style="color:var(--text-primary);"></strong>
           </div>
           <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;">
             <span style="color:var(--text-secondary);">Scheduled Time:</span>
@@ -497,12 +796,12 @@
         </div>
 
         <div class="field" style="margin-bottom:16px;">
-          <label style="font-size:12px;">Update Status:</label>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">
-            <button type="button" class="btn" style="font-size:11.5px;padding:4px 8px;" onclick="updateCurrentAptStatus('Confirmed')">Confirmed</button>
-            <button type="button" class="btn" style="font-size:11.5px;padding:4px 8px;color:#D97706;border-color:#F59E0B;" onclick="updateCurrentAptStatus('Checked In')">Checked In</button>
-            <button type="button" class="btn primary" style="font-size:11.5px;padding:4px 8px;background:#10B981;border-color:#059669;" onclick="updateCurrentAptStatus('In Room')">&#9679; In Room</button>
-            <button type="button" class="btn" style="font-size:11.5px;padding:4px 8px;" onclick="updateCurrentAptStatus('Completed')">&#10003; Completed</button>
+          <label style="font-size:12px;font-weight:600;display:block;margin-bottom:6px;">Update Clinical Status:</label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button type="button" class="btn" style="font-size:11.5px;padding:4px 9px;" onclick="updateCurrentAptStatus('Confirmed')">Confirmed</button>
+            <button type="button" class="btn" style="font-size:11.5px;padding:4px 9px;color:#D97706;border-color:#F59E0B;" onclick="updateCurrentAptStatus('Checked In')">Checked In (Waiting)</button>
+            <button type="button" class="btn primary" style="font-size:11.5px;padding:4px 9px;background:#10B981;border-color:#059669;" onclick="updateCurrentAptStatus('In Room')">&#9679; In Consultation</button>
+            <button type="button" class="btn" style="font-size:11.5px;padding:4px 9px;" onclick="updateCurrentAptStatus('Completed')">&#10003; Completed</button>
           </div>
         </div>
 
@@ -522,210 +821,90 @@
   <script src="data.js"></script>
   <script src="prototype.js"></script>
   <script>
-    // Master Appointment Store
-    const DEFAULT_APPOINTMENTS = [
-      {
-        id: 'apt-101',
-        dateOffset: 0,
-        patientId: 'amaia',
-        patientName: 'Amaia Okafor',
-        mrn: 'LCC-26-01248',
-        booth: 'booth1',
-        time: '09:00',
-        duration: '90 min',
-        procedure: 'Comprehensive Diagnostic Battery + PTA',
-        clinician: 'Dr. Chika Okafor, Au.D.',
-        status: 'In Room'
-      },
-      {
-        id: 'apt-102',
-        dateOffset: 0,
-        patientId: 'david',
-        patientName: 'David Mensah',
-        mrn: 'LCC-26-00892',
-        booth: 'booth1',
-        time: '11:00',
-        duration: '60 min',
-        procedure: 'Annual Hearing Review & Tympanometry',
-        clinician: 'Dr. Chika Okafor, Au.D.',
-        status: 'Confirmed'
-      },
-      {
-        id: 'apt-103',
-        dateOffset: 0,
-        patientId: 'emeka',
-        patientName: 'Emeka Eze',
-        mrn: 'LCC-26-01402',
-        booth: 'booth1',
-        time: '14:00',
-        duration: '60 min',
-        procedure: 'Asymmetric Loss & Threshold Masking',
-        clinician: 'Dr. Chika Okafor, Au.D.',
-        status: 'Confirmed'
-      },
-      {
-        id: 'apt-104',
-        dateOffset: 0,
-        patientId: 'zainab',
-        patientName: 'Zainab Abiola',
-        mrn: 'LCC-26-01822',
-        booth: 'booth2',
-        time: '09:00',
-        duration: '60 min',
-        procedure: 'Pediatric Play Audiometry + DPOAE',
-        clinician: 'Amina Bello, Au.D.',
-        status: 'Checked In'
-      },
-      {
-        id: 'apt-105',
-        dateOffset: 0,
-        patientId: 'taiwo',
-        patientName: 'Taiwo Adeyemi',
-        mrn: 'LCC-26-00311',
-        booth: 'booth2',
-        time: '11:30',
-        duration: '90 min',
-        procedure: 'Diagnostic ABR Threshold Estimation',
-        clinician: 'Amina Bello, Au.D.',
-        status: 'Confirmed'
-      },
-      {
-        id: 'apt-106',
-        dateOffset: 0,
-        patientId: 'khalid',
-        patientName: 'Khalid Danjuma',
-        mrn: 'LCC-26-01994',
-        booth: 'fitting',
-        time: '10:00',
-        duration: '60 min',
-        procedure: 'Bilateral Hearing Aid Fitting & REM',
-        clinician: 'Dr. Chika Okafor, Au.D.',
-        status: 'In Room'
-      },
-      {
-        id: 'apt-107',
-        dateOffset: 0,
-        patientId: 'ngozi',
-        patientName: 'Ngozi Okonjo',
-        mrn: 'LCC-26-02115',
-        booth: 'fitting',
-        time: '13:00',
-        duration: '45 min',
-        procedure: 'Hearing Aid Fine-Tuning & Verification',
-        clinician: 'Amina Bello, Au.D.',
-        status: 'Checked In'
-      },
-      {
-        id: 'apt-108',
-        dateOffset: 0,
-        patientId: 'fatima',
-        patientName: 'Fatima Aliyu',
-        mrn: 'LCC-26-00741',
-        booth: 'booth1',
-        time: '15:30',
-        duration: '45 min',
-        procedure: 'Post-Op Stapedectomy Audiometry',
-        clinician: 'Dr. Chika Okafor, Au.D.',
-        status: 'Confirmed'
-      },
-      {
-        id: 'apt-109',
-        dateOffset: 0,
-        patientId: 'babatunde',
-        patientName: 'Babatunde Balogun',
-        mrn: 'LCC-26-01119',
-        booth: 'fitting',
-        time: '15:00',
-        duration: '60 min',
-        procedure: 'Custom Earmold Impression & Real-Ear Probe',
-        clinician: 'Amina Bello, Au.D.',
-        status: 'Confirmed'
-      },
-      {
-        id: 'apt-tomorrow-1',
-        dateOffset: 1,
-        patientId: 'zainab',
-        patientName: 'Zainab Abiola',
-        mrn: 'LCC-26-01822',
-        booth: 'booth2',
-        time: '09:00',
-        duration: '60 min',
-        procedure: 'Pediatric Visual Reinforcement Audiometry',
-        clinician: 'Amina Bello, Au.D.',
-        status: 'Confirmed'
-      },
-      {
-        id: 'apt-tomorrow-2',
-        dateOffset: 1,
-        patientId: 'david',
-        patientName: 'David Mensah',
-        mrn: 'LCC-26-00892',
-        booth: 'booth1',
-        time: '10:00',
-        duration: '60 min',
-        procedure: 'Follow-up Pure Tone & Speech Audiometry',
-        clinician: 'Dr. Chika Okafor, Au.D.',
-        status: 'Confirmed'
-      },
-      {
-        id: 'apt-tomorrow-3',
-        dateOffset: 1,
-        patientId: 'emeka',
-        patientName: 'Emeka Eze',
-        mrn: 'LCC-26-01402',
-        booth: 'fitting',
-        time: '13:00',
-        duration: '45 min',
-        procedure: 'Device Orientation & Insertion Training',
-        clinician: 'Dr. Chika Okafor, Au.D.',
-        status: 'Confirmed'
-      },
-      {
-        id: 'apt-yesterday-1',
-        dateOffset: -1,
-        patientId: 'amaia',
-        patientName: 'Amaia Okafor',
-        mrn: 'LCC-26-01248',
-        booth: 'booth1',
-        time: '09:00',
-        duration: '60 min',
-        procedure: 'Preliminary Triage & Baseline Screening',
-        clinician: 'Dr. Chika Okafor, Au.D.',
-        status: 'Completed'
-      },
-      {
-        id: 'apt-yesterday-2',
-        dateOffset: -1,
-        patientId: 'khalid',
-        patientName: 'Khalid Danjuma',
-        mrn: 'LCC-26-01994',
-        booth: 'fitting',
-        time: '11:00',
-        duration: '60 min',
-        procedure: 'Initial Hearing Aid Demonstration',
-        clinician: 'Amina Bello, Au.D.',
-        status: 'Completed'
-      }
+    // Configuration & State
+    const STORAGE_KEY = 'hearintel_appointments_schedule';
+    const TIME_SLOTS = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
+    
+    const ROOMS = [
+      { id: 'room1', legacyId: 'booth1', name: 'Consultation Room 1', shortName: 'Room 1', label: 'Diagnostic Audiometry', subtitle: 'Comprehensive Diagnostic Audiometry Suite' },
+      { id: 'room2', legacyId: 'booth2', name: 'Consultation Room 2', shortName: 'Room 2', label: 'Pediatric & Specialized', subtitle: 'Pediatric VRA, Play Audiometry & E-Phys' },
+      { id: 'room3', legacyId: 'fitting', name: 'Consultation Room 3', shortName: 'Room 3', label: 'Fitting & Counseling', subtitle: 'Hearing Device Verification & Real-Ear Measurement' }
     ];
 
-    const STORAGE_KEY = 'hearintel_appointments_schedule';
+    // Reference today is 2026-09-08
+    const BASE_TODAY = '2026-09-08';
+
+    function getISODateFromOffset(offset) {
+      const parts = BASE_TODAY.split('-');
+      const d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+      d.setDate(d.getDate() + offset);
+      return formatDateISO(d);
+    }
+
+    function formatDateISO(d) {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    const DEFAULT_APPOINTMENTS = [
+      // Today (2026-09-08)
+      { id: 'apt-101', date: '2026-09-08', patientId: 'amaia', patientName: 'Amaia Okafor', mrn: 'LCC-26-01248', room: 'room1', time: '09:00', duration: '90 min', procedure: 'Comprehensive Diagnostic Battery + PTA', clinician: 'Dr. Chika Okafor, Au.D.', status: 'In Room', recall: 'None' },
+      { id: 'apt-102', date: '2026-09-08', patientId: 'david', patientName: 'David Mensah', mrn: 'LCC-26-00892', room: 'room1', time: '11:00', duration: '60 min', procedure: 'Annual Hearing Review & Tympanometry', clinician: 'Dr. Chika Okafor, Au.D.', status: 'Confirmed', recall: 'Annual Battery' },
+      { id: 'apt-103', date: '2026-09-08', patientId: 'emeka', patientName: 'Emeka Eze', mrn: 'LCC-26-01402', room: 'room1', time: '14:00', duration: '60 min', procedure: 'Asymmetric Loss & Threshold Masking', clinician: 'Dr. Chika Okafor, Au.D.', status: 'Confirmed', recall: 'None' },
+      { id: 'apt-104', date: '2026-09-08', patientId: 'zainab', patientName: 'Zainab Abiola', mrn: 'LCC-26-01822', room: 'room2', time: '09:00', duration: '60 min', procedure: 'Pediatric Play Audiometry + DPOAE', clinician: 'Amina Bello, Au.D.', status: 'Checked In', recall: '6-Month Review' },
+      { id: 'apt-105', date: '2026-09-08', patientId: 'taiwo', patientName: 'Taiwo Adeyemi', mrn: 'LCC-26-00311', room: 'room2', time: '11:30', duration: '90 min', procedure: 'Diagnostic ABR Threshold Estimation', clinician: 'Amina Bello, Au.D.', status: 'Confirmed', recall: 'None' },
+      { id: 'apt-106', date: '2026-09-08', patientId: 'khalid', patientName: 'Khalid Danjuma', mrn: 'LCC-26-01994', room: 'room3', time: '10:00', duration: '60 min', procedure: 'Bilateral Hearing Aid Fitting & REM', clinician: 'Dr. Chika Okafor, Au.D.', status: 'In Room', recall: '1-Month Follow-Up' },
+      { id: 'apt-107', date: '2026-09-08', patientId: 'ngozi', patientName: 'Ngozi Okonjo', mrn: 'LCC-26-02115', room: 'room3', time: '13:00', duration: '45 min', procedure: 'Hearing Aid Fine-Tuning & Verification', clinician: 'Amina Bello, Au.D.', status: 'Checked In', recall: '3-Month Follow-Up' },
+      { id: 'apt-108', date: '2026-09-08', patientId: 'fatima', patientName: 'Fatima Aliyu', mrn: 'LCC-26-00741', room: 'room1', time: '15:30', duration: '45 min', procedure: 'Post-Op Stapedectomy Audiometry', clinician: 'Dr. Chika Okafor, Au.D.', status: 'Confirmed', recall: 'None' },
+      { id: 'apt-109', date: '2026-09-08', patientId: 'babatunde', patientName: 'Babatunde Balogun', mrn: 'LCC-26-01119', room: 'room3', time: '15:00', duration: '60 min', procedure: 'Custom Earmold Impression & Real-Ear Probe', clinician: 'Amina Bello, Au.D.', status: 'Confirmed', recall: 'None' },
+
+      // Tomorrow (2026-09-09)
+      { id: 'apt-tm-1', date: '2026-09-09', patientId: 'zainab', patientName: 'Zainab Abiola', mrn: 'LCC-26-01822', room: 'room2', time: '09:00', duration: '60 min', procedure: 'Pediatric Visual Reinforcement Audiometry', clinician: 'Amina Bello, Au.D.', status: 'Confirmed', recall: '6-Month Review' },
+      { id: 'apt-tm-2', date: '2026-09-09', patientId: 'david', patientName: 'David Mensah', mrn: 'LCC-26-00892', room: 'room1', time: '10:00', duration: '60 min', procedure: 'Follow-up Pure Tone & Speech Audiometry', clinician: 'Dr. Chika Okafor, Au.D.', status: 'Confirmed', recall: 'Annual Battery' },
+      { id: 'apt-tm-3', date: '2026-09-09', patientId: 'emeka', patientName: 'Emeka Eze', mrn: 'LCC-26-01402', room: 'room3', time: '13:00', duration: '45 min', procedure: 'Device Orientation & Insertion Training', clinician: 'Dr. Chika Okafor, Au.D.', status: 'Confirmed', recall: 'None' },
+
+      // Later this month (September 2026)
+      { id: 'apt-sep-15', date: '2026-09-15', patientId: 'amaia', patientName: 'Amaia Okafor', mrn: 'LCC-26-01248', room: 'room3', time: '10:00', duration: '45 min', procedure: '1-Week Acclimatization Check', clinician: 'Dr. Chika Okafor, Au.D.', status: 'Confirmed', recall: '1-Month Follow-Up' },
+      { id: 'apt-sep-22', date: '2026-09-22', patientId: 'taiwo', patientName: 'Taiwo Adeyemi', mrn: 'LCC-26-00311', room: 'room1', time: '14:00', duration: '60 min', procedure: 'Follow-up Bone Conduction & Speech Masking', clinician: 'Dr. Chika Okafor, Au.D.', status: 'Confirmed', recall: 'None' },
+
+      // Longitudinal Recalls & Care Plans (Multi-Month and Multi-Year)
+      { id: 'apt-rec-1', date: '2026-10-15', patientId: 'khalid', patientName: 'Khalid Danjuma', mrn: 'LCC-26-01994', room: 'room3', time: '10:00', duration: '45 min', procedure: '1-Month Hearing Aid Review', clinician: 'Dr. Chika Okafor, Au.D.', status: 'Confirmed', recall: '1-Month Follow-Up' },
+      { id: 'apt-rec-2', date: '2026-12-10', patientId: 'ngozi', patientName: 'Ngozi Okonjo', mrn: 'LCC-26-02115', room: 'room3', time: '11:00', duration: '60 min', procedure: '3-Month Speech-in-Noise Verification', clinician: 'Amina Bello, Au.D.', status: 'Confirmed', recall: '3-Month Follow-Up' },
+      { id: 'apt-rec-3', date: '2027-03-05', patientId: 'zainab', patientName: 'Zainab Abiola', mrn: 'LCC-26-01822', room: 'room2', time: '09:30', duration: '60 min', procedure: '6-Month Pediatric Hearing Review', clinician: 'Amina Bello, Au.D.', status: 'Confirmed', recall: '6-Month Review' },
+      { id: 'apt-rec-4', date: '2027-09-08', patientId: 'david', patientName: 'David Mensah', mrn: 'LCC-26-00892', room: 'room1', time: '09:00', duration: '60 min', procedure: '1-Year Comprehensive Annual Audiogram', clinician: 'Dr. Chika Okafor, Au.D.', status: 'Confirmed', recall: 'Annual Battery' },
+      { id: 'apt-rec-5', date: '2027-09-15', patientId: 'amaia', patientName: 'Amaia Okafor', mrn: 'LCC-26-01248', room: 'room1', time: '11:00', duration: '90 min', procedure: 'Annual PTA & Tympanometric Health Battery', clinician: 'Dr. Chika Okafor, Au.D.', status: 'Confirmed', recall: 'Annual Battery' }
+    ];
+
     let appointments = [];
+    let currentSelectedDate = BASE_TODAY;
+    let currentActiveView = 'day'; // 'day' | 'month' | 'recall'
     let activeAptId = null;
     let draggedAptId = null;
-    let currentDateOffset = 0;
 
-    const TIME_SLOTS = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
-    const BOOTHS = [
-      { id: 'booth1', name: 'Room 1', label: 'Diagnostic' },
-      { id: 'booth2', name: 'Room 2', label: 'Pediatric & ABR' },
-      { id: 'fitting', name: 'Consult & Fitting', label: 'Fitting' }
-    ];
+    function normalizeRoom(r) {
+      if (r === 'booth1') return 'room1';
+      if (r === 'booth2') return 'room2';
+      if (r === 'fitting') return 'room3';
+      return r || 'room1';
+    }
 
     function loadAppointments() {
       try {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
-          appointments = JSON.parse(stored);
+          const parsed = JSON.parse(stored);
+          appointments = parsed.map(a => {
+            // Migrate legacy dateOffset or booth if present
+            if (!a.date && typeof a.dateOffset === 'number') {
+              a.date = getISODateFromOffset(a.dateOffset);
+            }
+            if (!a.date) a.date = BASE_TODAY;
+            a.room = normalizeRoom(a.room || a.booth);
+            a.recall = a.recall || 'None';
+            return a;
+          });
         } else {
           appointments = JSON.parse(JSON.stringify(DEFAULT_APPOINTMENTS));
           saveAppointments();
@@ -741,50 +920,138 @@
       } catch (e) {}
     }
 
-    function updateDateDisplay() {
-      const now = new Date();
-      now.setDate(now.getDate() + currentDateOffset);
-      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      const dayName = days[now.getDay()];
-      const str = `${dayName}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
-      const prefix = currentDateOffset === 0 ? 'Today — ' : (currentDateOffset === 1 ? 'Tomorrow — ' : (currentDateOffset === -1 ? 'Yesterday — ' : ''));
+    // ── Navigation & View Switching ──
+    function switchScheduleView(view) {
+      currentActiveView = view;
+      document.getElementById('btnViewDay').classList.toggle('active', view === 'day');
+      document.getElementById('btnViewMonth').classList.toggle('active', view === 'month');
+      document.getElementById('btnViewRecall').classList.toggle('active', view === 'recall');
+
+      document.getElementById('viewDayContainer').style.display = (view === 'day') ? 'block' : 'none';
+      document.getElementById('viewMonthContainer').style.display = (view === 'month') ? 'block' : 'none';
+      document.getElementById('viewRecallContainer').style.display = (view === 'recall') ? 'block' : 'none';
+
+      updateDateHeaderDisplay();
+      if (view === 'day') renderDaySchedule();
+      else if (view === 'month') renderMonthCalendar();
+      else if (view === 'recall') renderRecallRegister();
+    }
+
+    function parseISODate(str) {
+      const parts = str.split('-');
+      return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    }
+
+    function updateDateHeaderDisplay() {
+      const cur = parseISODate(currentSelectedDate);
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      
+      const datePicker = document.getElementById('datePickerJump');
+      if (datePicker) datePicker.value = currentSelectedDate;
+
       const sd = document.getElementById('currentScheduleDate');
-      if (sd) sd.textContent = prefix + str;
+      if (!sd) return;
+
+      if (currentActiveView === 'day') {
+        const isToday = (currentSelectedDate === BASE_TODAY);
+        const prefix = isToday ? 'Today — ' : '';
+        sd.textContent = prefix + `${days[cur.getDay()]}, ${cur.getDate()} ${months[cur.getMonth()]} ${cur.getFullYear()}`;
+      } else if (currentActiveView === 'month') {
+        sd.textContent = `${months[cur.getMonth()]} ${cur.getFullYear()}`;
+      } else {
+        sd.textContent = `All Years (2026 – 2027+)`;
+      }
     }
 
-    function navDate(delta) {
-      currentDateOffset += delta;
-      updateDateDisplay();
-      renderSchedule();
-      const label = currentDateOffset === 0 ? 'today’s' : (currentDateOffset === 1 ? 'tomorrow’s' : (currentDateOffset === -1 ? 'yesterday’s' : 'selected'));
-      notify('Switched to ' + label + ' schedule.');
+    function navSchedule(step) {
+      const cur = parseISODate(currentSelectedDate);
+      if (currentActiveView === 'day') {
+        cur.setDate(cur.getDate() + step);
+      } else if (currentActiveView === 'month') {
+        cur.setMonth(cur.getMonth() + step);
+      } else {
+        cur.setFullYear(cur.getFullYear() + step);
+      }
+      currentSelectedDate = formatDateISO(cur);
+      updateDateHeaderDisplay();
+      updateQuickPillState();
+      refreshActiveView();
     }
 
-    function resetToToday() {
-      currentDateOffset = 0;
-      updateDateDisplay();
-      renderSchedule();
-      notify('Viewing today’s room schedule.');
+    function jumpToSelectedDate(dateStr) {
+      if (!dateStr) return;
+      currentSelectedDate = dateStr;
+      updateDateHeaderDisplay();
+      updateQuickPillState();
+      refreshActiveView();
+      notify('Switched schedule to ' + dateStr);
     }
 
-    function renderSchedule() {
-      const bFilter = document.getElementById('boothFilter').value;
+    function setQuickDate(preset) {
+      const cur = parseISODate(BASE_TODAY);
+      if (preset === 'today') {
+        currentSelectedDate = BASE_TODAY;
+      } else if (preset === 'tomorrow') {
+        cur.setDate(cur.getDate() + 1);
+        currentSelectedDate = formatDateISO(cur);
+      } else if (preset === 'next-week') {
+        cur.setDate(cur.getDate() + 7);
+        currentSelectedDate = formatDateISO(cur);
+      } else if (preset === 'next-month') {
+        cur.setMonth(cur.getMonth() + 1);
+        currentSelectedDate = formatDateISO(cur);
+      } else if (preset === 'year-2027') {
+        currentSelectedDate = '2027-01-15';
+      }
+      updateDateHeaderDisplay();
+      updateQuickPillState(preset);
+      refreshActiveView();
+      notify('Navigated to ' + currentSelectedDate);
+    }
+
+    function updateQuickPillState(preset) {
+      document.querySelectorAll('.quick-pill').forEach(btn => {
+        if (!preset) {
+          btn.classList.remove('active');
+        } else {
+          btn.classList.toggle('active', btn.getAttribute('onclick')?.includes(preset));
+        }
+      });
+    }
+
+    function refreshActiveView() {
+      if (currentActiveView === 'day') renderDaySchedule();
+      else if (currentActiveView === 'month') renderMonthCalendar();
+      else if (currentActiveView === 'recall') renderRecallRegister();
+    }
+
+    function filterSchedule() {
+      refreshActiveView();
+    }
+
+    // ── Day Schedule Rendering ──
+    function renderDaySchedule() {
+      const rFilter = document.getElementById('roomFilter').value;
       const cFilter = document.getElementById('clinicianFilter').value;
 
-      // Filter by current schedule date offset
-      const dayApts = appointments.filter(a => ((typeof a.dateOffset === 'number') ? a.dateOffset : 0) === currentDateOffset);
+      // Filter appointments by selected date
+      const dayApts = appointments.filter(a => a.date === currentSelectedDate);
 
-      // Update KPIs for the active day
+      // Update KPI strip
       document.getElementById('kpiTotal').textContent = dayApts.length;
+      document.getElementById('kpiTotalNote').textContent = 'Appointments booked for ' + (currentSelectedDate === BASE_TODAY ? 'today' : currentSelectedDate);
       document.getElementById('kpiActive').textContent = dayApts.filter(a => a.status === 'In Room').length;
       document.getElementById('kpiWaiting').textContent = dayApts.filter(a => a.status === 'Checked In').length;
+      
+      const futureRecalls = appointments.filter(a => a.recall && a.recall !== 'None').length;
+      document.getElementById('kpiRecalls').textContent = futureRecalls;
 
       // Update Column Visibility
-      BOOTHS.forEach(b => {
-        const colHeader = document.getElementById('col-' + b.id);
+      ROOMS.forEach(r => {
+        const colHeader = document.getElementById('col-' + r.id);
         if (colHeader) {
-          colHeader.style.display = (bFilter === 'all' || bFilter === b.id) ? 'flex' : 'none';
+          colHeader.style.display = (rFilter === 'all' || rFilter === r.id) ? 'flex' : 'none';
         }
       });
 
@@ -795,13 +1062,12 @@
         html += `<div class="time-slot-row">`;
         html += `<div class="time-label-cell"><span>${time}</span><span style="font-size:10px;color:var(--text-tertiary);">${parseInt(time,10) < 12 ? 'AM' : 'PM'}</span></div>`;
 
-        BOOTHS.forEach(b => {
-          const isVisible = (bFilter === 'all' || bFilter === b.id);
+        ROOMS.forEach(r => {
+          const isVisible = (rFilter === 'all' || rFilter === r.id);
           const cellDisplay = isVisible ? '' : 'display:none;';
           
-          // Find matching appointments for this day, booth, and time
           const cellApts = dayApts.filter(a => {
-            if (a.booth !== b.id || a.time !== time) return false;
+            if (a.room !== r.id || a.time !== time) return false;
             if (cFilter === 'chika' && !a.clinician.includes('Chika')) return false;
             if (cFilter === 'amina' && !a.clinician.includes('Amina')) return false;
             return true;
@@ -809,11 +1075,11 @@
 
           html += `
             <div class="schedule-cell" style="${cellDisplay}"
-                 data-booth="${b.id}" data-time="${time}"
+                 data-room="${r.id}" data-time="${time}"
                  ondragover="handleDragOver(event)"
                  ondragleave="handleDragLeave(event)"
-                 ondrop="handleDrop(event, '${b.id}', '${time}')">
-              <button type="button" class="add-slot-btn" onclick="openBookModal('${b.id}', '${time}')" title="Book ${b.name} at ${time}">+ Add</button>
+                 ondrop="handleDrop(event, '${r.id}', '${time}')">
+              <button type="button" class="add-slot-btn" onclick="openBookModal('${r.id}', '${time}')" title="Book ${r.name} at ${time}">+ Add</button>
           `;
 
           cellApts.forEach(apt => {
@@ -824,7 +1090,7 @@
               statusBadge = '<span class="badge success" style="font-size:10px;"><span class="pulse-dot"></span> In Room</span>';
             } else if (apt.status === 'Checked In') {
               statusClass = 'status-checked-in';
-              statusBadge = '<span class="badge warning" style="font-size:10px;">Checked In</span>';
+              statusBadge = '<span class="badge warning" style="font-size:10px;">Waiting</span>';
             } else if (apt.status === 'Completed') {
               statusClass = 'status-completed';
               statusBadge = '<span class="badge neutral" style="font-size:10px;">&#10003; Done</span>';
@@ -862,11 +1128,155 @@
       });
 
       container.innerHTML = html;
-      if (window.lucide) lucide.createIcons();
     }
 
-    function filterSchedule() {
-      renderSchedule();
+    // ── Month Calendar Grid Rendering ──
+    function renderMonthCalendar() {
+      const cur = parseISODate(currentSelectedDate);
+      const year = cur.getFullYear();
+      const month = cur.getMonth();
+
+      // First day of month & days in month
+      const firstDay = new Date(year, month, 1).getDay();
+      const totalDays = new Date(year, month + 1, 0).getDate();
+      const prevTotalDays = new Date(year, month, 0).getDate();
+
+      const gridBody = document.getElementById('monthCalendarGridBody');
+      let html = '';
+
+      // Total calendar cells (usually 35 or 42)
+      const totalCells = (firstDay + totalDays > 35) ? 42 : 35;
+
+      for (let i = 0; i < totalCells; i++) {
+        let cellYear = year;
+        let cellMonth = month;
+        let cellDayNum;
+        let isOtherMonth = false;
+
+        if (i < firstDay) {
+          isOtherMonth = true;
+          cellDayNum = prevTotalDays - firstDay + 1 + i;
+          cellMonth = month - 1;
+          if (cellMonth < 0) { cellMonth = 11; cellYear--; }
+        } else if (i >= firstDay + totalDays) {
+          isOtherMonth = true;
+          cellDayNum = i - (firstDay + totalDays) + 1;
+          cellMonth = month + 1;
+          if (cellMonth > 11) { cellMonth = 0; cellYear++; }
+        } else {
+          cellDayNum = i - firstDay + 1;
+        }
+
+        const mStr = String(cellMonth + 1).padStart(2, '0');
+        const dStr = String(cellDayNum).padStart(2, '0');
+        const cellISODate = `${cellYear}-${mStr}-${dStr}`;
+        const isToday = (cellISODate === BASE_TODAY);
+
+        // Find appointments for this cell
+        const dayApts = appointments.filter(a => a.date === cellISODate);
+
+        html += `
+          <div class="month-day-cell ${isOtherMonth ? 'other-month' : ''} ${isToday ? 'is-today' : ''}" onclick="selectDateFromMonth('${cellISODate}')">
+            <div class="month-day-top">
+              <span class="month-day-num">${cellDayNum}</span>
+              ${dayApts.length ? `<span class="badge neutral" style="font-size:10px;padding:1px 5px;">${dayApts.length} apt${dayApts.length > 1 ? 's' : ''}</span>` : ''}
+            </div>
+            <div style="overflow-y:auto;max-height:80px;">
+              ${dayApts.slice(0, 3).map(a => `
+                <div class="month-apt-pill ${a.status === 'In Room' ? 'active' : (a.status === 'Checked In' ? 'waiting' : 'confirmed')}" title="${a.time} - ${a.patientName} (${a.procedure})">
+                  <strong>${a.time}</strong> ${a.patientName}
+                </div>
+              `).join('')}
+              ${dayApts.length > 3 ? `<div style="font-size:10px;color:var(--text-tertiary);font-weight:600;padding-left:4px;">+${dayApts.length - 3} more</div>` : ''}
+            </div>
+          </div>
+        `;
+      }
+
+      gridBody.innerHTML = html;
+    }
+
+    function selectDateFromMonth(isoDate) {
+      currentSelectedDate = isoDate;
+      switchScheduleView('day');
+      notify('Switched to day view: ' + isoDate);
+    }
+
+    // ── Longitudinal Recall Register Rendering ──
+    function renderRecallRegister() {
+      const container = document.getElementById('recallRegisterBody');
+      const recallApts = appointments.filter(a => a.recall && a.recall !== 'None');
+
+      // Group by categories
+      const categories = [
+        { key: '1-Month Follow-Up', title: '1-Month Device Acclimatization & Verification Reviews' },
+        { key: '3-Month Follow-Up', title: '3-Month Speech-in-Noise & Performance Follow-Ups' },
+        { key: '6-Month Review', title: '6-Month Pediatric Milestones & Post-Operative Reviews' },
+        { key: 'Annual Battery', title: '1-Year Annual Diagnostic Batteries (2026 – 2027)' },
+        { key: 'Multi-Year Plan', title: 'Multi-Year Longitudinal Care & Technology Upgrades' }
+      ];
+
+      let html = '';
+
+      categories.forEach(cat => {
+        const list = recallApts.filter(a => a.recall === cat.key);
+        html += `
+          <div class="recall-category-header">
+            <div>
+              <strong style="font-size:13.5px;color:var(--text-primary);">${cat.title}</strong>
+              <span class="badge neutral" style="margin-left:8px;font-size:10.5px;">${list.length} Patients Active</span>
+            </div>
+          </div>
+        `;
+
+        if (!list.length) {
+          html += `<p style="font-size:12px;color:var(--text-tertiary);font-style:italic;padding:0 12px 18px;">No patients currently pending in this recall tier.</p>`;
+        } else {
+          html += `
+            <table class="recall-table">
+              <thead>
+                <tr>
+                  <th>Patient Name &amp; MRN</th>
+                  <th>Target Due Date</th>
+                  <th>Consultation Room</th>
+                  <th>Clinical Procedure</th>
+                  <th>Attending Clinician</th>
+                  <th>Status</th>
+                  <th style="text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+          `;
+
+          list.forEach(a => {
+            const roomObj = ROOMS.find(r => r.id === a.room) || ROOMS[0];
+            html += `
+              <tr>
+                <td>
+                  <strong>${a.patientName}</strong>
+                  <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-tertiary);display:block;">${a.mrn}</span>
+                </td>
+                <td>
+                  <strong style="color:var(--brand);font-family:var(--font-mono);font-size:12px;">${a.date}</strong>
+                  <span style="font-size:11px;color:var(--text-tertiary);display:block;">${a.time}</span>
+                </td>
+                <td>${roomObj.name}</td>
+                <td>${a.procedure}</td>
+                <td>${a.clinician}</td>
+                <td><span class="badge ${a.status === 'In Room' ? 'success' : (a.status === 'Checked In' ? 'warning' : 'neutral')}">${a.status}</span></td>
+                <td style="text-align:right;">
+                  <button class="btn" style="font-size:11px;padding:3px 8px;margin-right:4px;" onclick="openAptDetail('${a.id}')">Details</button>
+                  <a class="btn primary" style="font-size:11px;padding:3px 8px;" href="03-start-encounter.html?patient=${a.patientId}">Start &rarr;</a>
+                </td>
+              </tr>
+            `;
+          });
+
+          html += `</tbody></table>`;
+        }
+      });
+
+      container.innerHTML = html;
     }
 
     // ── Drag and Drop Handlers ──
@@ -897,7 +1307,7 @@
       e.currentTarget.classList.remove('drag-over');
     }
 
-    function handleDrop(e, targetBooth, targetTime) {
+    function handleDrop(e, targetRoom, targetTime) {
       e.preventDefault();
       e.currentTarget.classList.remove('drag-over');
       const aptId = e.dataTransfer.getData('text/plain') || draggedAptId;
@@ -906,39 +1316,71 @@
       const apt = appointments.find(a => a.id === aptId);
       if (!apt) return;
 
-      const oldBoothName = BOOTHS.find(b => b.id === apt.booth)?.name || apt.booth;
-      const newBoothName = BOOTHS.find(b => b.id === targetBooth)?.name || targetBooth;
-
-      apt.booth = targetBooth;
+      apt.room = targetRoom;
       apt.time = targetTime;
       saveAppointments();
-      renderSchedule();
+      renderDaySchedule();
 
-      notify(`Rescheduled ${apt.patientName} to ${newBoothName} at ${targetTime}.`);
+      const rObj = ROOMS.find(r => r.id === targetRoom);
+      notify(`Rescheduled ${apt.patientName} to ${rObj ? rObj.name : targetRoom} at ${targetTime}.`);
     }
 
     // ── Booking Modal Logic ──
-    function openBookModal(prefillBooth, prefillTime) {
-      prefillBooth = prefillBooth || 'booth1';
+    function openBookModal(prefillRoom, prefillTime) {
+      prefillRoom = normalizeRoom(prefillRoom || 'room1');
       prefillTime = prefillTime || '09:00';
+
       const patientSelect = document.getElementById('bookPatientSelect');
       const fallbackPatients = [
         { id: 'amaia', name: 'Amaia Okafor', age: 46, gender: 'Female', mrn: 'LCC-26-01248' },
         { id: 'david', name: 'David Mensah', age: 58, gender: 'Male', mrn: 'LCC-26-00892' },
         { id: 'emeka', name: 'Emeka Eze', age: 34, gender: 'Male', mrn: 'LCC-26-01402' },
-        { id: 'zainab', name: 'Zainab Abiola', age: 7, gender: 'Female', mrn: 'LCC-26-01822' }
+        { id: 'zainab', name: 'Zainab Abiola', age: 7, gender: 'Female', mrn: 'LCC-26-01822' },
+        { id: 'taiwo', name: 'Taiwo Adeyemi', age: 29, gender: 'Male', mrn: 'LCC-26-00311' },
+        { id: 'khalid', name: 'Khalid Danjuma', age: 62, gender: 'Male', mrn: 'LCC-26-01994' },
+        { id: 'ngozi', name: 'Ngozi Okonjo', age: 51, gender: 'Female', mrn: 'LCC-26-02115' },
+        { id: 'fatima', name: 'Fatima Aliyu', age: 41, gender: 'Female', mrn: 'LCC-26-00741' },
+        { id: 'babatunde', name: 'Babatunde Balogun', age: 55, gender: 'Male', mrn: 'LCC-26-01119' }
       ];
-      const patients = (window.HearIntelDB && window.HearIntelDB.getAllPatients().length) ? window.HearIntelDB.getAllPatients() : fallbackPatients;
+
+      const patients = (window.HearIntelDB && window.HearIntelDB.getAllPatients().length) 
+        ? window.HearIntelDB.getAllPatients() 
+        : fallbackPatients;
       
       patientSelect.innerHTML = patients.map(p => `
         <option value="${p.id}" data-name="${p.name}" data-mrn="${p.mrn}">
-          ${p.name} (${p.age}y, ${p.gender} &middot; ${p.mrn})
+          ${p.name} (${p.age || '—'}y, ${p.gender || '—'} &middot; ${p.mrn || 'MRN'})
         </option>
       `).join('');
 
-      document.getElementById('bookBoothSelect').value = prefillBooth;
+      document.getElementById('bookRoomSelect').value = prefillRoom;
       document.getElementById('bookTimeSelect').value = prefillTime;
+      document.getElementById('bookDateInput').value = currentSelectedDate;
+
       openModal('bookAppointmentModal');
+    }
+
+    function openBookModalForRecall() {
+      openBookModal('room1', '10:00');
+      document.getElementById('bookRecallSelect').value = 'Annual Battery';
+      setBookDatePreset(365); // 1-year out by default
+    }
+
+    function setBookDatePreset(daysAhead) {
+      const cur = parseISODate(BASE_TODAY);
+      cur.setDate(cur.getDate() + daysAhead);
+      const iso = formatDateISO(cur);
+      document.getElementById('bookDateInput').value = iso;
+    }
+
+    function openNewPatientFromBooking() {
+      closeModal('bookAppointmentModal');
+      if (typeof openNewPatientModal === 'function') {
+        openNewPatientModal();
+        notify('Register the patient first. Upon registration, you can book their appointment.');
+      } else {
+        window.location.href = '01-registry.html';
+      }
     }
 
     function handleBookSubmit(e) {
@@ -953,32 +1395,40 @@
       const patientName = selectedOpt.getAttribute('data-name') || selectedOpt.textContent.split(' (')[0].trim();
       const mrn = selectedOpt.getAttribute('data-mrn') || 'LCC-26-09999';
 
-      const booth = document.getElementById('bookBoothSelect').value;
+      const apptDate = document.getElementById('bookDateInput').value || currentSelectedDate;
+      const room = document.getElementById('bookRoomSelect').value;
       const time = document.getElementById('bookTimeSelect').value;
       const duration = document.getElementById('bookDurationSelect').value;
       const clinician = document.getElementById('bookClinicianSelect').value;
       const procedure = document.getElementById('bookProcedureInput').value;
       const status = document.getElementById('bookStatusSelect').value;
+      const recall = document.getElementById('bookRecallSelect').value;
 
       const newApt = {
         id: 'apt-' + Date.now(),
-        dateOffset: currentDateOffset,
+        date: apptDate,
         patientId,
         patientName,
         mrn,
-        booth,
+        room,
         time,
         duration,
         procedure,
         clinician,
-        status
+        status,
+        recall
       };
 
       appointments.push(newApt);
       saveAppointments();
       closeModal('bookAppointmentModal');
-      renderSchedule();
-      notify(`Appointment booked for ${patientName} at ${time}.`);
+      
+      // If booked for the currently selected date or switch to that date
+      currentSelectedDate = apptDate;
+      updateDateHeaderDisplay();
+      refreshActiveView();
+      
+      notify(`Appointment scheduled for ${patientName} on ${apptDate} at ${time}.`);
       document.getElementById('bookForm').reset();
     }
 
@@ -988,9 +1438,12 @@
       const apt = appointments.find(a => a.id === aptId);
       if (!apt) return;
 
+      const roomObj = ROOMS.find(r => r.id === apt.room) || ROOMS[0];
+
       document.getElementById('detailPatientName').textContent = apt.patientName;
       document.getElementById('detailProcedure').textContent = apt.procedure;
-      document.getElementById('detailBooth').textContent = BOOTHS.find(b => b.id === apt.booth)?.name || apt.booth;
+      document.getElementById('detailDate').textContent = apt.date;
+      document.getElementById('detailRoom').textContent = roomObj.name;
       document.getElementById('detailTime').textContent = `${apt.time} (${apt.duration})`;
       document.getElementById('detailClinician').textContent = apt.clinician;
 
@@ -1011,7 +1464,7 @@
 
       apt.status = newStatus;
       saveAppointments();
-      renderSchedule();
+      refreshActiveView();
       closeModal('aptDetailModal');
       notify(`Updated ${apt.patientName}'s status to "${newStatus}".`);
     }
@@ -1023,15 +1476,15 @@
 
       appointments = appointments.filter(a => a.id !== activeAptId);
       saveAppointments();
-      renderSchedule();
+      refreshActiveView();
       closeModal('aptDetailModal');
       notify(`Removed appointment for ${apt.patientName}.`);
     }
 
     document.addEventListener('DOMContentLoaded', function() {
       loadAppointments();
-      updateDateDisplay();
-      renderSchedule();
+      updateDateHeaderDisplay();
+      renderDaySchedule();
     });
   </script>
 </body>

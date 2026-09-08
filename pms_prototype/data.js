@@ -9,7 +9,7 @@ const HearIntelDB = (function() {
     currentClinician: {
       name: 'Dr. Chika Okafor, Au.D.',
       facility: 'Lagos Central Hearing Clinic',
-      room: 'Booth 1 (Sound Suite)',
+      room: 'Consultation Room 1',
       license: 'MLSCN-AUD-2024-0891'
     },
     patients: {
@@ -46,7 +46,7 @@ const HearIntelDB = (function() {
         alerts: [
           'High-frequency discrimination drop in left ear (WRS 76%)',
           'Oticon Real 1 miniRITE 3-week REM verification due',
-          'Wheelchair user — requires extra transfer time into sound booth'
+          'Wheelchair user — requires level-access consultation suite'
         ],
         clinicalNote: 'Patient presents with a 3-year history of bilateral progressive hearing difficulty, most prominent in background noise. Baseline evaluation conducted Feb 2026 demonstrated mild sloping loss; May 2026 follow-up revealed progressive high-frequency threshold decline and asymmetric word recognition breakdown in left ear. Bilateral Oticon Real 1 miniRITE devices fitted on 20 May 2026 with NAL-NL2 verification.',
         diagnosesHistory: [

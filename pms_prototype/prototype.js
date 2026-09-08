@@ -938,7 +938,7 @@ function patientShell(active) {
         + '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>'
         + '<span class="nav-label">Dashboard</span>'
         + '</a>' : '',
-        canAccessPmsArea('appointments') ? '<a class="nav-item ' + (active === 'appointments' ? 'active' : '') + '" href="01-appointments.html" title="Appointments & Sound Booth Schedule">'
+        canAccessPmsArea('appointments') ? '<a class="nav-item ' + (active === 'appointments' ? 'active' : '') + '" href="01-appointments.html" title="Appointments & Clinic Schedule">'
         + '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg></span>'
         + '<span class="nav-label">Appointments</span>'
         + '</a>' : '',
@@ -1377,7 +1377,7 @@ function workspaceShell(active, content) {
         + '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>'
         + '<span class="nav-label">Dashboard</span>'
         + '</a>' : '',
-        canAccessPmsArea('appointments') ? '<a class="nav-item" href="01-appointments.html" title="Appointments & Room Schedule">'
+        canAccessPmsArea('appointments') ? '<a class="nav-item" href="01-appointments.html" title="Appointments & Clinic Schedule">'
         + '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg></span>'
         + '<span class="nav-label">Appointments</span>'
         + '</a>' : '',
@@ -1433,7 +1433,7 @@ function workspaceShell(active, content) {
           '</a>',
           '<div>',
             '<div class="encounter-title">Active Clinical Diagnostic Assessment</div>',
-            '<div class="encounter-patient">' + patient.name + ' &middot; ' + patient.mrn + ' &middot; Booth 1 Sound Suite</div>',
+            '<div class="encounter-patient">' + patient.name + ' &middot; ' + patient.mrn + ' &middot; Consultation Room 1</div>',
           '</div>',
         '</div>',
         '<div class="encounter-actions">',
@@ -2148,7 +2148,7 @@ function renderReportContent() {
       <div class="report-section" id="sec-bat-standards">
         <div class="report-section-title"><span>1. Testing Suite &amp; Calibration Standards</span></div>
         <div class="report-box" style="font-size:11.5px;line-height:1.6;">
-          <div>Facility: <strong>${clinic} &middot; Booth 1 Sound Suite</strong></div>
+          <div>Facility: <strong>${clinic} &middot; Consultation Room 1</strong></div>
           <div>Standards: <strong>ANSI S3.6-2018 / ISO 8253-1:2010 Calibrated</strong></div>
         </div>
       </div>
