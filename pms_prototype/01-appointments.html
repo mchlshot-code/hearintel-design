@@ -292,7 +292,7 @@
 
             <button class="btn primary" onclick="openBookModal()" style="display:inline-flex;align-items:center;gap:6px;font-weight:600;">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-              + Book Appointment
+              Book Appointment
             </button>
           </div>
         </div>
@@ -390,7 +390,7 @@
   </div>
 
   <!-- Booking Modal -->
-  <div class="modal-backdrop" id="bookAppointmentModal">
+  <div class="modal-backdrop" id="bookAppointmentModal" onclick="if(event.target===this)closeModal('bookAppointmentModal')">
     <div class="modal-dialog" style="max-width:540px;">
       <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border-light);">
         <div>
@@ -467,7 +467,7 @@
   </div>
 
   <!-- Appointment Details & Action Modal -->
-  <div class="modal-backdrop" id="aptDetailModal">
+  <div class="modal-backdrop" id="aptDetailModal" onclick="if(event.target===this)closeModal('aptDetailModal')">
     <div class="modal-dialog" style="max-width:500px;">
       <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border-light);">
         <div style="display:flex;align-items:center;gap:8px;">
@@ -526,6 +526,7 @@
     const DEFAULT_APPOINTMENTS = [
       {
         id: 'apt-101',
+        dateOffset: 0,
         patientId: 'amaia',
         patientName: 'Amaia Okafor',
         mrn: 'LCC-26-01248',
@@ -538,6 +539,7 @@
       },
       {
         id: 'apt-102',
+        dateOffset: 0,
         patientId: 'david',
         patientName: 'David Mensah',
         mrn: 'LCC-26-00892',
@@ -550,6 +552,7 @@
       },
       {
         id: 'apt-103',
+        dateOffset: 0,
         patientId: 'emeka',
         patientName: 'Emeka Eze',
         mrn: 'LCC-26-01402',
@@ -562,7 +565,8 @@
       },
       {
         id: 'apt-104',
-        patientId: 'amaia',
+        dateOffset: 0,
+        patientId: 'zainab',
         patientName: 'Zainab Abiola',
         mrn: 'LCC-26-01822',
         booth: 'booth2',
@@ -574,63 +578,133 @@
       },
       {
         id: 'apt-105',
-        patientId: 'david',
-        patientName: 'Kemi Adeleke',
-        mrn: 'LCC-26-01934',
+        dateOffset: 0,
+        patientId: 'taiwo',
+        patientName: 'Taiwo Adeyemi',
+        mrn: 'LCC-26-00311',
         booth: 'booth2',
-        time: '11:00',
+        time: '11:30',
         duration: '90 min',
-        procedure: 'Tone-Burst ABR Diagnostic Thresholds',
-        clinician: 'Dr. Chika Okafor, Au.D.',
+        procedure: 'Diagnostic ABR Threshold Estimation',
+        clinician: 'Amina Bello, Au.D.',
         status: 'Confirmed'
       },
       {
         id: 'apt-106',
-        patientId: 'emeka',
-        patientName: 'Tunde Balogun',
-        mrn: 'LCC-26-02011',
-        booth: 'booth2',
-        time: '14:00',
-        duration: '45 min',
-        procedure: 'School Screening Referral Confirmation',
-        clinician: 'Amina Bello, Au.D.',
-        status: 'Confirmed'
-      },
-      {
-        id: 'apt-107',
-        patientId: 'amaia',
-        patientName: 'Babatunde Adeleke',
-        mrn: 'LCC-26-00451',
+        dateOffset: 0,
+        patientId: 'khalid',
+        patientName: 'Khalid Danjuma',
+        mrn: 'LCC-26-01994',
         booth: 'fitting',
         time: '10:00',
         duration: '60 min',
-        procedure: 'Oticon Real 1 Fitting & Speech Mapping',
+        procedure: 'Bilateral Hearing Aid Fitting & REM',
         clinician: 'Dr. Chika Okafor, Au.D.',
-        status: 'Completed'
+        status: 'In Room'
       },
       {
-        id: 'apt-108',
-        patientId: 'david',
-        patientName: 'Funke Akindele',
-        mrn: 'LCC-26-01129',
+        id: 'apt-107',
+        dateOffset: 0,
+        patientId: 'ngozi',
+        patientName: 'Ngozi Okonjo',
+        mrn: 'LCC-26-02115',
         booth: 'fitting',
         time: '13:00',
-        duration: '60 min',
-        procedure: 'Tinnitus Retraining & Sound Masking Fitting',
+        duration: '45 min',
+        procedure: 'Hearing Aid Fine-Tuning & Verification',
         clinician: 'Amina Bello, Au.D.',
         status: 'Checked In'
       },
       {
+        id: 'apt-108',
+        dateOffset: 0,
+        patientId: 'fatima',
+        patientName: 'Fatima Aliyu',
+        mrn: 'LCC-26-00741',
+        booth: 'booth1',
+        time: '15:30',
+        duration: '45 min',
+        procedure: 'Post-Op Stapedectomy Audiometry',
+        clinician: 'Dr. Chika Okafor, Au.D.',
+        status: 'Confirmed'
+      },
+      {
         id: 'apt-109',
-        patientId: 'emeka',
-        patientName: 'Chioma Adeleke',
-        mrn: 'LCC-26-01588',
+        dateOffset: 0,
+        patientId: 'babatunde',
+        patientName: 'Babatunde Balogun',
+        mrn: 'LCC-26-01119',
         booth: 'fitting',
         time: '15:00',
-        duration: '45 min',
-        procedure: 'Bilateral Silicone Ear Impression Casting',
+        duration: '60 min',
+        procedure: 'Custom Earmold Impression & Real-Ear Probe',
         clinician: 'Amina Bello, Au.D.',
         status: 'Confirmed'
+      },
+      {
+        id: 'apt-tomorrow-1',
+        dateOffset: 1,
+        patientId: 'zainab',
+        patientName: 'Zainab Abiola',
+        mrn: 'LCC-26-01822',
+        booth: 'booth2',
+        time: '09:00',
+        duration: '60 min',
+        procedure: 'Pediatric Visual Reinforcement Audiometry',
+        clinician: 'Amina Bello, Au.D.',
+        status: 'Confirmed'
+      },
+      {
+        id: 'apt-tomorrow-2',
+        dateOffset: 1,
+        patientId: 'david',
+        patientName: 'David Mensah',
+        mrn: 'LCC-26-00892',
+        booth: 'booth1',
+        time: '10:00',
+        duration: '60 min',
+        procedure: 'Follow-up Pure Tone & Speech Audiometry',
+        clinician: 'Dr. Chika Okafor, Au.D.',
+        status: 'Confirmed'
+      },
+      {
+        id: 'apt-tomorrow-3',
+        dateOffset: 1,
+        patientId: 'emeka',
+        patientName: 'Emeka Eze',
+        mrn: 'LCC-26-01402',
+        booth: 'fitting',
+        time: '13:00',
+        duration: '45 min',
+        procedure: 'Device Orientation & Insertion Training',
+        clinician: 'Dr. Chika Okafor, Au.D.',
+        status: 'Confirmed'
+      },
+      {
+        id: 'apt-yesterday-1',
+        dateOffset: -1,
+        patientId: 'amaia',
+        patientName: 'Amaia Okafor',
+        mrn: 'LCC-26-01248',
+        booth: 'booth1',
+        time: '09:00',
+        duration: '60 min',
+        procedure: 'Preliminary Triage & Baseline Screening',
+        clinician: 'Dr. Chika Okafor, Au.D.',
+        status: 'Completed'
+      },
+      {
+        id: 'apt-yesterday-2',
+        dateOffset: -1,
+        patientId: 'khalid',
+        patientName: 'Khalid Danjuma',
+        mrn: 'LCC-26-01994',
+        booth: 'fitting',
+        time: '11:00',
+        duration: '60 min',
+        procedure: 'Initial Hearing Aid Demonstration',
+        clinician: 'Amina Bello, Au.D.',
+        status: 'Completed'
       }
     ];
 
@@ -670,33 +744,41 @@
     function updateDateDisplay() {
       const now = new Date();
       now.setDate(now.getDate() + currentDateOffset);
+      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      const str = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
-      var _sd=document.getElementById('currentScheduleDate');if(_sd)_sd.textContent=(currentDateOffset===0?'Today — ':'')+str;
+      const dayName = days[now.getDay()];
+      const str = `${dayName}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+      const prefix = currentDateOffset === 0 ? 'Today — ' : (currentDateOffset === 1 ? 'Tomorrow — ' : (currentDateOffset === -1 ? 'Yesterday — ' : ''));
+      const sd = document.getElementById('currentScheduleDate');
+      if (sd) sd.textContent = prefix + str;
     }
 
     function navDate(delta) {
       currentDateOffset += delta;
       updateDateDisplay();
       renderSchedule();
-      notify('Switched schedule date.');
+      const label = currentDateOffset === 0 ? 'today’s' : (currentDateOffset === 1 ? 'tomorrow’s' : (currentDateOffset === -1 ? 'yesterday’s' : 'selected'));
+      notify('Switched to ' + label + ' schedule.');
     }
 
     function resetToToday() {
       currentDateOffset = 0;
       updateDateDisplay();
       renderSchedule();
-      notify('Viewing today’s booth schedule.');
+      notify('Viewing today’s room schedule.');
     }
 
     function renderSchedule() {
       const bFilter = document.getElementById('boothFilter').value;
       const cFilter = document.getElementById('clinicianFilter').value;
 
-      // Update KPIs
-      document.getElementById('kpiTotal').textContent = appointments.length;
-      document.getElementById('kpiActive').textContent = appointments.filter(a => a.status === 'In Room').length;
-      document.getElementById('kpiWaiting').textContent = appointments.filter(a => a.status === 'Checked In').length;
+      // Filter by current schedule date offset
+      const dayApts = appointments.filter(a => ((typeof a.dateOffset === 'number') ? a.dateOffset : 0) === currentDateOffset);
+
+      // Update KPIs for the active day
+      document.getElementById('kpiTotal').textContent = dayApts.length;
+      document.getElementById('kpiActive').textContent = dayApts.filter(a => a.status === 'In Room').length;
+      document.getElementById('kpiWaiting').textContent = dayApts.filter(a => a.status === 'Checked In').length;
 
       // Update Column Visibility
       BOOTHS.forEach(b => {
@@ -717,8 +799,8 @@
           const isVisible = (bFilter === 'all' || bFilter === b.id);
           const cellDisplay = isVisible ? '' : 'display:none;';
           
-          // Find matching appointments
-          const cellApts = appointments.filter(a => {
+          // Find matching appointments for this day, booth, and time
+          const cellApts = dayApts.filter(a => {
             if (a.booth !== b.id || a.time !== time) return false;
             if (cFilter === 'chika' && !a.clinician.includes('Chika')) return false;
             if (cFilter === 'amina' && !a.clinician.includes('Amina')) return false;
@@ -739,7 +821,7 @@
             let statusBadge = '<span class="badge neutral" style="font-size:10px;">Confirmed</span>';
             if (apt.status === 'In Room') {
               statusClass = 'status-active';
-              statusBadge = '<span class="badge success" style="font-size:10px;"><span class="pulse-dot"></span> In Suite</span>';
+              statusBadge = '<span class="badge success" style="font-size:10px;"><span class="pulse-dot"></span> In Room</span>';
             } else if (apt.status === 'Checked In') {
               statusClass = 'status-checked-in';
               statusBadge = '<span class="badge warning" style="font-size:10px;">Checked In</span>';
@@ -836,9 +918,17 @@
     }
 
     // ── Booking Modal Logic ──
-    function openBookModal(prefillBooth = 'booth1', prefillTime = '09:00') {
+    function openBookModal(prefillBooth, prefillTime) {
+      prefillBooth = prefillBooth || 'booth1';
+      prefillTime = prefillTime || '09:00';
       const patientSelect = document.getElementById('bookPatientSelect');
-      const patients = window.HearIntelDB ? window.HearIntelDB.getAllPatients() : [];
+      const fallbackPatients = [
+        { id: 'amaia', name: 'Amaia Okafor', age: 46, gender: 'Female', mrn: 'LCC-26-01248' },
+        { id: 'david', name: 'David Mensah', age: 58, gender: 'Male', mrn: 'LCC-26-00892' },
+        { id: 'emeka', name: 'Emeka Eze', age: 34, gender: 'Male', mrn: 'LCC-26-01402' },
+        { id: 'zainab', name: 'Zainab Abiola', age: 7, gender: 'Female', mrn: 'LCC-26-01822' }
+      ];
+      const patients = (window.HearIntelDB && window.HearIntelDB.getAllPatients().length) ? window.HearIntelDB.getAllPatients() : fallbackPatients;
       
       patientSelect.innerHTML = patients.map(p => `
         <option value="${p.id}" data-name="${p.name}" data-mrn="${p.mrn}">
@@ -855,9 +945,13 @@
       e.preventDefault();
       const patientSelect = document.getElementById('bookPatientSelect');
       const selectedOpt = patientSelect.options[patientSelect.selectedIndex];
+      if (!selectedOpt) {
+        notify('Please select a patient.');
+        return;
+      }
       const patientId = selectedOpt.value;
-      const patientName = selectedOpt.getAttribute('data-name');
-      const mrn = selectedOpt.getAttribute('data-mrn');
+      const patientName = selectedOpt.getAttribute('data-name') || selectedOpt.textContent.split(' (')[0].trim();
+      const mrn = selectedOpt.getAttribute('data-mrn') || 'LCC-26-09999';
 
       const booth = document.getElementById('bookBoothSelect').value;
       const time = document.getElementById('bookTimeSelect').value;
@@ -868,6 +962,7 @@
 
       const newApt = {
         id: 'apt-' + Date.now(),
+        dateOffset: currentDateOffset,
         patientId,
         patientName,
         mrn,
@@ -883,7 +978,7 @@
       saveAppointments();
       closeModal('bookAppointmentModal');
       renderSchedule();
-      notify(`Appointment scheduled for ${patientName} in ${BOOTHS.find(b => b.id === booth)?.name} at ${time}.`);
+      notify(`Appointment booked for ${patientName} at ${time}.`);
       document.getElementById('bookForm').reset();
     }
 

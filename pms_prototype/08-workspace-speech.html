@@ -347,9 +347,12 @@
       </div>
 
       <!-- Step Navigation Footer -->
-      <div class="footer-nav">
-        <a class="btn" id="prevStepBtn" href="07-workspace-immittance.html?patient=amaia">← Previous: Immittance</a>
-        <button type="button" class="btn primary" id="btnSaveModule" onclick="saveActiveModule()">Save</button>
+      <div class="footer-nav" style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding-top:16px;border-top:1px solid var(--border-light);">
+        <a class="btn" id="btnPrevStep" href="07-workspace-immittance.html?patient=amaia">← Previous: Immittance</a>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button type="button" class="btn" id="btnSaveModule" onclick="saveActiveModule()">Save</button>
+          <a class="btn primary" id="btnNextStep" href="12-workspace-electrophysiology.html?patient=amaia">Next: E-Physiology →</a>
+        </div>
       </div>
 
     </div>
@@ -551,7 +554,9 @@
 
     // ── Init ──
     document.addEventListener('DOMContentLoaded', function() {
-      const pid = getActivePatientId();
+            const pid = getActivePatientId();
+      var _bp = document.getElementById('btnPrevStep'); if (_bp) _bp.href = '07-workspace-immittance.html?patient=' + pid;
+      var _bn = document.getElementById('btnNextStep'); if (_bn) _bn.href = '12-workspace-electrophysiology.html?patient=' + pid;
       document.getElementById('prevStepBtn').href = '07-workspace-immittance.html?patient=' + pid;
       // (Next button removed — navigation handled by Hub & tab rail)
 

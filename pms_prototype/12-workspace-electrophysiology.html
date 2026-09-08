@@ -359,9 +359,12 @@
       </div>
 
       <!-- Step Navigation Footer -->
-      <div class="footer-nav" style="display:flex;justify-content:space-between;align-items:center;padding-top:16px;border-top:1px solid var(--border-light);">
-        <a class="btn" id="btnPrev" href="08-workspace-speech.html?patient=amaia">← Previous: Speech & Tinnitus</a>
-        <button type="button" class="btn primary" id="btnSaveModule" onclick="saveActiveModule()">Save</button>
+      <div class="footer-nav" style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding-top:16px;border-top:1px solid var(--border-light);">
+        <a class="btn" id="btnPrevStep" href="08-workspace-speech.html?patient=amaia">← Previous: Speech & Tinnitus</a>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button type="button" class="btn" id="btnSaveModule" onclick="saveActiveModule()">Save</button>
+          <a class="btn primary" id="btnNextStep" href="09-conclusion.html?patient=amaia">Next: Management & Conclusion →</a>
+        </div>
       </div>
 
     </div>
@@ -387,7 +390,9 @@
       const file = event.target.files && event.target.files[0];
       if (!file) return;
 
-      const pid = getActivePatientId();
+            const pid = getActivePatientId();
+      var _bp = document.getElementById('btnPrevStep'); if (_bp) _bp.href = '08-workspace-speech.html?patient=' + pid;
+      var _bn = document.getElementById('btnNextStep'); if (_bn) _bn.href = '09-conclusion.html?patient=' + pid;
       const sizeStr = (file.size / 1024).toFixed(0) + ' KB';
 
       if (window.HearIntelDB && window.HearIntelDB.saveSlotMedia) {
@@ -448,7 +453,9 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-      const pid = getActivePatientId();
+            const pid = getActivePatientId();
+      var _bp = document.getElementById('btnPrevStep'); if (_bp) _bp.href = '08-workspace-speech.html?patient=' + pid;
+      var _bn = document.getElementById('btnNextStep'); if (_bn) _bn.href = '09-conclusion.html?patient=' + pid;
       document.getElementById('btnPrev').href = '08-workspace-speech.html?patient=' + pid;
       // (Next button removed — navigation handled by Hub & tab rail)
     

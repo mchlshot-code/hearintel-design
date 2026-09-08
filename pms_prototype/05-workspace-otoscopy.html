@@ -190,9 +190,12 @@
       </div>
 
       <!-- Footer Nav -->
-      <div class="footer-nav">
-        <a class="btn" id="btnHistory" href="04-workspace-history.html?patient=amaia">← Case History</a>
-        <button type="button" class="btn primary" id="btnSaveModule" onclick="saveActiveModule()">Save</button>
+      <div class="footer-nav" style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding-top:16px;border-top:1px solid var(--border-light);">
+        <a class="btn" id="btnPrevStep" href="04-workspace-history.html?patient=amaia">← Case History</a>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button type="button" class="btn" id="btnSaveModule" onclick="saveActiveModule()">Save</button>
+          <a class="btn primary" id="btnNextStep" href="06-workspace-pta.html?patient=amaia">Next: Pure Tone (PTA) →</a>
+        </div>
       </div>
 
     </div>
@@ -239,7 +242,9 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-      const pid = getActivePatientId();
+            const pid = getActivePatientId();
+      var _bp = document.getElementById('btnPrevStep'); if (_bp) _bp.href = '04-workspace-history.html?patient=' + pid;
+      var _bn = document.getElementById('btnNextStep'); if (_bn) _bn.href = '06-workspace-pta.html?patient=' + pid;
       document.getElementById('btnHistory').href = '04-workspace-history.html?patient=' + pid;
       const today = (typeof getCurrentClinicalDate === 'function') ? getCurrentClinicalDate() : '';
       const adBadge = document.getElementById('adMetaBadge');

@@ -53,9 +53,9 @@ var PMS_AUTH_PRESETS = {
       'dashboard.view',
       'patients.register',
       'patients.demographics',
+      'appointments.view',
       'appointments.manage',
-      'queue.manage',
-      'settings.view'
+      'queue.manage'
     ]
   },
   audiologist: {
@@ -74,8 +74,7 @@ var PMS_AUTH_PRESETS = {
       'patients.view',
       'clinical.view',
       'clinical.write',
-      'rehab.manage',
-      'settings.view'
+      'rehab.manage'
     ]
   },
   lead: PMS_AUTH_DEFAULT_CONTEXT,
@@ -95,11 +94,12 @@ var PMS_AUTH_PRESETS = {
       'patients.view',
       'patients.register',
       'patients.demographics',
+      'appointments.view',
       'finance.manage',
-      'settings.view',
       'settings.manage',
       'staff.manage',
       'branches.manage',
+      'governance.view',
       'governance.manage'
     ]
   },
@@ -117,10 +117,11 @@ var PMS_AUTH_PRESETS = {
     permissions: [
       'dashboard.view',
       'patients.view',
-      'settings.view',
+      'appointments.view',
       'settings.manage',
       'staff.manage',
       'branches.manage',
+      'governance.view',
       'governance.manage',
       'platform.manage'
     ]
@@ -129,8 +130,8 @@ var PMS_AUTH_PRESETS = {
 
 var PMS_ROUTE_PERMISSIONS = {
   dashboard: ['dashboard.view'],
-  appointments: ['appointments.view', 'dashboard.view'],
-  schedule: ['appointments.view', 'dashboard.view'],
+  appointments: ['appointments.view', 'appointments.manage', 'schedule.view', 'schedule.manage'],
+  schedule: ['appointments.view', 'appointments.manage', 'schedule.view', 'schedule.manage'],
   patients: ['patients.view', 'patients.register', 'patients.demographics'],
   registry: ['patients.view', 'patients.register', 'patients.demographics'],
   profile: ['patients.view', 'patients.demographics'],
@@ -142,9 +143,9 @@ var PMS_ROUTE_PERMISSIONS = {
   speech: ['clinical.view', 'clinical.write'],
   electrophysiology: ['clinical.view', 'clinical.write'],
   conclusion: ['clinical.view', 'clinical.write', 'clinical.review'],
-  screening: ['clinical.write', 'patients.register'],
-  media: ['clinical.view'],
-  settings: ['settings.view', 'settings.manage', 'staff.manage']
+  screening: ['clinical.write', 'clinical.view'],
+  media: ['clinical.view', 'clinical.write'],
+  settings: ['settings.manage', 'staff.manage', 'branches.manage']
 };
 
 function getStoredAuthContext() {
@@ -858,6 +859,31 @@ document.addEventListener('keydown', function(e) {
 });
 
 // ── Master Shell Generator ──
+function renderRoleSwitcherHtml(authContext) {
+  var r = authContext.role || '';
+  var isLead = r === 'lead_audiologist' || r === 'lead';
+  var isRec  = r === 'receptionist' || r === 'front_desk';
+  var isAud  = r === 'audiologist';
+  var isAdmin = r === 'organization_admin' || r === 'org_admin';
+  var isSuper = r === 'super_admin';
+
+  return '<div class="auth-context-card">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">'
+    +   '<span class="auth-context-label" style="margin:0;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;">Active Role</span>'
+    +   '<select onchange="setPmsAuthPreset(this.value)" style="font-size:10px;font-weight:600;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:var(--surface);color:var(--brand-hover);cursor:pointer;" title="Switch simulated demo role">'
+    +     '<option value="lead"' + (isLead ? ' selected' : '') + '>Lead Audiologist (All Access)</option>'
+    +     '<option value="receptionist"' + (isRec ? ' selected' : '') + '>Front Desk (Receptionist)</option>'
+    +     '<option value="audiologist"' + (isAud ? ' selected' : '') + '>Audiologist (Clinical Only)</option>'
+    +     '<option value="admin"' + (isAdmin ? ' selected' : '') + '>Organization Admin</option>'
+    +     '<option value="super_admin"' + (isSuper ? ' selected' : '') + '>Super Admin</option>'
+    +   '</select>'
+    + '</div>'
+    + '<div class="auth-context-name" style="font-weight:600;font-size:12.5px;">' + authContext.identityName + '</div>'
+    + '<div class="auth-context-role" style="font-size:11px;color:var(--text-secondary);">' + authContext.roleLabel + '</div>'
+    + '<div class="auth-context-scope" style="font-size:10.5px;color:var(--text-tertiary);margin-top:2px;">' + authContext.scopeLabel + ' &middot; ' + authContext.branchName + '</div>'
+    + '</div>';
+}
+
 function patientShell(active) {
   const patientId = getActivePatientId();
   const patient = (window.HearIntelDB && window.HearIntelDB.getPatient(patientId)) || { name: 'Amaia O.', mrn: 'LCC-26-01248', age: 46, gender: 'Female' };
@@ -870,15 +896,16 @@ function patientShell(active) {
   const showPatientSub = isRegistry || isProfile || isAssessment || active === 'media';
   const assessHref = '03-assessment-hub.html?patient=' + patientId;
 
-  const patientSub = showPatientSub
+  const canClinical = hasPmsPermission('clinical.view') || hasPmsPermission('clinical.write');
+  const patientSub = (showPatientSub && canAccessPmsArea('patients'))
     ? '<div class="nav-sub">'
     +   '<a class="nav-sub-item ' + (isRegistry  ? 'active' : '') + '" href="01-registry.html">Registry</a>'
     +   '<a class="nav-sub-item ' + (isProfile   ? 'active' : '') + '" href="02-profile.html?patient=' + patientId + '">Patient Record</a>'
-    +   '<a class="nav-sub-item ' + (isAssessment ? 'active' : '') + '" href="' + assessHref + '">Assessment</a>'
+    +   (canClinical ? '<a class="nav-sub-item ' + (isAssessment ? 'active' : '') + '" href="' + assessHref + '">Assessment</a>' : '')
     + '</div>'
     : '';
 
-  const assessBlock = (patientId && patientId !== '')
+  const assessBlock = (patientId && patientId !== '' && canClinical)
     ? '<div class="sidebar-assessment-block">'
     +   '<div class="sidebar-assessment-label">Current Patient</div>'
     +   '<div class="sidebar-assessment-patient">' + patient.name + '</div>'
@@ -892,9 +919,7 @@ function patientShell(active) {
         '<div style="margin-bottom:12px;"><div style="display:inline-flex;align-items:center;padding:2px 4px;"><div style="color:#FFFFFF;font-size:22px;font-weight:800;letter-spacing:-0.03em;font-family:var(--font-heading);">Clinical<span style="color:var(--brand);"> PMS</span></div></div></div>',
         '<div class="brand-sub">Practice Management</div>',
       '</div>',
-      '<div class="auth-context-card">',
-        '<div class="auth-context-label">Signed in as</div>',
-        '<div class="auth-context-name">' + authContext.identityName + '</div>',
+      renderRoleSwitcherHtml(authContext),
         '<div class="auth-context-role">' + authContext.roleLabel + '</div>',
         '<div class="auth-context-scope">' + authContext.scopeLabel + ' &middot; ' + authContext.branchName + '</div>',
       '</div>',
@@ -1333,60 +1358,56 @@ function workspaceShell(active, content) {
     ['09-conclusion.html?patient=' + patientId,         'Management',       '7', active === 'conclusion', 'conclusion'],
   ];
 
+  const canClinical = hasPmsPermission('clinical.view') || hasPmsPermission('clinical.write');
   const sidebarHtml = [
     '<aside class="sidebar">',
       '<div class="brand">',
         '<div style="margin-bottom:12px;"><div style="display:inline-flex;align-items:center;padding:2px 4px;"><div style="color:#FFFFFF;font-size:22px;font-weight:800;letter-spacing:-0.03em;font-family:var(--font-heading);">Clinical<span style="color:var(--brand);"> PMS</span></div></div></div>',
         '<div class="brand-sub">Assessment</div>',
       '</div>',
-      '<div class="auth-context-card">',
-        '<div class="auth-context-label">Signed in as</div>',
-        '<div class="auth-context-name">' + authContext.identityName + '</div>',
-        '<div class="auth-context-role">' + authContext.roleLabel + '</div>',
-        '<div class="auth-context-scope">' + authContext.scopeLabel + ' &middot; ' + authContext.branchName + '</div>',
-      '</div>',
+      renderRoleSwitcherHtml(authContext),
       '<nav class="nav-group">',
         '<div class="nav-section">Clinical Ops</div>',
-        '<a class="nav-item" href="00-dashboard.html" title="Dashboard">',
-          '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>',
-          '<span class="nav-label">Dashboard</span>',
-        '</a>',
-        '<a class="nav-item" href="01-appointments.html" title="Appointments & Sound Booth Schedule">',
-          '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg></span>',
-          '<span class="nav-label">Appointments</span>',
-        '</a>',
-        '<a class="nav-item active" href="01-registry.html" title="Patients">',
-          '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>',
-          '<span class="nav-label">Patients</span>',
-        '</a>',
-        '<div class="nav-sub">',
-          '<a class="nav-sub-item" href="01-registry.html">Directory</a>',
-          '<a class="nav-sub-item" href="02-profile.html?patient=' + patientId + '">Patient Record</a>',
-          '<a class="nav-sub-item active" href="' + assessHref + '">Assessment</a>',
-        '</div>',
-        '<a class="nav-item ' + (active === 'screening' ? 'active' : '') + '" href="13-workspace-screening.html?patient=' + patientId + '" title="Screening">',
-          '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg></span>',
-          '<span class="nav-label">Screening</span>',
-        '</a>',
-        '<a class="nav-item" href="10-media.html?patient=' + patientId + '" title="Clinical Media">',
-          '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/></svg></span>',
-          '<span class="nav-label">Clinical Media</span>',
-        '</a>',
-        '<a class="nav-item" href="11-settings.html" title="Settings">',
-          '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83-2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>',
-          '<span class="nav-label">Settings</span>',
-        '</a>',
+        canAccessPmsArea('dashboard') ? '<a class="nav-item" href="00-dashboard.html" title="Dashboard">'
+        + '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>'
+        + '<span class="nav-label">Dashboard</span>'
+        + '</a>' : '',
+        canAccessPmsArea('appointments') ? '<a class="nav-item" href="01-appointments.html" title="Appointments & Room Schedule">'
+        + '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg></span>'
+        + '<span class="nav-label">Appointments</span>'
+        + '</a>' : '',
+        canAccessPmsArea('patients') ? '<a class="nav-item active" href="01-registry.html" title="Patients">'
+        + '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>'
+        + '<span class="nav-label">Patients</span>'
+        + '</a>' : '',
+        canAccessPmsArea('patients') ? ('<div class="nav-sub">'
+          + '<a class="nav-sub-item" href="01-registry.html">Registry</a>'
+          + '<a class="nav-sub-item" href="02-profile.html?patient=' + patientId + '">Patient Record</a>'
+          + (canClinical ? '<a class="nav-sub-item active" href="' + assessHref + '">Assessment</a>' : '')
+          + '</div>') : '',
+        canAccessPmsArea('screening') ? '<a class="nav-item ' + (active === 'screening' ? 'active' : '') + '" href="13-workspace-screening.html?patient=' + patientId + '" title="Screening">'
+        + '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg></span>'
+        + '<span class="nav-label">Screening</span>'
+        + '</a>' : '',
+        canAccessPmsArea('media') ? '<a class="nav-item" href="10-media.html?patient=' + patientId + '" title="Clinical Media">'
+        + '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/></svg></span>'
+        + '<span class="nav-label">Clinical Media</span>'
+        + '</a>' : '',
+        canAccessPmsArea('settings') ? '<a class="nav-item" href="11-settings.html" title="Settings">'
+        + '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83-2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>'
+        + '<span class="nav-label">Settings</span>'
+        + '</a>' : '',
         canAccessGovernance() ? '<a class="nav-item" href="../authorization_prototype/index.html" title="Admin Governance">'
         + '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 4v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V7l7-4z"/><path d="M9 12l2 2 4-4"/></svg></span>'
         + '<span class="nav-label">Governance</span>'
         + '</a>' : '',
       '</nav>',
-      '<div class="sidebar-divider"></div>',
-      '<div class="sidebar-assessment-block">',
-        '<div class="sidebar-assessment-label">Current Patient</div>',
-        '<div class="sidebar-assessment-patient">' + patient.name + '</div>',
-        '<a class="sidebar-assessment-link" href="02-profile.html?patient=' + patientId + '">&#8592; Back to Record</a>',
-      '</div>',
+      canClinical ? ('<div class="sidebar-divider"></div>'
+        + '<div class="sidebar-assessment-block">'
+        +   '<div class="sidebar-assessment-label">Current Patient</div>'
+        +   '<div class="sidebar-assessment-patient">' + patient.name + '</div>'
+        +   '<a class="sidebar-assessment-link" href="02-profile.html?patient=' + patientId + '">&#8592; Back to Record</a>'
+        + '</div>') : '',
       '<div class="sidebar-divider"></div>',
       '<div class="sidebar-footer" onclick="openPatientLookupModal()" title="Search or switch patient">',
         '<div class="sidebar-footer-row">',
