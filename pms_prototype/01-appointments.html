@@ -642,20 +642,17 @@
           <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:flex;align-items:center;gap:6px;">
             Room:
             <select id="roomFilter" onchange="filterSchedule()" style="padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:var(--radius-xs);background:var(--surface);">
-              <option value="all" selected>All Rooms (3)</option>
-              <option value="room1">Consultation Room 1 (Diagnostic)</option>
-              <option value="room2">Consultation Room 2 (Pediatric &amp; Specialized)</option>
-              <option value="room3">Consultation Room 3 (Hearing Aid &amp; Counseling)</option>
+              <!-- populated by populateRoomDropdowns() -->
             </select>
           </label>
+          <button id="addRoomHeaderBtn" onclick="showAddRoomInline()" title="Add a new consultation room" style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;font-size:12px;font-weight:600;border:1px dashed var(--brand);border-radius:var(--radius-xs);background:transparent;color:var(--brand);cursor:pointer;">+ Add Room</button>
           <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:flex;align-items:center;gap:6px;">
             Clinician:
             <select id="clinicianFilter" onchange="filterSchedule()" style="padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:var(--radius-xs);background:var(--surface);">
-              <option value="all" selected>All Clinicians</option>
-              <option value="chika">Dr. Chika Okafor, Au.D. (Lead)</option>
-              <option value="amina">Amina Bello, Au.D.</option>
+              <!-- populated by populateCliniciansDropdowns() -->
             </select>
           </label>
+
         </div>
       </div>
 
@@ -674,27 +671,8 @@
             <div class="room-col-header" style="background:var(--bg-subtle);justify-content:center;text-align:center;">
               <span style="font-size:11.5px;font-weight:700;color:var(--text-secondary);">TIME</span>
             </div>
-            <div class="room-col-header" id="col-room1">
-              <div class="room-title">
-                <span>Consultation Room 1</span>
-                <span class="badge neutral" style="font-size:10px;">Diagnostic</span>
-              </div>
-              <div class="room-subtitle">Comprehensive Diagnostic Audiometry Suite</div>
-            </div>
-            <div class="room-col-header" id="col-room2">
-              <div class="room-title">
-                <span>Consultation Room 2</span>
-                <span class="badge neutral" style="font-size:10px;">Pediatric &amp; Specialized</span>
-              </div>
-              <div class="room-subtitle">Pediatric VRA, Play Audiometry &amp; E-Phys</div>
-            </div>
-            <div class="room-col-header" id="col-room3">
-              <div class="room-title">
-                <span>Consultation Room 3</span>
-                <span class="badge neutral" style="font-size:10px;">Fitting &amp; Counseling</span>
-              </div>
-              <div class="room-subtitle">Hearing Device Verification &amp; Real-Ear Measurement</div>
-            </div>
+            <div id="dynamicRoomHeaders" style="display:contents;"><!-- rendered by renderRoomHeaders() --></div>
+
           </div>
 
           <div id="scheduleGridBody">
@@ -782,9 +760,7 @@
           <div class="field">
             <label for="bookRoomSelect" style="display:block;margin-bottom:4px;font-weight:600;font-size:12px;">Consultation Room *</label>
             <select id="bookRoomSelect" required style="font-size:13px;padding:8px 10px;width:100%;border:1px solid var(--border);border-radius:var(--radius-xs);background:var(--surface);">
-              <option value="room1">Consultation Room 1 (Diagnostic)</option>
-              <option value="room2">Consultation Room 2 (Pediatric &amp; Specialized)</option>
-              <option value="room3">Consultation Room 3 (Hearing Aid &amp; Counseling)</option>
+              <!-- populated by populateRoomDropdowns() -->
             </select>
           </div>
 
@@ -820,8 +796,7 @@
           <div class="field">
             <label for="bookClinicianSelect" style="display:block;margin-bottom:4px;font-weight:600;font-size:12px;">Clinician *</label>
             <select id="bookClinicianSelect" required style="font-size:13px;padding:8px 10px;width:100%;border:1px solid var(--border);border-radius:var(--radius-xs);background:var(--surface);">
-              <option value="Dr. Chika Okafor, Au.D.">Dr. Chika Okafor, Au.D. (Lead)</option>
-              <option value="Amina Bello, Au.D.">Amina Bello, Au.D.</option>
+              <!-- populated by populateCliniciansDropdowns() -->
             </select>
           </div>
 
@@ -926,11 +901,41 @@
     const STORAGE_KEY = 'hearintel_appointments_schedule_v3';
     const TIME_SLOTS = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
     
-    const ROOMS = [
-      { id: 'room1', legacyId: 'booth1', name: 'Consultation Room 1', shortName: 'Room 1', label: 'Diagnostic Audiometry', subtitle: 'Comprehensive Diagnostic Audiometry Suite' },
-      { id: 'room2', legacyId: 'booth2', name: 'Consultation Room 2', shortName: 'Room 2', label: 'Pediatric & Specialized', subtitle: 'Pediatric VRA, Play Audiometry & E-Phys' },
-      { id: 'room3', legacyId: 'fitting', name: 'Consultation Room 3', shortName: 'Room 3', label: 'Fitting & Counseling', subtitle: 'Hearing Device Verification & Real-Ear Measurement' }
+    const ROOMS_STORAGE_KEY = 'hearintel_rooms_config_v1';
+    const DEFAULT_ROOMS = [
+      { id: 'room1', name: 'Consultation Room 1', label: 'Diagnostic Audiometry', subtitle: 'Comprehensive Diagnostic Audiometry Suite' },
+      { id: 'room2', name: 'Consultation Room 2', label: 'Pediatric & Specialized', subtitle: 'Pediatric VRA, Play Audiometry & E-Phys' },
+      { id: 'room3', name: 'Consultation Room 3', label: 'Fitting & Counseling', subtitle: 'Hearing Device Verification & Real-Ear Measurement' }
     ];
+
+    function loadRooms() {
+      try {
+        const saved = localStorage.getItem(ROOMS_STORAGE_KEY);
+        return saved ? JSON.parse(saved) : DEFAULT_ROOMS;
+      } catch(e) { return DEFAULT_ROOMS; }
+    }
+    function saveRooms(arr) { localStorage.setItem(ROOMS_STORAGE_KEY, JSON.stringify(arr)); }
+
+    let ROOMS = loadRooms();
+
+    // Clinicians are derived dynamically from appointments (no manual management needed)
+    function getClinicianList() {
+      const seen = new Set();
+      const list = [];
+      appointments.forEach(a => {
+        if (a.clinician && !seen.has(a.clinician)) {
+          seen.add(a.clinician);
+          const slug = a.clinician.toLowerCase().replace(/[^a-z]/g,'').substring(0,12);
+          list.push({ id: slug, name: a.clinician });
+        }
+      });
+      // Add defaults if list is empty
+      if (!list.length) {
+        list.push({ id: 'chika', name: 'Dr. Chika Okafor, Au.D.' });
+        list.push({ id: 'amina', name: 'Amina Bello, Au.D.' });
+      }
+      return list;
+    }
 
     // Reference today is 2026-09-08
     const BASE_TODAY = '2026-09-08';
@@ -1200,7 +1205,8 @@
       let html = '';
 
       TIME_SLOTS.forEach(time => {
-        html += `<div class="time-slot-row">`;
+        const colTpl = `85px repeat(${ROOMS.length}, minmax(280px, 1fr))`;
+        html += `<div class="time-slot-row" style="grid-template-columns:${colTpl};">`;
         html += `<div class="time-label-cell"><span>${time}</span><span style="font-size:10px;color:var(--text-tertiary);">${parseInt(time,10) < 12 ? 'AM' : 'PM'}</span></div>`;
 
         ROOMS.forEach(r => {
@@ -1211,8 +1217,10 @@
             if (a.room !== r.id) return false;
             const aptHour = (a.time || '').split(':')[0] + ':00';
             if (a.time !== time && aptHour !== time) return false;
-            if (cFilter === 'chika' && !a.clinician.includes('Chika')) return false;
-            if (cFilter === 'amina' && !a.clinician.includes('Amina')) return false;
+            if (cFilter !== 'all') {
+              const cObj = getClinicianList().find(c => c.id === cFilter);
+              if (cObj && !a.clinician.includes(cObj.name.split(',')[0].split(' ').slice(-1)[0])) return false;
+            }
             if (currentStatFilter === 'active' && a.status !== 'In Room') return false;
             if (currentStatFilter === 'waiting' && a.status !== 'Checked In') return false;
             return true;
@@ -1626,11 +1634,165 @@
       notify(`Removed appointment for ${apt.patientName}.`);
     }
 
+    // ── Dynamic Room & Clinician UI Functions ──────────────────────────────
+
+    function renderRoomHeaders() {
+      const container = document.getElementById('dynamicRoomHeaders');
+      if (!container) return;
+      container.innerHTML = ROOMS.map(r => `
+        <div class="room-col-header" id="col-${r.id}">
+          <div class="room-title">
+            <span>${r.name}</span>
+            <span class="badge neutral" style="font-size:10px;">${r.label}</span>
+          </div>
+          <div class="room-subtitle">${r.subtitle || ''}</div>
+        </div>
+      `).join('');
+
+      // Update grid-template-columns on the header and all slot rows dynamically
+      const colTemplate = `85px repeat(${ROOMS.length}, minmax(280px, 1fr))`;
+      const header = document.querySelector('.room-grid-header');
+      if (header) header.style.gridTemplateColumns = colTemplate;
+      document.querySelectorAll('.time-slot-row').forEach(row => {
+        row.style.gridTemplateColumns = colTemplate;
+      });
+
+      // Reset the + Add Room button
+      const addBtn = document.getElementById('addRoomHeaderBtn');
+      if (addBtn) {
+        addBtn.textContent = '+ Add Room';
+        addBtn.disabled = false;
+        addBtn.onclick = showAddRoomInline;
+      }
+    }
+
+    function removeRoom(roomId) {
+      if (ROOMS.length <= 1) { notify('At least one room is required.'); return; }
+      const r = ROOMS.find(x => x.id === roomId);
+      ROOMS = ROOMS.filter(x => x.id !== roomId);
+      saveRooms(ROOMS);
+      refreshDropdownsAndHeaders();
+      renderDaySchedule();
+      if (r) notify(`Removed: ${r.name}`);
+    }
+
+    function populateRoomDropdowns() {
+      const filterSel = document.getElementById('roomFilter');
+      const bookSel   = document.getElementById('bookRoomSelect');
+      const filterVal = filterSel ? filterSel.value : 'all';
+      const bookVal   = bookSel   ? bookSel.value   : (ROOMS[0] ? ROOMS[0].id : '');
+
+      const allOpt = `<option value="all">All Rooms (${ROOMS.length})</option>`;
+      const roomOpts = ROOMS.map(r => `<option value="${r.id}">${r.name} (${r.label})</option>`).join('');
+
+      if (filterSel) {
+        filterSel.innerHTML = allOpt + roomOpts;
+        filterSel.value = ROOMS.find(r => r.id === filterVal) ? filterVal : 'all';
+      }
+      if (bookSel) {
+        bookSel.innerHTML = roomOpts;
+        bookSel.value = ROOMS.find(r => r.id === bookVal) ? bookVal : (ROOMS[0] ? ROOMS[0].id : '');
+      }
+    }
+
+    function populateCliniciansDropdowns() {
+      const CLINICIANS = getClinicianList();
+      const filterSel = document.getElementById('clinicianFilter');
+      const bookSel   = document.getElementById('bookClinicianSelect');
+      const filterVal = filterSel ? filterSel.value : 'all';
+
+      const allOpt    = `<option value="all">All Clinicians</option>`;
+      const filterOpts = CLINICIANS.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+      const bookOpts   = CLINICIANS.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+
+      if (filterSel) {
+        filterSel.innerHTML = allOpt + filterOpts;
+        filterSel.value = CLINICIANS.find(c => c.id === filterVal) ? filterVal : 'all';
+      }
+      if (bookSel) {
+        bookSel.innerHTML = bookOpts;
+      }
+    }
+
+    function refreshDropdownsAndHeaders() {
+      renderRoomHeaders();
+      populateRoomDropdowns();
+      populateCliniciansDropdowns();
+    }
+
+    // ── Add Room Inline Logic ────────────────────────────────────────────────
+
+    function showAddRoomInline() {
+      const btn = document.getElementById('addRoomHeaderBtn');
+      if (!btn) return;
+      // Remove existing popover if any
+      const existing = document.getElementById('addRoomPopover');
+      if (existing) { existing.remove(); return; }
+
+      const idx = ROOMS.length + 1;
+      const popover = document.createElement('div');
+      popover.id = 'addRoomPopover';
+      popover.style.cssText = 'position:absolute;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:0 6px 20px rgba(0,0,0,0.15);padding:14px;display:flex;flex-direction:column;gap:8px;min-width:280px;';
+      popover.innerHTML = `
+        <p style="font-size:12px;font-weight:700;color:var(--text-primary);margin:0;">Add Consultation Room</p>
+        <input id="newRoomNameInput" type="text" value="Consultation Room ${idx}"
+          style="font-size:13px;padding:7px 10px;border:1px solid var(--brand);border-radius:var(--radius-xs);background:var(--surface);color:var(--text-primary);width:100%;box-sizing:border-box;"
+          placeholder="Room name">
+        <input id="newRoomLabelInput" type="text" value="General"
+          style="font-size:13px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-xs);background:var(--surface);color:var(--text-primary);width:100%;box-sizing:border-box;"
+          placeholder="Specialty label (e.g. Diagnostic Audiometry)">
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button onclick="cancelAddRoom()" style="font-size:12px;padding:5px 12px;border:1px solid var(--border);border-radius:var(--radius-xs);background:var(--surface);cursor:pointer;color:var(--text-secondary);">Cancel</button>
+          <button onclick="saveNewRoom()" style="font-size:12px;padding:5px 14px;border:none;border-radius:var(--radius-xs);background:var(--brand);color:#fff;cursor:pointer;font-weight:700;">Add Room</button>
+        </div>
+      `;
+
+      // Position below the button
+      const rect = btn.getBoundingClientRect();
+      popover.style.top = (rect.bottom + window.scrollY + 6) + 'px';
+      popover.style.left = (rect.left + window.scrollX) + 'px';
+      document.body.appendChild(popover);
+
+      document.getElementById('newRoomNameInput').focus();
+      document.getElementById('newRoomNameInput').select();
+
+      // Close on outside click
+      setTimeout(() => {
+        document.addEventListener('click', function outsideClick(e) {
+          if (!popover.contains(e.target) && e.target !== btn) {
+            popover.remove();
+            document.removeEventListener('click', outsideClick);
+          }
+        });
+      }, 100);
+    }
+
+    function cancelAddRoom() {
+      const p = document.getElementById('addRoomPopover');
+      if (p) p.remove();
+    }
+
+    function saveNewRoom() {
+      const name  = (document.getElementById('newRoomNameInput')?.value || '').trim();
+      const label = (document.getElementById('newRoomLabelInput')?.value || '').trim();
+      if (!name) { alert('Please enter a room name.'); return; }
+      const newRoom = { id: 'room' + Date.now(), name, label: label || 'General', subtitle: '' };
+      ROOMS.push(newRoom);
+      saveRooms(ROOMS);
+      const p = document.getElementById('addRoomPopover');
+      if (p) p.remove();
+      refreshDropdownsAndHeaders();
+      renderDaySchedule();
+      notify(`Added: ${name}`);
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       loadAppointments();
+      refreshDropdownsAndHeaders();
       updateDateHeaderDisplay();
       renderDaySchedule();
     });
   </script>
+
 </body>
 </html>
