@@ -633,6 +633,7 @@
             <button class="quick-pill" onclick="setQuickDate('next-week')">Next Week</button>
             <button class="quick-pill" onclick="setQuickDate('next-month')">Next Month</button>
             <button class="quick-pill" onclick="setQuickDate('year-2027')">2027</button>
+            <button class="quick-pill" onclick="resetToDefaultSchedule()" title="Reset schedule to default mock data" style="color:var(--brand);font-weight:700;">&#8634; Reset Data</button>
           </div>
         </div>
 
@@ -922,7 +923,7 @@
   <script src="prototype.js"></script>
   <script>
     // Configuration & State
-    const STORAGE_KEY = 'hearintel_appointments_schedule';
+    const STORAGE_KEY = 'hearintel_appointments_schedule_v3';
     const TIME_SLOTS = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
     
     const ROOMS = [
@@ -993,25 +994,45 @@
     function loadAppointments() {
       try {
         const stored = localStorage.getItem(STORAGE_KEY);
+        let loaded = null;
         if (stored) {
           const parsed = JSON.parse(stored);
-          appointments = parsed.map(a => {
-            // Migrate legacy dateOffset or booth if present
-            if (!a.date && typeof a.dateOffset === 'number') {
-              a.date = getISODateFromOffset(a.dateOffset);
-            }
-            if (!a.date) a.date = BASE_TODAY;
-            a.room = normalizeRoom(a.room || a.booth);
-            a.recall = a.recall || 'None';
-            return a;
-          });
-        } else {
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            loaded = parsed.map(a => {
+              if (!a.date && typeof a.dateOffset === 'number') {
+                a.date = getISODateFromOffset(a.dateOffset);
+              }
+              if (!a.date) a.date = BASE_TODAY;
+              a.room = normalizeRoom(a.room || a.booth);
+              a.recall = a.recall || 'None';
+              return a;
+            });
+          }
+        }
+        // If nothing loaded or no appointments on today, seed with full DEFAULT_APPOINTMENTS
+        if (!loaded || loaded.length === 0 || !loaded.some(a => a.date === BASE_TODAY)) {
           appointments = JSON.parse(JSON.stringify(DEFAULT_APPOINTMENTS));
           saveAppointments();
+        } else {
+          appointments = loaded;
         }
       } catch (e) {
         appointments = JSON.parse(JSON.stringify(DEFAULT_APPOINTMENTS));
+        saveAppointments();
       }
+    }
+
+    function resetToDefaultSchedule() {
+      appointments = JSON.parse(JSON.stringify(DEFAULT_APPOINTMENTS));
+      currentStatFilter = 'all';
+      currentSelectedDate = BASE_TODAY;
+      saveAppointments();
+      updateDateHeaderDisplay();
+      document.getElementById('cardStatTotal')?.classList.add('active');
+      document.getElementById('cardStatActive')?.classList.remove('active');
+      document.getElementById('cardStatWaiting')?.classList.remove('active');
+      refreshActiveView();
+      notify('Schedule restored with default appointments.');
     }
 
     function saveAppointments() {
@@ -1126,6 +1147,26 @@
       else if (currentActiveView === 'recall') renderRecallRegister();
     }
 
+    let currentStatFilter = 'all';
+
+    function filterByStatCard(filterType) {
+      if (currentStatFilter === filterType) {
+        currentStatFilter = 'all';
+      } else {
+        currentStatFilter = filterType;
+      }
+      document.getElementById('cardStatTotal')?.classList.toggle('active', currentStatFilter === 'all');
+      document.getElementById('cardStatActive')?.classList.toggle('active', currentStatFilter === 'active');
+      document.getElementById('cardStatWaiting')?.classList.toggle('active', currentStatFilter === 'waiting');
+      if (currentActiveView !== 'day') {
+        switchScheduleView('day');
+      } else {
+        renderDaySchedule();
+      }
+      const label = currentStatFilter === 'all' ? 'all appointments' : (currentStatFilter === 'active' ? 'in-consultation appointments' : 'waiting room appointments');
+      notify('Filtered view to ' + label + '.');
+    }
+
     function filterSchedule() {
       refreshActiveView();
     }
@@ -1167,7 +1208,9 @@
           const cellDisplay = isVisible ? '' : 'display:none;';
           
           const cellApts = dayApts.filter(a => {
-            if (a.room !== r.id || a.time !== time) return false;
+            if (a.room !== r.id) return false;
+            const aptHour = (a.time || '').split(':')[0] + ':00';
+            if (a.time !== time && aptHour !== time) return false;
             if (cFilter === 'chika' && !a.clinician.includes('Chika')) return false;
             if (cFilter === 'amina' && !a.clinician.includes('Amina')) return false;
             if (currentStatFilter === 'active' && a.status !== 'In Room') return false;
