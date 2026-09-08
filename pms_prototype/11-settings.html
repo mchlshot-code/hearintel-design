@@ -79,7 +79,7 @@
             <button type="button" class="settings-nav-btn" onclick="switchSettingsSection(this, 'account')">Account & Security</button>
             <button type="button" class="settings-nav-btn" onclick="switchSettingsSection(this, 'clinical')">Clinical Preferences</button>
             <button type="button" class="settings-nav-btn" onclick="switchSettingsSection(this, 'notifications')">Notifications</button>
-            <button type="button" class="settings-nav-btn" onclick="switchSettingsSection(this, 'workspace')">Institution & Team</button>
+            <button type="button" class="settings-nav-btn" id="settingsTeamNav" onclick="switchSettingsSection(this, 'workspace')">Institution & Team</button>
             <button type="button" class="settings-nav-btn" onclick="switchSettingsSection(this, 'privacy')">Privacy & Data</button>
             <button type="button" class="settings-nav-btn" onclick="switchSettingsSection(this, 'appearance')">Appearance</button>
           </nav>
@@ -226,7 +226,10 @@
                   <h2 class="panel-title">Institution & Team Workspace</h2>
                   <p class="panel-subtitle">Organization profile and team roster. Role and scope changes are handled in Admin Governance.</p>
                 </div>
-                <span class="badge neutral">Governance controlled</span>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span class="badge neutral">Governance controlled</span>
+                  <a class="btn" href="../authorization_prototype/index.html" style="font-size:11.5px;padding:4px 10px;">Manage in Governance &#8594;</a>
+                </div>
               </div>
 
               <div class="form-grid" style="margin-bottom:20px;">
@@ -335,6 +338,39 @@
   <script src="data.js"></script>
   <script src="prototype.js"></script>
   <script>
+    function isSoloPracticeContext() {
+      try {
+        if (typeof getPmsAuthContext !== 'function') return false;
+        const ctx = getPmsAuthContext();
+        return ctx.organizationType === 'Solo Practice' || ctx.role === 'solo_practitioner' || ctx.role === 'solo';
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function applySettingsContext() {
+      const solo = isSoloPracticeContext();
+      const ctx = typeof getPmsAuthContext === 'function' ? getPmsAuthContext() : {};
+      const navBtn = document.getElementById('settingsTeamNav');
+      const pane = document.getElementById('pane-workspace');
+      if (navBtn) navBtn.style.display = solo ? 'none' : '';
+      if (pane) pane.style.display = solo ? 'none' : '';
+      if (solo && pane && pane.classList.contains('active')) {
+        const profileBtn = document.querySelector('.settings-nav-btn[onclick*="profile"]');
+        if (profileBtn) switchSettingsSection(profileBtn, 'profile');
+      }
+      if (ctx.identityName) {
+        const nameInput = document.getElementById('setProfName');
+        if (nameInput) nameInput.value = ctx.identityName;
+      }
+      if (ctx.roleLabel) {
+        const titleInput = document.getElementById('setProfTitle');
+        if (titleInput) titleInput.value = ctx.roleLabel + (solo ? ' & Practice Owner' : '');
+      }
+      const facilityInput = document.querySelector('#pane-workspace input');
+      if (facilityInput && ctx.organizationName) facilityInput.value = ctx.organizationName;
+    }
+
     function switchSettingsSection(button, sectionId) {
       document.querySelectorAll('.settings-nav-btn').forEach(b => b.classList.remove('active'));
       button.classList.add('active');
@@ -357,6 +393,7 @@
   </script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      applySettingsContext();
       if (window.lucide) lucide.createIcons();
     });
   </script>

@@ -200,7 +200,7 @@
             <div class="toolbar">
               <input id="userSearch" placeholder="Filter users..." oninput="renderUsers()">
               <select id="roleFilter" onchange="renderUsers()"><option value="">All roles</option></select>
-              <button class="btn primary" onclick="openUserDrawer()">Invite User</button>
+              <button id="inviteUserBtn" class="btn primary" onclick="openUserDrawer()">Invite User</button>
             </div>
           </div>
           <div class="table-scroll"><table class="admin-table" id="usersTable"></table></div>
@@ -372,6 +372,53 @@
       'governance.manage': 'Manage governance',
       'platform.manage': 'Manage platform'
     };
+    
+    const SCOPE_EXPLANATIONS = {
+      organization: '🏢 <strong>Organization-wide:</strong> Access and manage all patient files, clinical records, and schedules across every branch and unit in this organization.',
+      branch: '📍 <strong>Branch only:</strong> Access is strictly restricted to patient records and appointment queues at this practitioner\'s assigned branch facility.',
+      assigned_patients: '👤 <strong>Assigned patients only:</strong> Clinician can strictly view and edit patients directly assigned to their individual care caseload.',
+      multi_branch: '👥 <strong>Multiple branches:</strong> Multi-site roaming access across the specific selected branch facilities checked below.',
+      platform: '🌐 <strong>Platform governance:</strong> Full system oversight across all registered clinics, hospitals, and universities.'
+    };
+
+    const PERMISSION_GROUPS = [
+      {
+        title: 'Clinical Diagnostics & Patient Encounters',
+        badge: 'Clinical',
+        perms: [
+          { id: 'clinical.view', label: 'View Clinical Records & Encounters', desc: 'Inspect medical history, past audiograms, tympanograms, and visit notes' },
+          { id: 'clinical.write', label: 'Perform Tests & Author Assessments', desc: 'Record otoscopy findings, pure tone audiometry, immittance, and speech results' },
+          { id: 'clinical.review', label: 'Review & Modify Assessment Drafts', desc: 'Supervise encounters and adjust diagnostic impressions authored by colleagues' },
+          { id: 'reports.sign', label: 'Sign & Finalize Clinical Reports', desc: 'Affix official digital practitioner signature to generate patient-facing reports' },
+          { id: 'rehab.manage', label: 'Prescribe & Fit Hearing Devices', desc: 'Manage hearing aid fittings, verification curves, and rehabilitation care plans' }
+        ]
+      },
+      {
+        title: 'Patient Administration & Clinic Flow',
+        badge: 'Administrative',
+        perms: [
+          { id: 'patients.view', label: 'View Patient Registry', desc: 'Search patient database and view demographic summary files' },
+          { id: 'patients.register', label: 'Register New Patients', desc: 'Enroll new patient charts and auto-generate institutional MRNs' },
+          { id: 'patients.demographics', label: 'Modify Patient Demographics', desc: 'Update contact details, insurance, address, and next of kin records' },
+          { id: 'appointments.manage', label: 'Manage Clinic Schedule', desc: 'Book consultations, reschedule visits, and handle appointment slots' },
+          { id: 'queue.manage', label: 'Manage Patient Queue', desc: 'Check in arriving patients, prioritize urgency, and direct to consultation rooms' }
+        ]
+      },
+      {
+        title: 'Practice Governance & Operations',
+        badge: 'Governance',
+        perms: [
+          { id: 'dashboard.view', label: 'Operational Analytics Dashboard', desc: 'View facility appointment statistics, patient volume, and clinical trends' },
+          { id: 'settings.view', label: 'Inspect Facility Configuration', desc: 'View practice profile, clinical preference templates, and room rosters' },
+          { id: 'settings.manage', label: 'Manage Practice Settings', desc: 'Configure consultation suites, report header branding, and clinical defaults' },
+          { id: 'staff.manage', label: 'Manage Team & Staff Roles', desc: 'Invite clinic practitioners and modify team roster access permissions' },
+          { id: 'branches.manage', label: 'Manage Clinic Branch Locations', desc: 'Add new clinical branch suites, testing booths, and outreach centers' },
+          { id: 'finance.manage', label: 'Manage Billing & Invoicing', desc: 'Generate clinical invoices, record diagnostic payments, and review collections' },
+          { id: 'governance.manage', label: 'Manage Access Governance', desc: 'Full authority to assign, customize, or revoke user roles and permissions' }
+        ]
+      }
+    ];
+
     const DEFAULT_STATE = {
       selectedOrgId: 'org-lagos',
       selectedOrgType: '',
@@ -551,7 +598,7 @@
       document.getElementById('orgCards').innerHTML = state.organizations.map(org => (
         '<button class="org-card ' + (org.id === selected.id ? 'selected' : '') + '" onclick="selectOrg(\'' + org.id + '\')">' +
           '<div>' + badge(org.status) + '</div><h3>' + org.name + '</h3><p>' + org.type + ' - ' + org.subscription + ' subscription</p>' +
-          '<div class="scope-chip-list"><span class="scope-chip">' + org.branches.length + ' branch' + (org.branches.length === 1 ? '' : 'es') + '</span><span class="scope-chip">Owner: ' + org.owner + '</span></div>' +
+          '<div class="scope-chip-list"><span class="scope-chip">' + org.branches.length + ' branch' + (org.branches.length === 1 ? '' : 'es') + '</span><span class="scope-chip">Owner: ' + org.owner + '</span>' + (org.type === 'Solo Practice' ? '<span class="scope-chip">Single practitioner</span>' : '') + '</div>' +
         '</button>'
       )).join('');
       document.getElementById('branchPanelSubtitle').textContent = selected.name + ' branch scope controls.';
@@ -587,6 +634,9 @@
       const selected = orgMeta(state.selectedOrgId) || governanceOrgs()[0];
       document.getElementById('usersPanelTitle').textContent = selected.name + ' Team & Roles';
       document.getElementById('usersPanelSubtitle').textContent = selected.type + ' organization scope. Assign role, branch reach, and patient-level access inside this organization.';
+      // Hide Invite User button for Solo Practice (single-user subscription)
+      const inviteBtn = document.getElementById('inviteUserBtn');
+      if (inviteBtn) inviteBtn.style.display = selected.type === 'Solo Practice' ? 'none' : '';
       const users = state.users.filter(u => u.orgId === selected.id && (!q || [u.name,u.email,roleLabel(u.role),scopeLabel(u.scope)].join(' ').toLowerCase().includes(q)) && (!rf || u.role === rf));
       document.getElementById('usersTable').innerHTML = '<thead><tr><th>User</th><th>Role</th><th>Scope</th><th>Status</th><th>Last Active</th><th></th></tr></thead><tbody>' +
         (users.length ? users.map(u => '<tr><td><strong>' + u.name + '</strong><small>' + u.email + '</small></td><td>' + roleLabel(u.role) + '</td><td>' + scopeSummary(u) + '</td><td>' + badge(u.status) + '</td><td>' + u.lastActive + '</td><td><div class="row-actions"><button class="btn" onclick="openUserDrawer(\'' + u.id + '\')">Edit</button><button class="btn" onclick="publishUserToPms(\'' + u.id + '\')">Use in PMS</button><button class="btn" onclick="toggleUserStatus(\'' + u.id + '\')">' + (u.status === 'Active' ? 'Deactivate' : 'Activate') + '</button></div></td></tr>').join('') : '<tr><td colspan="6"><div class="empty-inline">No users match this organization and filter.</div></td></tr>') +
@@ -643,7 +693,7 @@
       const role = roleValue || document.getElementById('previewRole')?.value || 'front_desk';
       const scope = scopeValue || document.getElementById('previewScope')?.value || 'branch';
       const permissions = effectivePermissions(role, scope);
-      target.innerHTML = permissions.map(p => '<div><span>' + (PERMISSION_LABELS[p] || p) + '</span><code>' + p + '</code></div>').join('');
+      target.innerHTML = permissions.map(p => '<div style="padding:6px 8px;"><span>' + (PERMISSION_LABELS[p] || p) + '</span></div>').join('');
     }
     function effectivePermissions(role, scope) {
       const base = (ROLE_DEFS[role]?.permissions || []).slice();
@@ -689,10 +739,18 @@
       } else if (relationship === 'different_org_consent' && action !== 'invite') {
         status = 'Allowed With Consent Scope'; cls = 'success'; visible = 'Only data categories named in consent.'; rationale = 'Consent event authorizes scoped access for purpose and duration.';
       } else if (action === 'invite') {
-        status = has('governance.manage') ? 'Allowed' : 'Denied';
-        cls = has('governance.manage') ? 'success' : 'danger';
-        visible = has('governance.manage') ? 'User, role, branch, and scope administration.' : visible;
-        rationale = has('governance.manage') ? 'Governance permission authorizes role/scope management.' : 'Only governance roles manage access.';
+        const userOrg = orgMeta(user.orgId);
+        if (userOrg && userOrg.type === 'Solo Practice') {
+          status = 'Denied';
+          cls = 'danger';
+          visible = 'No user invitation permitted.';
+          rationale = 'Solo practice subscriptions are strictly single-user. Additional user invitations are not permitted.';
+        } else {
+          status = has('governance.manage') ? 'Allowed' : 'Denied';
+          cls = has('governance.manage') ? 'success' : 'danger';
+          visible = has('governance.manage') ? 'User, role, branch, and scope administration.' : visible;
+          rationale = has('governance.manage') ? 'Governance permission authorizes role/scope management.' : 'Only governance roles manage access.';
+        }
       } else if (action === 'clinical' || action === 'write') {
         status = (has('clinical.view') || has('clinical.write')) && user.scope !== 'branch' ? 'Allowed' : 'Denied';
         cls = status === 'Allowed' ? 'success' : 'danger';
@@ -744,79 +802,319 @@
       if (event.target.id === 'drawerBackdrop') closeDrawer();
     }
     function openUserDrawer(userId) {
-      const user = userId ? state.users.find(u => u.id === userId) : { id:'u-' + Date.now(), name:'', email:'', orgId:state.selectedOrgId, role:'front_desk', scope:'branch', branches:defaultBranchIdsForOrg(state.selectedOrgId), patients:[], status:'Active', lastActive:'Never' };
-      const orgOptions = governanceOrgs().map(o => '<option value="' + o.id + '"' + (user.orgId === o.id ? ' selected' : '') + '>' + o.name + '</option>').join('');
-      const body = '<form class="drawer-form" oninput="renderPermissionPreview(\'drawerPermissionPreview\', document.getElementById(\'drawerRole\').value, document.getElementById(\'drawerScope\').value)">' +
-        '<div class="field"><label>Name</label><input id="drawerName" value="' + user.name + '" placeholder="Full name"></div>' +
-        '<div class="field"><label>Email</label><input id="drawerEmail" value="' + user.email + '" placeholder="name@organization.org"></div>' +
-        '<div class="field-row"><div class="field"><label>Organization</label><select id="drawerOrg">' + orgOptions + '</select></div><div class="field"><label>Status</label><select id="drawerStatus"><option' + (user.status === 'Active' ? ' selected' : '') + '>Active</option><option' + (user.status === 'Inactive' ? ' selected' : '') + '>Inactive</option><option' + (user.status === 'Invited' ? ' selected' : '') + '>Invited</option></select></div></div>' +
-        '<div class="field-row"><div class="field"><label>Role</label><select id="drawerRole">' + Object.keys(ROLE_DEFS).map(k => '<option value="' + k + '"' + (user.role === k ? ' selected' : '') + '>' + roleLabel(k) + '</option>').join('') + '</select></div><div class="field"><label>Scope</label><select id="drawerScope">' + Object.keys(SCOPE_DEFS).map(k => '<option value="' + k + '"' + (user.scope === k ? ' selected' : '') + '>' + scopeLabel(k) + '</option>').join('') + '</select></div></div>' +
-        '<div class="field"><label>Branch IDs</label><input id="drawerBranches" value="' + user.branches.join(', ') + '" placeholder="lagos-central, lekki-annex"></div>' +
-        '<div class="field"><label>Assigned Patient IDs</label><input id="drawerPatients" value="' + user.patients.join(', ') + '" placeholder="amaia, emeka"></div>' +
-        '<div class="field"><label>Effective Permission Preview</label><div class="permission-preview" id="drawerPermissionPreview"></div></div>' +
+      const user = userId ? state.users.find(u => u.id === userId) : {
+        id: 'u-' + Date.now(),
+        name: '',
+        email: '',
+        orgId: state.selectedOrgId,
+        role: 'front_desk',
+        scope: 'branch',
+        branches: defaultBranchIdsForOrg(state.selectedOrgId),
+        patients: [],
+        status: 'Active',
+        lastActive: 'Never'
+      };
+
+      const userOrg = orgMeta(user.orgId) || governanceOrgs()[0];
+      const orgTypes = Array.from(new Set(governanceOrgs().map(o => o.type)));
+
+      // Allowed roles & scopes
+      const allowedRoles = user.orgId === 'platform'
+        ? Object.keys(ROLE_DEFS)
+        : Object.keys(ROLE_DEFS).filter(k => k !== 'super_admin');
+
+      const allowedScopes = user.orgId === 'platform'
+        ? Object.keys(SCOPE_DEFS)
+        : Object.keys(SCOPE_DEFS).filter(k => k !== 'platform');
+
+      // User's active permissions (custom or role default)
+      const activePerms = user.permissions || effectivePermissions(user.role, user.scope);
+      const isCustom = Boolean(user.permissions);
+
+      // Org Type Dropdown Options
+      const orgTypeOptions = orgTypes.map(t =>
+        '<option value="' + t + '"' + (userOrg.type === t ? ' selected' : '') + '>' + t + '</option>'
+      ).join('');
+
+      // Org Facility Dropdown Options (filtered by current type)
+      const orgOptions = governanceOrgs()
+        .filter(o => o.type === userOrg.type)
+        .map(o => '<option value="' + o.id + '"' + (user.orgId === o.id ? ' selected' : '') + '>' + o.name + '</option>')
+        .join('');
+
+      // Branches: selectable checkboxes
+      const orgBranches = userOrg.branches || [];
+      const branchField = '<div class="field"><label>Assigned Branches / Rooms</label><div style="display:flex;flex-wrap:wrap;gap:6px;padding:9px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface-2);" id="branchCheckboxes">' +
+        (orgBranches.length ? orgBranches.map(b => '<label style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;cursor:pointer;"><input type="checkbox" value="' + b.id + '"' + (user.branches.includes(b.id) ? ' checked' : '') + '> ' + b.name + '</label>').join('') : '<span style="font-size:12px;color:var(--text-secondary);">No branches configured</span>') +
+        '</div></div>';
+
+      // Assigned patients: multi-select
+      const patientOptions = state.patients
+        .filter(p => p.orgId === user.orgId)
+        .map(p => '<option value="' + p.id + '"' + (user.patients.includes(p.id) ? ' selected' : '') + '>' + p.name + ' - ' + p.mrn + '</option>')
+        .join('');
+      const patientField = '<div class="field"><label>Directly Assigned Patients</label><select id="drawerPatients" multiple size="4" style="min-height:90px;">' + (patientOptions || '<option disabled>No patients in this organization</option>') + '</select><div style="font-size:11px;color:var(--text-secondary);margin-top:4px;">Hold Ctrl (or Cmd) to select specific patient charts assigned to this clinician.</div></div>';
+
+      // Granular Permission Toggles HTML
+      const permGroupsHtml = PERMISSION_GROUPS.map((grp, gIdx) => {
+        return '<div style="margin-bottom:12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface-2);overflow:hidden;">' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--surface-1);border-bottom:1px solid var(--border);">' +
+            '<span style="font-weight:700;font-size:12px;color:var(--text-primary);">' + grp.title + '</span>' +
+            '<span class="badge neutral" style="font-size:10px;">' + grp.badge + '</span>' +
+          '</div>' +
+          '<div style="padding:8px 10px;display:flex;flex-direction:column;gap:6px;">' +
+            grp.perms.map(p => {
+              const checked = activePerms.includes(p.id) ? ' checked' : '';
+              return '<label style="display:flex;align-items:flex-start;gap:9px;padding:6px 8px;border-radius:var(--radius-sm);cursor:pointer;background:var(--surface-3);border:1px solid var(--border-light);">' +
+                '<input type="checkbox" class="perm-checkbox" value="' + p.id + '"' + checked + ' onchange="handlePermissionToggle()" style="margin-top:3px;cursor:pointer;">' +
+                '<div style="flex:1;">' +
+                  '<div style="font-size:12px;font-weight:600;color:var(--text-primary);line-height:1.2;">' + p.label + '</div>' +
+                  '<div style="font-size:11px;color:var(--text-secondary);margin-top:2px;line-height:1.3;">' + p.desc + '</div>' +
+                '</div>' +
+              '</label>';
+            }).join('') +
+          '</div>' +
+        '</div>';
+      }).join('');
+
+      const body = '<form class="drawer-form" onsubmit="event.preventDefault()">' +
+        (userOrg.type === 'Solo Practice' ? '<div style="font-size:11px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;display:inline-flex;align-items:center;gap:6px;"><span class="badge teal">Solo Practice</span> Single-Practitioner Account</div>' : '') +
+        '<div class="field"><label>Full Name</label><input id="drawerName" value="' + user.name + '" placeholder="Full name"></div>' +
+        '<div class="field"><label>Email Address</label><input id="drawerEmail" value="' + user.email + '" placeholder="name@organization.org"></div>' +
+        
+        // Two-Tier Organization Selection
+        '<div class="field-row">' +
+          '<div class="field">' +
+            '<label>Organization Type</label>' +
+            '<select id="drawerOrgType" onchange="handleDrawerOrgTypeChange(this.value)">' + orgTypeOptions + '</select>' +
+          '</div>' +
+          '<div class="field">' +
+            '<label>Organization / Practice</label>' +
+            '<select id="drawerOrg" onchange="handleDrawerOrgChange(this.value)">' + orgOptions + '</select>' +
+          '</div>' +
+        '</div>' +
+
+        '<div class="field-row">' +
+          '<div class="field">' +
+            '<label>Status</label>' +
+            '<select id="drawerStatus"><option' + (user.status === 'Active' ? ' selected' : '') + '>Active</option><option' + (user.status === 'Inactive' ? ' selected' : '') + '>Inactive</option><option' + (user.status === 'Invited' ? ' selected' : '') + '>Invited</option></select>' +
+          '</div>' +
+          '<div class="field">' +
+            '<label>Role Preset</label>' +
+            '<select id="drawerRole" onchange="handleRolePresetChange(this.value)">' + allowedRoles.map(k => '<option value="' + k + '"' + (user.role === k ? ' selected' : '') + '>' + roleLabel(k) + '</option>').join('') + '</select>' +
+          '</div>' +
+        '</div>' +
+
+        // Clinical Data Scope with explanation
+        '<div class="field">' +
+          '<label>Clinical Data Reach (Scope)</label>' +
+          '<select id="drawerScope" onchange="handleScopeChange(this.value)">' +
+            allowedScopes.map(k => '<option value="' + k + '"' + (user.scope === k ? ' selected' : '') + '>' + scopeLabel(k) + '</option>').join('') +
+          '</select>' +
+          '<div id="scopeExplanation" style="margin-top:6px;padding:8px 10px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:11.5px;color:var(--text-secondary);line-height:1.4;">' +
+            (SCOPE_EXPLANATIONS[user.scope] || SCOPE_EXPLANATIONS.organization) +
+          '</div>' +
+        '</div>' +
+
+        branchField +
+        patientField +
+
+        // Granular Access Levels
+        '<div class="field" style="margin-top:16px;">' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
+            '<label style="margin:0;font-weight:700;font-size:12.5px;">Assigned Access Levels & Capabilities</label>' +
+            '<div style="display:flex;align-items:center;gap:8px;">' +
+              '<span id="permCountBadge" class="badge ' + (isCustom ? 'teal' : 'neutral') + '" style="font-size:10.5px;">' + (isCustom ? 'Custom Access' : 'Role Preset') + '</span>' +
+              '<button type="button" class="btn" style="padding:2px 8px;font-size:11px;min-height:24px;" onclick="resetPermissionsToRole()">Reset to Role</button>' +
+            '</div>' +
+          '</div>' +
+          '<div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:10px;">' +
+            'Toggle specific access levels below to grant or remove individual clinical or administrative privileges.' +
+          '</div>' +
+          permGroupsHtml +
+        '</div>' +
       '</form>';
-      const footer = '<button class="btn" onclick="closeDrawer()">Cancel</button><button class="btn primary" onclick="saveUserFromDrawer()">Save User</button>';
-      openDrawer(userId ? 'Edit User' : 'Invite User', userId ? 'Edit User Access' : 'Invite User', body, footer, user.id);
-      renderPermissionPreview('drawerPermissionPreview', user.role, user.scope);
+
+      const footer = '<button class="btn" onclick="closeDrawer()">Cancel</button><button class="btn primary" onclick="saveUserFromDrawer()">Save User Access</button>';
+      openDrawer(userId ? 'Edit User Access' : 'Invite User', userId ? 'Configure Access & Roles' : 'Invite New Team Member', body, footer, user.id);
+      updatePermissionCountBadge();
     }
+
+    function handleDrawerOrgTypeChange(selectedType) {
+      const orgs = governanceOrgs().filter(o => o.type === selectedType);
+      const orgSelect = document.getElementById('drawerOrg');
+      if (!orgSelect) return;
+      orgSelect.innerHTML = orgs.map(o => '<option value="' + o.id + '">' + o.name + '</option>').join('');
+      if (orgs.length) {
+        handleDrawerOrgChange(orgs[0].id);
+      }
+    }
+
+    function handleDrawerOrgChange(orgId) {
+      const org = orgMeta(orgId);
+      const branchContainer = document.getElementById('branchCheckboxes');
+      if (branchContainer && org) {
+        branchContainer.innerHTML = org.branches.length
+          ? org.branches.map(b => '<label style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;cursor:pointer;"><input type="checkbox" value="' + b.id + '" checked> ' + b.name + '</label>').join('')
+          : '<span style="font-size:12px;color:var(--text-secondary);">No branches configured</span>';
+      }
+      const patientSelect = document.getElementById('drawerPatients');
+      if (patientSelect) {
+        const orgPatients = state.patients.filter(p => p.orgId === orgId);
+        patientSelect.innerHTML = orgPatients.length
+          ? orgPatients.map(p => '<option value="' + p.id + '">' + p.name + ' - ' + p.mrn + '</option>').join('')
+          : '<option disabled>No patients in this organization</option>';
+      }
+    }
+
+    function handleScopeChange(scopeKey) {
+      const exp = document.getElementById('scopeExplanation');
+      if (exp) exp.innerHTML = SCOPE_EXPLANATIONS[scopeKey] || SCOPE_EXPLANATIONS.organization;
+    }
+
+    function handleRolePresetChange(roleKey) {
+      const roleDef = ROLE_DEFS[roleKey];
+      if (!roleDef) return;
+      const basePerms = roleDef.permissions || [];
+      document.querySelectorAll('.perm-checkbox').forEach(cb => {
+        cb.checked = basePerms.includes(cb.value);
+      });
+      const badge = document.getElementById('permCountBadge');
+      if (badge) {
+        badge.className = 'badge neutral';
+        badge.textContent = 'Role Defaults (' + roleDef.label + ')';
+      }
+    }
+
+    function resetPermissionsToRole() {
+      const roleKey = document.getElementById('drawerRole')?.value || 'front_desk';
+      handleRolePresetChange(roleKey);
+      notify('Reset permissions to ' + roleLabel(roleKey) + ' defaults.');
+    }
+
+    function handlePermissionToggle() {
+      updatePermissionCountBadge();
+    }
+
+    function updatePermissionCountBadge() {
+      const badge = document.getElementById('permCountBadge');
+      if (!badge) return;
+      const roleKey = document.getElementById('drawerRole')?.value || 'front_desk';
+      const rolePerms = (ROLE_DEFS[roleKey]?.permissions || []).slice().sort();
+      const checkedBoxes = Array.from(document.querySelectorAll('.perm-checkbox:checked')).map(cb => cb.value).sort();
+
+      const isSame = rolePerms.length === checkedBoxes.length && rolePerms.every((v, i) => v === checkedBoxes[i]);
+      if (isSame) {
+        badge.className = 'badge neutral';
+        badge.textContent = 'Role Defaults';
+      } else {
+        badge.className = 'badge teal';
+        badge.textContent = 'Customized (' + checkedBoxes.length + ' granted)';
+      }
+    }
+
     function defaultBranchIdsForOrg(orgId) {
       const org = orgMeta(orgId);
       return org && org.branches.length ? [org.branches[0].id] : [];
     }
+
     function saveUserFromDrawer() {
+      const drawerOrg = document.getElementById('drawerOrg').value;
+      const roleValue = document.getElementById('drawerRole').value;
+      const scopeValue = document.getElementById('drawerScope').value;
+      const checkedPerms = Array.from(document.querySelectorAll('.perm-checkbox:checked')).map(cb => cb.value);
+
+      // Check if custom or matches role defaults
+      const roleDefaults = (ROLE_DEFS[roleValue]?.permissions || []).slice().sort();
+      const sortedChecked = checkedPerms.slice().sort();
+      const isCustom = !(roleDefaults.length === sortedChecked.length && roleDefaults.every((v, i) => v === sortedChecked[i]));
+
       const user = {
         id: editingId || 'u-' + Date.now(),
         name: document.getElementById('drawerName').value.trim(),
         email: document.getElementById('drawerEmail').value.trim(),
-        orgId: document.getElementById('drawerOrg').value,
-        role: document.getElementById('drawerRole').value,
-        scope: document.getElementById('drawerScope').value,
-        branches: csv('drawerBranches'),
-        patients: csv('drawerPatients'),
+        orgId: drawerOrg,
+        role: roleValue,
+        scope: scopeValue,
+        branches: (() => {
+          const boxes = document.querySelectorAll('#branchCheckboxes input[type=checkbox]:checked');
+          if (boxes.length) return Array.from(boxes).map(b => b.value);
+          return [];
+        })(),
+        patients: multiSelectValues('drawerPatients'),
+        permissions: isCustom ? checkedPerms : null,
         status: document.getElementById('drawerStatus').value,
         lastActive: editingId ? (state.users.find(u => u.id === editingId)?.lastActive || 'Never') : 'Invited'
       };
-      if (!user.name || !user.email) { notify('Name and email are required.'); return; }
+
+      if (!user.name || !user.email) {
+        notify('Name and email are required.');
+        return;
+      }
+
       const idx = state.users.findIndex(u => u.id === user.id);
       if (idx >= 0) state.users[idx] = user; else state.users.push(user);
-      addAudit(idx >= 0 ? 'Role/scope changed' : 'User invited', user.name + ' assigned ' + roleLabel(user.role) + ' with ' + scopeLabel(user.scope) + ' scope.');
+
+      addAudit(
+        idx >= 0 ? 'Role/scope/permissions updated' : 'User invited',
+        user.name + ' assigned ' + roleLabel(user.role) + ' (' + scopeLabel(user.scope) + ')' + (isCustom ? ' with ' + checkedPerms.length + ' custom permissions.' : '.')
+      );
+
       closeDrawer();
-      notify('User access saved.');
+      selectOrg(user.orgId);
+      notify('User access saved: ' + user.name + (isCustom ? ' (Custom Access Levels)' : ''));
     }
+
     function csv(id) {
-      return document.getElementById(id).value.split(',').map(v => v.trim()).filter(Boolean);
+      const el = document.getElementById(id);
+      return el ? el.value.split(',').map(v => v.trim()).filter(Boolean) : [];
     }
+
+    function multiSelectValues(id) {
+      const select = document.getElementById(id);
+      if (!select) return [];
+      return Array.from(select.selectedOptions || []).map(option => option.value).filter(Boolean);
+    }
+
     function toggleUserStatus(userId) {
       const user = state.users.find(u => u.id === userId);
       if (!user) return;
       user.status = user.status === 'Active' ? 'Inactive' : 'Active';
-      addAudit('User status changed', user.name + ' marked ' + user.status + '.');
-      notify('User status updated.');
+      addAudit('Status updated', user.name + ' marked ' + user.status + '.');
+      saveState();
+      renderUsers();
+      notify('User status changed.');
     }
+
     function publishUserToPms(userId) {
       const user = state.users.find(u => u.id === userId);
       if (!user) return;
+      const org = orgMeta(user.orgId);
       const roleToPreset = { front_desk:'receptionist', audiologist:'audiologist', lead_audiologist:'lead', org_admin:'admin', super_admin:'super_admin' };
-      const preset = PMS_AUTH_PRESETS[roleToPreset[user.role]] || PMS_AUTH_PRESETS.admin;
+      const presetKey = roleToPreset[user.role] || (org && org.type === 'Solo Practice' ? 'solo' : 'admin');
+      const preset = PMS_AUTH_PRESETS[presetKey] || PMS_AUTH_PRESETS.admin;
+      const grantedPermissions = user.permissions || effectivePermissions(user.role, user.scope);
+
       const context = Object.assign({}, preset, {
-        identityName:user.name,
-        organizationName:orgName(user.orgId),
-        organizationType:user.orgId === 'platform' ? 'Platform' : (state.organizations.find(o => o.id === user.orgId)?.type || 'Organization'),
-        role:user.role,
-        roleLabel:roleLabel(user.role),
-        scopeType:user.scope,
-        scopeLabel:scopeLabel(user.scope),
-        branchName:user.scope === 'organization' ? 'All Branches' : user.branches.map(branchName).join(', '),
-        branchIds:user.branches,
-        assignedPatientIds:user.patients,
-        permissions:effectivePermissions(user.role, user.scope)
+        identityName: user.name,
+        organizationName: orgName(user.orgId),
+        organizationType: user.orgId === 'platform' ? 'Platform' : (org?.type || 'Organization'),
+        role: user.role,
+        roleLabel: roleLabel(user.role),
+        scopeType: user.scope,
+        scopeLabel: scopeLabel(user.scope),
+        branchName: user.scope === 'organization' ? 'All Branches' : (user.branches.map(branchName).join(', ') || 'Main Clinic'),
+        branchIds: user.branches,
+        assignedPatientIds: user.patients,
+        permissions: grantedPermissions
       });
       savePmsAuthContext(context);
       addAudit('PMS context changed', user.name + ' published as active PMS simulated user.');
-      notify('PMS now uses ' + user.name + ' as the simulated user.');
+      notify('PMS now uses ' + user.name + ' with ' + grantedPermissions.length + ' granted permissions.');
     }
     function publishCurrentAdmin() {
-      const admin = state.users.find(u => u.role === 'org_admin') || state.users.find(u => u.role === 'super_admin');
+      const selectedOrg = state.selectedOrgId;
+      const admin = state.users.find(u => u.orgId === selectedOrg && u.role === 'org_admin') || state.users.find(u => u.role === 'org_admin') || state.users.find(u => u.role === 'super_admin');
       if (admin) publishUserToPms(admin.id);
     }
     function decideRequest(id, status) {

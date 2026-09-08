@@ -100,6 +100,36 @@ var PMS_AUTH_PRESETS = {
     
     ]
   },
+  solo: {
+    identityName: 'Ola Martins',
+    organizationName: 'Ola Martins Hearing Practice',
+    organizationType: 'Solo Practice',
+    role: 'solo_practitioner',
+    roleLabel: 'Solo Practitioner',
+    scopeType: 'organization',
+    scopeLabel: 'Organization-wide',
+    branchName: 'Main Practice',
+    branchIds: ['solo-main'],
+    assignedPatientIds: [],
+    permissions: [
+      'dashboard.view',
+      'patients.view',
+      'patients.register',
+      'patients.demographics',
+      'appointments.view',
+      'appointments.manage',
+      'schedule.view',
+      'schedule.manage',
+      'queue.manage',
+      'clinical.view',
+      'clinical.write',
+      'clinical.review',
+      'reports.sign',
+      'rehab.manage',
+      'settings.view',
+      'settings.manage'
+    ]
+  },
   super_admin: {
     identityName: 'HearIntel Super Admin',
     organizationName: 'HearIntel Network',
@@ -873,6 +903,7 @@ function renderRoleSwitcherHtml(authContext) {
   var isRec  = r === 'receptionist' || r === 'front_desk';
   var isAud  = r === 'audiologist';
   var isAdmin = r === 'organization_admin' || r === 'org_admin';
+  var isSolo = r === 'solo_practitioner' || r === 'solo';
   var isSuper = r === 'super_admin';
 
   var chevronSvg = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="%2338BDF8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
@@ -886,6 +917,7 @@ function renderRoleSwitcherHtml(authContext) {
     +     '<option value="receptionist" style="background:#0F172A;color:#FFFFFF;"' + (isRec ? ' selected' : '') + '>Front Desk Officer</option>'
     +     '<option value="audiologist" style="background:#0F172A;color:#FFFFFF;"' + (isAud ? ' selected' : '') + '>Audiologist</option>'
     +     '<option value="admin" style="background:#0F172A;color:#FFFFFF;"' + (isAdmin ? ' selected' : '') + '>Organization Admin</option>'
+    +     '<option value="solo" style="background:#0F172A;color:#FFFFFF;"' + (isSolo ? ' selected' : '') + '>Solo Practitioner</option>'
     +     '<option value="super_admin" style="background:#0F172A;color:#FFFFFF;"' + (isSuper ? ' selected' : '') + '>Super Admin</option>'
     +   '</select>'
     + '</div>'
