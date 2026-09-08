@@ -80,7 +80,6 @@
             <button type="button" class="settings-nav-btn" onclick="switchSettingsSection(this, 'clinical')">Clinical Preferences</button>
             <button type="button" class="settings-nav-btn" onclick="switchSettingsSection(this, 'notifications')">Notifications</button>
             <button type="button" class="settings-nav-btn" onclick="switchSettingsSection(this, 'workspace')">Institution & Team</button>
-            <button type="button" class="settings-nav-btn" onclick="switchSettingsSection(this, 'authorization')">Authorization</button>
             <button type="button" class="settings-nav-btn" onclick="switchSettingsSection(this, 'privacy')">Privacy & Data</button>
             <button type="button" class="settings-nav-btn" onclick="switchSettingsSection(this, 'appearance')">Appearance</button>
           </nav>
@@ -225,9 +224,9 @@
               <div class="panel-header" style="padding:0 0 14px 0;margin-bottom:18px;">
                 <div>
                   <h2 class="panel-title">Institution & Team Workspace</h2>
-                  <p class="panel-subtitle">Facility parameters and authorized clinical staff.</p>
+                  <p class="panel-subtitle">Organization profile and team roster. Role and scope changes are handled in Admin Governance.</p>
                 </div>
-                <button class="btn primary" style="font-size:12px;" onclick="notify('Invite practitioner dialog opened.');">+ Invite Member</button>
+                <span class="badge neutral">Governance controlled</span>
               </div>
 
               <div class="form-grid" style="margin-bottom:20px;">
@@ -243,7 +242,7 @@
                       <th>Name</th>
                       <th>Role</th>
                       <th>License</th>
-                      <th>Access Level</th>
+                      <th>Assigned Scope</th>
                       <th style="text-align:right;"></th>
                     </tr>
                   </thead>
@@ -252,133 +251,29 @@
                       <td><strong>Dr. Chika Okafor</strong><div style="font-size:11px;color:var(--text-secondary);">chika.okafor@lagoshearing.org</div></td>
                       <td>Lead Audiologist</td>
                       <td>AUD-NG-2026-081</td>
-                      <td><span class="badge success">Administrator</span></td>
+                      <td><span class="badge success">Organization-wide clinical review</span></td>
                       <td style="text-align:right;color:var(--text-secondary);font-size:11.5px;">Current User</td>
                     </tr>
                     <tr>
                       <td><strong>Amina Bello</strong><div style="font-size:11px;color:var(--text-secondary);">amina.b@lagoshearing.org</div></td>
                       <td>Clinical Audiologist</td>
                       <td>AUD-NG-2025-114</td>
-                      <td><span class="badge teal">Clinician</span></td>
-                      <td style="text-align:right;"><button class="btn ghost" style="font-size:11px;" onclick="notify('Permissions opened.')">Manage</button></td>
+                      <td><span class="badge teal">Assigned patients</span></td>
+                      <td style="text-align:right;color:var(--text-secondary);font-size:11.5px;">Governance controlled</td>
                     </tr>
                     <tr>
                       <td><strong>Kelechi Musa</strong><div style="font-size:11px;color:var(--text-secondary);">kelechi.m@lagoshearing.org</div></td>
                       <td>Hearing Care Professional</td>
                       <td>HCP-NG-2024-009</td>
-                      <td><span class="badge teal">Clinician</span></td>
-                      <td style="text-align:right;"><button class="btn ghost" style="font-size:11px;" onclick="notify('Permissions opened.')">Manage</button></td>
+                      <td><span class="badge teal">Branch only</span></td>
+                      <td style="text-align:right;color:var(--text-secondary);font-size:11.5px;">Governance controlled</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
             </div>
 
-            <!-- SECTION 6: AUTHORIZATION -->
-            <div class="surface settings-pane" id="pane-authorization" style="padding:24px;">
-              <div class="panel-header" style="padding:0 0 14px 0;margin-bottom:18px;">
-                <div>
-                  <h2 class="panel-title">Authorization Model</h2>
-                  <p class="panel-subtitle">Prototype view of identity, organization, role, scope, and clinical permissions.</p>
-                </div>
-                <span class="badge success">Least Privilege</span>
-              </div>
-
-              <div class="auth-model-grid">
-                <div class="auth-model-card">
-                  <div class="auth-model-kicker">Identity</div>
-                  <strong id="authIdentityName">Dr. Chika Okafor, Au.D.</strong>
-                  <span>Individual authenticated HearIntel user</span>
-                </div>
-                <div class="auth-model-card">
-                  <div class="auth-model-kicker">Organization</div>
-                  <strong id="authOrgName">Lagos Central Hearing Clinic</strong>
-                  <span id="authOrgType">Clinic subscription owner</span>
-                </div>
-                <div class="auth-model-card">
-                  <div class="auth-model-kicker">Role</div>
-                  <strong id="authRoleLabel">Lead Audiologist</strong>
-                  <span>Controls allowed actions</span>
-                </div>
-                <div class="auth-model-card">
-                  <div class="auth-model-kicker">Scope</div>
-                  <strong id="authScopeLabel">Organization-wide</strong>
-                  <span id="authBranchLabel">All Branches</span>
-                </div>
-              </div>
-
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:20px;">
-                <section style="border:1px solid var(--border);border-radius:var(--radius);padding:16px;background:var(--surface-2);">
-                  <h3 style="font-size:13px;font-weight:700;margin-bottom:10px;">Preview Role Context</h3>
-                  <div class="auth-preset-row">
-                    <button class="btn" onclick="setPmsAuthPreset('receptionist')">Receptionist</button>
-                    <button class="btn" onclick="setPmsAuthPreset('audiologist')">Audiologist</button>
-                    <button class="btn" onclick="setPmsAuthPreset('lead')">Lead Audiologist</button>
-                    <button class="btn" onclick="setPmsAuthPreset('admin')">Organization Admin</button>
-                  </div>
-                  <p style="font-size:12px;color:var(--text-secondary);margin-top:12px;">This is local prototype state only. It demonstrates how modules lock or unlock when the role and scope change.</p>
-                </section>
-
-                <section style="border:1px solid var(--border);border-radius:var(--radius);padding:16px;background:var(--surface-2);">
-                  <h3 style="font-size:13px;font-weight:700;margin-bottom:10px;">Access Policy</h3>
-                  <div id="authPermissionList" class="auth-permission-list"></div>
-                </section>
-              </div>
-
-              <div class="table-container" style="border:none;margin-top:20px;">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Team Member</th>
-                      <th>Role</th>
-                      <th>Organization</th>
-                      <th>Scope</th>
-                      <th>Clinical Access</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><strong>Chioma Okoro</strong><div style="font-size:11px;color:var(--text-secondary);">chioma.o@lagoshearing.org</div></td>
-                      <td>Receptionist</td>
-                      <td>Lagos Central Hearing Clinic</td>
-                      <td>Branch only: Lagos Central</td>
-                      <td><span class="badge warning">Administrative only</span></td>
-                    </tr>
-                    <tr>
-                      <td><strong>Amina Bello</strong><div style="font-size:11px;color:var(--text-secondary);">amina.b@lagoshearing.org</div></td>
-                      <td>Audiologist</td>
-                      <td>Lagos Central Hearing Clinic</td>
-                      <td>Assigned patients: Amaia O., Emeka E.</td>
-                      <td><span class="badge teal">Assessment write</span></td>
-                    </tr>
-                    <tr>
-                      <td><strong>Dr. Chika Okafor</strong><div style="font-size:11px;color:var(--text-secondary);">chika.okafor@lagoshearing.org</div></td>
-                      <td>Lead Audiologist</td>
-                      <td>Lagos Central Hearing Clinic</td>
-                      <td>Organization-wide</td>
-                      <td><span class="badge success">Review and sign-off</span></td>
-                    </tr>
-                    <tr>
-                      <td><strong>Dr. Tunde Salako</strong><div style="font-size:11px;color:var(--text-secondary);">salako@lagoshearing.org</div></td>
-                      <td>Organization Admin</td>
-                      <td>Lagos Central Hearing Clinic</td>
-                      <td>All branches</td>
-                      <td><span class="badge info">Governance</span></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <div class="auth-flow-strip" style="margin-top:20px;">
-                <div><strong>Organization Admin</strong><span>invites member</span></div>
-                <div><strong>Email Invitation</strong><span>creates identity</span></div>
-                <div><strong>Membership</strong><span>binds organization</span></div>
-                <div><strong>Role + Scope</strong><span>unlocks PMS work</span></div>
-                <div><strong>Audit Trail</strong><span>records access</span></div>
-              </div>
-            </div>
-
-            <!-- SECTION 7: PRIVACY & DATA -->
+            <!-- SECTION 6: PRIVACY & DATA -->
             <div class="surface settings-pane" id="pane-privacy" style="padding:24px;">
               <div class="panel-header" style="padding:0 0 14px 0;margin-bottom:18px;">
                 <div>
@@ -403,7 +298,7 @@
               </div>
             </div>
 
-            <!-- SECTION 8: APPEARANCE -->
+            <!-- SECTION 7: APPEARANCE -->
             <div class="surface settings-pane" id="pane-appearance" style="padding:24px;">
               <div class="panel-header" style="padding:0 0 14px 0;margin-bottom:18px;">
                 <div>
@@ -459,41 +354,6 @@
       notify('Clinician profile saved: ' + name + ' (' + title + ')');
     }
 
-    function renderAuthorizationPane() {
-      if (typeof getPmsAuthContext !== 'function') return;
-      const context = getPmsAuthContext();
-      const permissionLabels = {
-        'dashboard.view': 'View clinical dashboard',
-        'patients.view': 'View authorized patient records',
-        'patients.register': 'Register new patients',
-        'patients.demographics': 'Manage demographic and administrative details',
-        'appointments.manage': 'Book appointments and check patients in',
-        'queue.manage': 'Manage queue and visit status',
-        'clinical.view': 'View clinical history and test results',
-        'clinical.write': 'Record assessment findings',
-        'clinical.review': 'Review clinical work',
-        'reports.sign': 'Finalize and sign reports',
-        'rehab.manage': 'Manage device and rehabilitation care',
-        'finance.manage': 'Manage billing and claims',
-        'settings.manage': 'Manage workspace settings',
-        'staff.manage': 'Invite and manage team members',
-        'branches.manage': 'Manage branches and service locations'
-      };
-
-      document.getElementById('authIdentityName').textContent = context.identityName;
-      document.getElementById('authOrgName').textContent = context.organizationName;
-      document.getElementById('authOrgType').textContent = context.organizationType + ' subscription owner';
-      document.getElementById('authRoleLabel').textContent = context.roleLabel;
-      document.getElementById('authScopeLabel').textContent = context.scopeLabel;
-      document.getElementById('authBranchLabel').textContent = context.branchName;
-
-      const permissionList = document.getElementById('authPermissionList');
-      permissionList.innerHTML = (context.permissions || []).map(function(permission) {
-        return '<div class="auth-permission-item"><span>' + (permissionLabels[permission] || permission) + '</span><code>' + permission + '</code></div>';
-      }).join('');
-    }
-
-    document.addEventListener('DOMContentLoaded', renderAuthorizationPane);
   </script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {

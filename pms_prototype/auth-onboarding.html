@@ -65,7 +65,7 @@
       <div style="margin-bottom:20px;">
         <div class="brand-name" style="color:var(--text-primary);font-size:22px;">Hear<span style="color:var(--teal);">Intel</span></div>
         <h1 style="font-size:18px;font-weight:700;margin-top:14px;color:var(--text-primary);">Professional Context & Workspace</h1>
-        <p style="font-size:13px;color:var(--text-secondary);margin-top:4px;">Define your clinical role and join your facility workspace.</p>
+        <p style="font-size:13px;color:var(--text-secondary);margin-top:4px;">Review the organization access assigned by your administrator.</p>
       </div>
 
       <form onsubmit="handleOnboardingSubmit(event)">
@@ -77,49 +77,24 @@
         </div>
         <div class="form-grid" style="grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;">
           <div class="field" style="grid-column:1 / -1;">
-            <label for="onbRole">Clinical Role</label>
-            <select id="onbRole" onchange="refreshAuthSummary()">
-              <option value="lead" selected>Lead Audiologist</option>
-              <option value="audiologist">Audiologist</option>
-              <option value="receptionist">Receptionist</option>
-              <option value="admin">Organization Admin</option>
-            </select>
+            <label for="onbRole">Assigned Role</label>
+            <input id="onbRole" value="Lead Audiologist" readonly>
           </div>
           <div class="field" style="grid-column:1 / -1;">
-            <label for="onbFacility">Institution / Workspace</label>
-            <select id="onbFacility" onchange="refreshAuthSummary()">
-              <option value="Lagos Central Hearing Clinic" selected>Lagos Central Hearing Clinic</option>
-              <option value="LUTH Department of Otolaryngology">LUTH Department of Otolaryngology</option>
-              <option value="Abuja National Ear Centre">Abuja National Ear Centre</option>
-              <option value="Solo Practice">Create New Solo Practice Workspace</option>
-            </select>
+            <label for="onbFacility">Organization / Workspace</label>
+            <input id="onbFacility" value="Lagos Central Hearing Clinic" readonly>
           </div>
           <div class="field">
             <label for="onbOrgType">Organization Type</label>
-            <select id="onbOrgType" onchange="refreshAuthSummary()">
-              <option selected>Clinic</option>
-              <option>Hospital</option>
-              <option>University</option>
-              <option>Solo Practice</option>
-              <option>Research Institution</option>
-            </select>
+            <input id="onbOrgType" value="Clinic" readonly>
           </div>
           <div class="field">
             <label for="onbScope">Access Scope</label>
-            <select id="onbScope" onchange="refreshAuthSummary()">
-              <option value="organization" selected>Organization-wide</option>
-              <option value="branch">Branch only</option>
-              <option value="assigned_patients">Assigned patients only</option>
-            </select>
+            <input id="onbScope" value="Organization-wide" readonly>
           </div>
           <div class="field">
             <label for="onbBranch">Primary Branch / Location</label>
-            <select id="onbBranch" onchange="refreshAuthSummary()">
-              <option selected>Lagos Central</option>
-              <option>Lekki Annex</option>
-              <option>Ikorodu Outreach</option>
-              <option>All Branches</option>
-            </select>
+            <input id="onbBranch" value="All Branches" readonly>
           </div>
           <div class="field">
             <label for="onbPhone">Phone Number</label>
@@ -132,6 +107,9 @@
         </div>
 
         <button type="submit" class="btn primary" style="width:100%;min-height:38px;font-size:13.5px;font-weight:600;">Complete Setup & Enter PMS →</button>
+        <div style="border:1px solid var(--border);background:var(--bg-subtle);border-radius:var(--radius);padding:10px 12px;font-size:12px;color:var(--text-secondary);margin-top:14px;">
+          Role and scope are assigned through Admin Governance. If this access is wrong, the organization administrator must update the invitation.
+        </div>
       </form>
     </div>
   </div>
@@ -141,12 +119,12 @@
   <script>
     function handleOnboardingSubmit(event) {
       event.preventDefault();
-      const roleKey = document.getElementById('onbRole').value;
-      const role = document.getElementById('onbRole').selectedOptions[0].textContent;
+      const roleKey = getInviteRoleKey();
+      const role = document.getElementById('onbRole').value;
       const facility = document.getElementById('onbFacility').value;
       const orgType = document.getElementById('onbOrgType').value;
-      const scopeType = document.getElementById('onbScope').value;
-      const scopeLabel = document.getElementById('onbScope').selectedOptions[0].textContent;
+      const scopeType = getInviteScopeType();
+      const scopeLabel = document.getElementById('onbScope').value;
       const branchName = document.getElementById('onbBranch').value;
       const phone = document.getElementById('onbPhone').value;
       
@@ -173,11 +151,41 @@
       const storedName = localStorage.getItem('hearintel_reg_name') || 'Dr. Chika Okafor';
       document.getElementById('summaryIdentity').textContent = storedName;
       document.getElementById('summaryOrg').textContent = document.getElementById('onbFacility').value;
-      document.getElementById('summaryRole').textContent = document.getElementById('onbRole').selectedOptions[0].textContent;
-      document.getElementById('summaryScope').textContent = document.getElementById('onbScope').selectedOptions[0].textContent;
+      document.getElementById('summaryRole').textContent = document.getElementById('onbRole').value;
+      document.getElementById('summaryScope').textContent = document.getElementById('onbScope').value;
     }
 
-    document.addEventListener('DOMContentLoaded', refreshAuthSummary);
+    function getInviteRoleKey() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('role') || localStorage.getItem('hearintel_invite_role') || 'lead';
+    }
+
+    function getInviteScopeType() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('scope') || localStorage.getItem('hearintel_invite_scope') || 'organization';
+    }
+
+    function hydrateInvitationContext() {
+      const params = new URLSearchParams(window.location.search);
+      const roleKey = getInviteRoleKey();
+      const scopeType = getInviteScopeType();
+      const preset = (typeof PMS_AUTH_PRESETS !== 'undefined' && PMS_AUTH_PRESETS[roleKey]) ? PMS_AUTH_PRESETS[roleKey] : PMS_AUTH_PRESETS.lead;
+      const scopeLabels = {
+        organization: 'Organization-wide',
+        branch: 'Branch only',
+        assigned_patients: 'Assigned patients only',
+        platform: 'Platform governance'
+      };
+
+      document.getElementById('onbRole').value = preset.roleLabel;
+      document.getElementById('onbFacility').value = params.get('organization') || preset.organizationName;
+      document.getElementById('onbOrgType').value = params.get('type') || preset.organizationType;
+      document.getElementById('onbScope').value = scopeLabels[scopeType] || preset.scopeLabel;
+      document.getElementById('onbBranch').value = params.get('branch') || preset.branchName;
+      refreshAuthSummary();
+    }
+
+    document.addEventListener('DOMContentLoaded', hydrateInvitationContext);
   </script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {

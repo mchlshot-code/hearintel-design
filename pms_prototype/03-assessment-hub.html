@@ -124,6 +124,7 @@
     ];
 
     function renderAssessmentHub() {
+      if (!document.getElementById('hubPatientName')) return;
       const patientId = getActivePatientId();
       const patient = (window.HearIntelDB && window.HearIntelDB.getPatient(patientId)) || {
         name: 'Amaia O.',

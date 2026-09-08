@@ -30,7 +30,7 @@ var PMS_AUTH_PRESETS = {
     organizationName: 'Lagos Central Hearing Clinic',
     organizationType: 'Clinic',
     role: 'receptionist',
-    roleLabel: 'Receptionist',
+    roleLabel: 'Front Desk Officer',
     scopeType: 'branch',
     scopeLabel: 'Branch only',
     branchName: 'Lagos Central',
@@ -82,15 +82,34 @@ var PMS_AUTH_PRESETS = {
       'patients.view',
       'patients.register',
       'patients.demographics',
-      'clinical.view',
-      'clinical.review',
-      'reports.sign',
-      'rehab.manage',
       'finance.manage',
       'settings.view',
       'settings.manage',
       'staff.manage',
-      'branches.manage'
+      'branches.manage',
+      'governance.manage'
+    ]
+  },
+  super_admin: {
+    identityName: 'HearIntel Super Admin',
+    organizationName: 'HearIntel Network',
+    organizationType: 'Platform',
+    role: 'super_admin',
+    roleLabel: 'Super Admin',
+    scopeType: 'platform',
+    scopeLabel: 'Platform governance',
+    branchName: 'All Organizations',
+    branchIds: [],
+    assignedPatientIds: [],
+    permissions: [
+      'dashboard.view',
+      'patients.view',
+      'settings.view',
+      'settings.manage',
+      'staff.manage',
+      'branches.manage',
+      'governance.manage',
+      'platform.manage'
     ]
   }
 };
@@ -150,6 +169,78 @@ function canAccessPmsArea(area) {
   return required.some(function(permission) { return hasPmsPermission(permission); });
 }
 
+function getPatientBranchId(patient) {
+  var facility = ((patient && patient.facility) || '').toLowerCase();
+  if (facility.indexOf('lekki') !== -1) return 'lekki-annex';
+  if (facility.indexOf('ikorodu') !== -1) return 'ikorodu-outreach';
+  return 'lagos-central';
+}
+
+function canAccessPatientClinicalRecord(patient, area) {
+  var ctx = getPmsAuthContext();
+  if (!patient) return false;
+  if (hasPmsPermission('clinical.review') && (ctx.scopeType === 'organization' || ctx.scopeType === 'platform')) return true;
+  if (!hasPmsPermission('clinical.view') && !hasPmsPermission('clinical.write')) return false;
+  if (ctx.scopeType === 'organization' || ctx.scopeType === 'platform') return true;
+  if (ctx.scopeType === 'assigned_patients') return (ctx.assignedPatientIds || []).indexOf(patient.id) !== -1;
+  return (ctx.branchIds || []).indexOf(getPatientBranchId(patient)) !== -1 && area === 'screening';
+}
+
+function getPatientAccessState(patient, area) {
+  var ctx = getPmsAuthContext();
+  var canFind = hasPmsPermission('patients.view') || hasPmsPermission('patients.register') || hasPmsPermission('patients.demographics');
+  var canSeeIdentity = canFind || hasPmsPermission('clinical.view') || hasPmsPermission('clinical.write');
+  var clinicalAllowed = canAccessPatientClinicalRecord(patient, area);
+  var isAssigned = patient && (ctx.assignedPatientIds || []).indexOf(patient.id) !== -1;
+  var sameBranch = patient && (ctx.branchIds || []).indexOf(getPatientBranchId(patient)) !== -1;
+
+  if (!canSeeIdentity) {
+    return {
+      label: 'Access request required',
+      badgeClass: 'danger',
+      clinicalAllowed: false,
+      identityVisible: false,
+      actionLabel: 'Request Access',
+      reason: 'This role cannot search patient identity records.'
+    };
+  }
+
+  if (clinicalAllowed) {
+    return {
+      label: 'Clinical record authorized',
+      badgeClass: 'success',
+      clinicalAllowed: true,
+      identityVisible: true,
+      actionLabel: area === 'profile' ? 'Open Record' : 'Start Assessment',
+      reason: isAssigned ? 'Assigned patient within clinical scope.' : 'Role and organization scope permit clinical access.'
+    };
+  }
+
+  if (hasPmsPermission('patients.demographics') || hasPmsPermission('patients.register')) {
+    return {
+      label: 'Basic identity visible',
+      badgeClass: 'warning',
+      clinicalAllowed: false,
+      identityVisible: true,
+      actionLabel: 'View Identity',
+      reason: sameBranch ? 'Administrative access only; clinical data remains restricted.' : 'Patient exists, but clinical record requires role, scope, consent, or access request.'
+    };
+  }
+
+  return {
+    label: 'Patient exists',
+    badgeClass: 'neutral',
+    clinicalAllowed: false,
+    identityVisible: true,
+    actionLabel: 'Request Access',
+    reason: 'Identity can be discovered, but the clinical record is closed.'
+  };
+}
+
+function canAccessGovernance() {
+  return hasPmsPermission('governance.manage') || hasPmsPermission('platform.manage');
+}
+
 function authLockedNavHtml(label, title) {
   return '<div class="nav-item disabled" title="' + (title || 'Restricted by current role and scope') + '">'
     + '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>'
@@ -162,8 +253,30 @@ function renderAuthDenied(areaLabel) {
   return '<div class="auth-denied-panel">'
     + '<div class="auth-denied-icon"><i data-lucide="shield-alert"></i></div>'
     + '<h2>' + areaLabel + ' is outside this demo role</h2>'
-    + '<p>' + ctx.roleLabel + ' access is limited to ' + ctx.scopeLabel.toLowerCase() + '. Switch role context in Settings to preview another authorization path.</p>'
-    + '<a class="btn primary" href="11-settings.html">Open Authorization Settings</a>'
+    + '<p>' + ctx.roleLabel + ' access is limited to ' + ctx.scopeLabel.toLowerCase() + '. Authorization is determined by organization membership, role, scope, patient relationship, consent, workflow state, and audit policy.</p>'
+    + '<a class="btn primary" href="00-dashboard.html">Return to Worklist</a>'
+    + '</div>';
+}
+
+function renderPatientLimitedView(patient, areaLabel) {
+  var state = getPatientAccessState(patient, areaLabel);
+  var name = state.identityVisible ? (patient.fullName || patient.name) : 'Restricted patient';
+  var mrn = state.identityVisible ? patient.mrn : 'Hidden';
+  var phone = state.identityVisible ? (patient.phone || 'Not recorded') : 'Hidden';
+  return '<div class="auth-denied-panel">'
+    + '<div class="auth-denied-icon"><i data-lucide="shield-alert"></i></div>'
+    + '<h2>' + state.label + '</h2>'
+    + '<p>' + state.reason + '</p>'
+    + '<div class="auth-limited-card">'
+      + '<div><span>Patient</span><strong>' + name + '</strong></div>'
+      + '<div><span>Global MRN</span><strong>' + mrn + '</strong></div>'
+      + '<div><span>Phone</span><strong>' + phone + '</strong></div>'
+      + '<div><span>Clinical Data</span><strong>Locked</strong></div>'
+    + '</div>'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">'
+      + '<button class="btn" onclick="notify(\'Access request created for governance review.\')">Request Access</button>'
+      + '<a class="btn primary" href="01-registry.html">Return to Registry</a>'
+    + '</div>'
     + '</div>';
 }
 
@@ -682,27 +795,33 @@ function filterLookupResults(query) {
     return;
   }
 
-  list.innerHTML = matches.map(p => `
-    <div class="lookup-result-row" onclick="location.href='02-profile.html?patient=${p.id}'" title="Open patient record">
+  list.innerHTML = matches.map(p => {
+    const accessState = getPatientAccessState(p, 'profile');
+    const clinicalHref = accessState.clinicalAllowed ? `03-start-encounter.html?patient=${p.id}` : '#';
+    const rowClick = accessState.identityVisible ? `location.href='02-profile.html?patient=${p.id}'` : `notify('Access request created for governance review.')`;
+    const actionClick = accessState.clinicalAllowed ? 'event.stopPropagation();' : "event.preventDefault();event.stopPropagation();notify('Access request created for governance review.');";
+    return `
+    <div class="lookup-result-row" onclick="${rowClick}" title="${accessState.reason}">
       <div style="flex:1;min-width:0;padding-right:20px;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:4px;">
           <div style="display:flex;align-items:center;gap:10px;">
             <strong style="font-size:14.5px;color:var(--text-primary);letter-spacing:-0.01em;">${p.name}</strong>
             <span style="font-family:monospace;font-size:11.5px;color:var(--text-secondary);letter-spacing:0.02em;">${p.mrn}</span>
-            <span class="badge ${p.statusType || 'neutral'}">${p.status}</span>
+            <span class="badge ${accessState.badgeClass}">${accessState.label}</span>
           </div>
           <span style="font-size:12px;color:var(--text-secondary);white-space:nowrap;">${p.age} yrs · ${p.gender}</span>
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;color:var(--text-secondary);">
-          <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:440px;">${p.primaryDiagnosis || 'Audiological Assessment Required'}</span>
+          <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:440px;">${accessState.clinicalAllowed ? (p.primaryDiagnosis || 'Audiological Assessment Required') : accessState.reason}</span>
           <span style="font-family:monospace;font-size:11.5px;color:var(--text-tertiary);white-space:nowrap;">${p.phone || '+234 800 000 0000'}</span>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-        <a class="btn primary" style="min-height:30px;padding:0 12px;font-size:12px;font-weight:600;" href="03-start-encounter.html?patient=${p.id}" onclick="event.stopPropagation();">Start Assessment</a>
+        <a class="btn ${accessState.clinicalAllowed ? 'primary' : ''}" style="min-height:30px;padding:0 12px;font-size:12px;font-weight:600;" href="${clinicalHref}" onclick="${actionClick}">${accessState.actionLabel}</a>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 
 // Global Keyboard Listener for "/" or "Ctrl+K" / "Cmd+K"
@@ -787,6 +906,10 @@ function patientShell(active) {
         + '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83-2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>'
         + '<span class="nav-label">Settings</span>'
         + '</a>' : authLockedNavHtml('Settings'),
+        canAccessGovernance() ? '<a class="nav-item" href="../authorization_prototype/index.html" title="Admin Governance">'
+        + '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 4v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V7l7-4z"/><path d="M9 12l2 2 4-4"/></svg></span>'
+        + '<span class="nav-label">Governance</span>'
+        + '</a>' : '',
       '</nav>',
       assessBlock ? '<div class="sidebar-divider"></div>' : '',
       assessBlock,
@@ -1176,6 +1299,8 @@ function workspaceShell(active, content) {
   const patient = (window.HearIntelDB && window.HearIntelDB.getPatient(patientId)) || { name: 'Amaia O.', mrn: 'LCC-26-01248', age: 46, gender: 'Female' };
   const currentTheme = getActiveTheme();
   const authContext = getPmsAuthContext();
+  const patientAccess = getPatientAccessState(patient, active);
+  const workspaceAllowed = canAccessPmsArea(active) && patientAccess.clinicalAllowed;
   const assessHref = '03-assessment-hub.html?patient=' + patientId;
 
   // Unconditional, decoupled navigation steps
@@ -1228,6 +1353,10 @@ function workspaceShell(active, content) {
           '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83-2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>',
           '<span class="nav-label">Settings</span>',
         '</a>',
+        canAccessGovernance() ? '<a class="nav-item" href="../authorization_prototype/index.html" title="Admin Governance">'
+        + '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 4v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V7l7-4z"/><path d="M9 12l2 2 4-4"/></svg></span>'
+        + '<span class="nav-label">Governance</span>'
+        + '</a>' : '',
       '</nav>',
       '<div class="sidebar-divider"></div>',
       '<div class="sidebar-assessment-block">',
@@ -1283,9 +1412,9 @@ function workspaceShell(active, content) {
         }).join(''),
       '</nav>',
       '<div class="workspace-body">',
-        canAccessPmsArea(active) ? safetyGateHtml : '',
-        canAccessPmsArea(active) ? instanceStripHtml : '',
-        canAccessPmsArea(active) ? content : renderAuthDenied(MODULE_SHORT_NAMES[active] || 'Assessment'),
+        workspaceAllowed ? safetyGateHtml : '',
+        workspaceAllowed ? instanceStripHtml : '',
+        workspaceAllowed ? content : renderPatientLimitedView(patient, MODULE_SHORT_NAMES[active] || 'Assessment'),
       '</div>',
     '</div>'
   ].join('');
@@ -1304,6 +1433,20 @@ document.addEventListener('DOMContentLoaded', function() {
       var main = document.querySelector('main.main');
       if (main) {
         main.innerHTML = '<section class="page">' + renderAuthDenied(activePage.charAt(0).toUpperCase() + activePage.slice(1)) + '</section>';
+      }
+    } else if (['profile', 'assessment', 'media'].indexOf(activePage) !== -1) {
+      var patient = window.HearIntelDB ? window.HearIntelDB.getPatient(getActivePatientId()) : null;
+      var patientAccess = getPatientAccessState(patient, activePage);
+      if (!patientAccess.clinicalAllowed && activePage !== 'profile') {
+        var protectedMain = document.querySelector('main.main');
+        if (protectedMain) {
+          protectedMain.innerHTML = '<section class="page">' + renderPatientLimitedView(patient, activePage) + '</section>';
+        }
+      } else if (!patientAccess.clinicalAllowed && activePage === 'profile') {
+        var profileMain = document.querySelector('main.main');
+        if (profileMain) {
+          profileMain.innerHTML = '<section class="page">' + renderPatientLimitedView(patient, 'Patient Record') + '</section>';
+        }
       }
     }
   });

@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clinical PMS - Admin Governance Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../pms_prototype/styles.css">
+  <style>
+    body { display:block; background:var(--bg-page); }
+    .admin-shell { min-height:100vh; display:grid; grid-template-columns:238px 1fr; }
+    .admin-sidebar { background:var(--sidebar-bg); color:var(--sidebar-text); padding:18px 12px; position:sticky; top:0; height:100vh; overflow:auto; }
+    .admin-brand { padding:4px 8px 18px; border-bottom:1px solid rgba(255,255,255,0.08); margin-bottom:12px; }
+    .admin-brand strong { display:block; color:#fff; font-family:var(--font-heading); font-size:21px; letter-spacing:-0.03em; }
+    .admin-brand span { display:block; margin-top:4px; font-size:9.5px; font-weight:800; letter-spacing:0.13em; text-transform:uppercase; color:rgba(255,255,255,0.38); }
+    .admin-nav { display:flex; flex-direction:column; gap:2px; }
+    .admin-nav button, .admin-nav a { width:100%; border:0; background:transparent; color:rgba(255,255,255,0.66); border-radius:var(--radius-sm); padding:9px 10px; font-size:12.5px; font-family:var(--font-sans); text-align:left; text-decoration:none; cursor:pointer; }
+    .admin-nav button:hover, .admin-nav a:hover { background:rgba(255,255,255,0.06); color:#fff; }
+    .admin-nav button.active { background:rgba(8,145,178,0.16); color:#fff; border-left:2px solid var(--sidebar-accent); }
+    .admin-main { min-width:0; padding:22px 26px 34px; }
+    .admin-topbar { display:flex; justify-content:space-between; align-items:flex-start; gap:18px; margin-bottom:18px; }
+    .admin-title { font-size:28px; font-weight:800; letter-spacing:-0.04em; color:var(--text-primary); }
+    .admin-subtitle { max-width:760px; color:var(--text-secondary); font-size:13.5px; margin-top:4px; }
+    .admin-actions { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+    .admin-view { display:none; }
+    .admin-view.active { display:block; }
+    .metric-grid { display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); gap:12px; margin-bottom:14px; }
+    .metric-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:14px; box-shadow:var(--shadow-subtle); min-height:96px; }
+    .metric-card span { display:block; font-size:9.5px; font-weight:800; letter-spacing:0.12em; color:var(--text-tertiary); text-transform:uppercase; margin-bottom:9px; }
+    .metric-card strong { display:block; font-family:var(--font-mono); font-size:26px; line-height:1; color:var(--text-primary); }
+    .metric-card p { margin-top:8px; font-size:12px; color:var(--text-secondary); }
+    .admin-grid { display:grid; gap:14px; }
+    .admin-grid.two { grid-template-columns:1.25fr .9fr; align-items:start; }
+    .admin-grid.three { grid-template-columns:repeat(3, minmax(0, 1fr)); }
+    .admin-panel { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow-card); overflow:hidden; }
+    .admin-panel-header { padding:14px 16px; border-bottom:1px solid var(--border-light); display:flex; justify-content:space-between; gap:12px; align-items:center; }
+    .admin-panel-title { font-size:15px; font-weight:800; letter-spacing:-0.02em; color:var(--text-primary); }
+    .admin-panel-subtitle { font-size:12px; color:var(--text-secondary); margin-top:2px; }
+    .admin-panel-body { padding:14px 16px; }
+    .admin-table { width:100%; border-collapse:collapse; }
+    .admin-table th { text-align:left; font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-tertiary); background:var(--surface-3); padding:9px 10px; border-bottom:1px solid var(--border); }
+    .admin-table td { padding:10px; border-bottom:1px solid var(--border-light); font-size:12.5px; vertical-align:middle; }
+    .admin-table tr:hover td { background:var(--hover-row); }
+    .admin-table strong { color:var(--text-primary); }
+    .admin-table small { display:block; color:var(--text-secondary); margin-top:2px; }
+    .table-scroll { overflow:auto; }
+    .row-actions { display:flex; justify-content:flex-end; gap:6px; flex-wrap:wrap; }
+    .toolbar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .toolbar input, .toolbar select, .drawer-form input, .drawer-form select, .drawer-form textarea { border:1px solid var(--border); border-radius:var(--radius-sm); padding:8px 9px; font-family:var(--font-sans); font-size:12.5px; background:var(--surface); color:var(--text-primary); }
+    .toolbar input { min-width:220px; }
+    .drawer-backdrop { position:fixed; inset:0; background:rgba(12,10,9,0.34); display:none; align-items:stretch; justify-content:flex-end; z-index:1000; }
+    .drawer-backdrop.active { display:flex; }
+    .drawer { width:min(520px, 100%); height:100%; background:var(--surface); box-shadow:var(--shadow-modal); display:flex; flex-direction:column; }
+    .drawer-header { padding:18px 20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; gap:12px; }
+    .drawer-title { font-size:18px; font-weight:800; letter-spacing:-0.03em; }
+    .drawer-body { padding:18px 20px; overflow:auto; flex:1; }
+    .drawer-footer { padding:14px 20px; border-top:1px solid var(--border); background:var(--bg-subtle); display:flex; justify-content:flex-end; gap:8px; }
+    .drawer-form { display:grid; gap:12px; }
+    .field-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .field label { display:block; margin-bottom:5px; font-size:10px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-tertiary); }
+    .field input, .field select, .field textarea { width:100%; }
+    .permission-preview { display:grid; gap:7px; max-height:220px; overflow:auto; border:1px solid var(--border); border-radius:var(--radius); padding:8px; background:var(--surface-2); }
+    .permission-preview div { display:flex; justify-content:space-between; gap:10px; padding:7px 8px; border:1px solid var(--border-light); border-radius:var(--radius-sm); background:var(--surface); font-size:12px; }
+    .permission-preview code { font-family:var(--font-mono); font-size:10px; color:var(--brand-hover); white-space:nowrap; }
+    .decision-card { border:1px solid var(--border); border-radius:var(--radius); padding:14px; background:var(--surface-2); }
+    .decision-card h3 { font-size:15px; margin-bottom:6px; }
+    .decision-card p { color:var(--text-secondary); font-size:12.5px; }
+    .pathway-strip { display:grid; grid-template-columns:repeat(9, minmax(100px, 1fr)); gap:1px; background:var(--border); border:1px solid var(--border); border-radius:var(--radius); overflow:auto; margin-bottom:14px; }
+    .pathway-strip div { background:var(--surface); padding:10px; min-height:72px; }
+    .pathway-strip strong { display:block; font-size:11px; color:var(--text-primary); }
+    .pathway-strip span { display:block; margin-top:4px; font-size:10.5px; color:var(--text-secondary); line-height:1.35; }
+    .audit-list { display:grid; gap:8px; }
+    .audit-item { display:grid; grid-template-columns:150px 1fr 110px; gap:10px; align-items:start; border:1px solid var(--border-light); border-radius:var(--radius-sm); padding:9px 10px; background:var(--surface); font-size:12px; }
+    .audit-item strong { color:var(--text-primary); }
+    .audit-item span { color:var(--text-secondary); }
+    .audit-item time { color:var(--text-tertiary); font-family:var(--font-mono); font-size:10.5px; text-align:right; }
+    .scope-chip-list { display:flex; flex-wrap:wrap; gap:5px; }
+    .scope-chip { border:1px solid var(--border); border-radius:999px; padding:3px 8px; font-size:11px; color:var(--text-secondary); background:var(--surface-2); }
+    .org-card { border:1px solid var(--border); border-radius:var(--radius); padding:14px; background:var(--surface); display:grid; gap:10px; }
+    .org-card.selected { border-color:var(--brand); box-shadow:0 0 0 2px var(--brand-subtle); }
+    .org-card h3 { font-size:15px; letter-spacing:-0.02em; }
+    .org-card p { font-size:12px; color:var(--text-secondary); }
+    .org-type-tabs { display:flex; gap:8px; flex-wrap:wrap; }
+    .org-type-tabs button { border:1px solid var(--border); background:var(--surface); color:var(--text-secondary); border-radius:var(--radius-sm); padding:8px 10px; font-size:12px; font-family:var(--font-sans); cursor:pointer; }
+    .org-type-tabs button.active { border-color:var(--brand); background:var(--brand-subtle); color:var(--brand-hover); font-weight:700; }
+    .branch-list { display:grid; gap:8px; }
+    .branch-item { display:flex; justify-content:space-between; gap:12px; border:1px solid var(--border-light); border-radius:var(--radius-sm); padding:9px; background:var(--surface-2); font-size:12px; }
+    .empty-inline { padding:20px; color:var(--text-secondary); text-align:center; font-size:13px; }
+    .muted { color:var(--text-secondary); }
+    @media (max-width:1100px) {
+      .admin-shell { grid-template-columns:1fr; }
+      .admin-sidebar { position:relative; height:auto; }
+      .admin-nav { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); }
+      .metric-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+      .admin-grid.two, .admin-grid.three, .field-row { grid-template-columns:1fr; }
+      .pathway-strip { grid-template-columns:1fr 1fr; }
+      .admin-topbar { flex-direction:column; }
+    }
+  </style>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+  <div class="admin-shell">
+    <aside class="admin-sidebar">
+      <div class="admin-brand">
+        <strong>Clinical<span style="color:var(--brand);"> PMS</span></strong>
+        <span>Governance Admin</span>
+      </div>
+      <nav class="admin-nav" aria-label="Admin sections">
+        <button class="active" data-view-link="dashboard" onclick="switchView('dashboard')">Dashboard</button>
+        <button data-view-link="organizations" onclick="switchView('organizations')">Organizations</button>
+        <button data-view-link="users" onclick="switchView('users')">Users & Roles</button>
+        <button data-view-link="permissions" onclick="switchView('permissions')">Permission Matrix</button>
+        <button data-view-link="requests" onclick="switchView('requests')">Access Requests</button>
+        <button data-view-link="consent" onclick="switchView('consent')">Consent</button>
+        <button data-view-link="decision" onclick="switchView('decision')">Decision Simulator</button>
+        <button data-view-link="audit" onclick="switchView('audit')">Audit Log</button>
+        <a href="../pms_prototype/00-dashboard.html">Back to PMS</a>
+      </nav>
+    </aside>
+
+    <main class="admin-main">
+      <header class="admin-topbar">
+        <div>
+          <div class="eyebrow">Organization Access Authority</div>
+          <h1 class="admin-title">Admin Governance Console</h1>
+        </div>
+        <div class="admin-actions">
+          <a class="btn" href="../index.html">Prototype Hub</a>
+          <a class="btn" href="../pms_prototype/00-dashboard.html">Clinical PMS</a>
+          <button class="btn primary" onclick="publishCurrentAdmin()">Use Current Admin in PMS</button>
+        </div>
+      </header>
+
+      <section id="view-dashboard" class="admin-view active">
+        <div class="metric-grid" id="metricGrid"></div>
+        <div class="pathway-strip">
+          <div><strong>Identity</strong><span>Individual user account</span></div>
+          <div><strong>Membership</strong><span>Organization relationship</span></div>
+          <div><strong>Context</strong><span>Active org and branch</span></div>
+          <div><strong>Role</strong><span>Allowed action family</span></div>
+          <div><strong>Scope</strong><span>Patients, branch, org</span></div>
+          <div><strong>Action</strong><span>Requested operation</span></div>
+          <div><strong>Resource</strong><span>Patient or admin object</span></div>
+          <div><strong>State</strong><span>Consent, workflow, emergency</span></div>
+          <div><strong>Audit</strong><span>Recorded decision</span></div>
+        </div>
+        <div class="admin-grid two">
+          <div class="admin-panel">
+            <div class="admin-panel-header">
+              <div><div class="admin-panel-title">Pending Authority Work</div><div class="admin-panel-subtitle">Requests and high-risk events needing admin action.</div></div>
+              <button class="btn" onclick="switchView('requests')">Open Queue</button>
+            </div>
+            <div class="table-scroll"><table class="admin-table" id="dashboardQueueTable"></table></div>
+          </div>
+          <div class="admin-panel">
+            <div class="admin-panel-header">
+              <div><div class="admin-panel-title">Recent Audit</div><div class="admin-panel-subtitle">Latest governance changes and access decisions.</div></div>
+              <button class="btn" onclick="switchView('audit')">View All</button>
+            </div>
+            <div class="admin-panel-body"><div class="audit-list" id="dashboardAuditList"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-organizations" class="admin-view">
+        <div class="admin-grid two">
+          <div class="admin-panel">
+            <div class="admin-panel-header">
+              <div><div class="admin-panel-title">Organizations</div><div class="admin-panel-subtitle">One model covers clinics, hospitals, universities, research institutions, and solo practices.</div></div>
+              <button class="btn primary" onclick="openOrgDrawer()">Add Organization</button>
+            </div>
+            <div class="admin-panel-body"><div class="admin-grid three" id="orgCards"></div></div>
+          </div>
+          <div class="admin-panel">
+            <div class="admin-panel-header">
+              <div><div class="admin-panel-title">Branches & Facilities</div><div class="admin-panel-subtitle" id="branchPanelSubtitle">Select an organization to inspect branch scope.</div></div>
+              <button class="btn" onclick="addBranchToSelected()">Add Branch</button>
+            </div>
+            <div class="admin-panel-body"><div class="branch-list" id="branchList"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-users" class="admin-view">
+        <div class="admin-panel" style="margin-bottom:14px;">
+          <div class="admin-panel-header">
+            <div><div class="admin-panel-title">Organization Teams</div><div class="admin-panel-subtitle">Choose an organization type, then select an organization to manage its team, roles, and scope.</div></div>
+          </div>
+          <div class="admin-panel-body">
+            <div class="org-type-tabs" id="usersOrgTypes"></div>
+            <div class="admin-grid three" id="usersOrgCards" style="margin-top:12px;"></div>
+          </div>
+        </div>
+        <div class="admin-panel">
+          <div class="admin-panel-header">
+            <div><div class="admin-panel-title" id="usersPanelTitle">Users, Roles & Scope</div><div class="admin-panel-subtitle" id="usersPanelSubtitle">Invite users, activate or deactivate accounts, assign role, branch, and patient scope.</div></div>
+            <div class="toolbar">
+              <input id="userSearch" placeholder="Filter users..." oninput="renderUsers()">
+              <select id="roleFilter" onchange="renderUsers()"><option value="">All roles</option></select>
+              <button class="btn primary" onclick="openUserDrawer()">Invite User</button>
+            </div>
+          </div>
+          <div class="table-scroll"><table class="admin-table" id="usersTable"></table></div>
+        </div>
+      </section>
+
+      <section id="view-permissions" class="admin-view">
+        <div class="admin-grid two">
+          <div class="admin-panel">
+            <div class="admin-panel-header">
+              <div><div class="admin-panel-title">Role Permission Matrix</div><div class="admin-panel-subtitle">Roles define action families; scope narrows patient and branch reach.</div></div>
+            </div>
+            <div class="table-scroll"><table class="admin-table" id="permissionsTable"></table></div>
+          </div>
+          <div class="admin-panel">
+            <div class="admin-panel-header">
+              <div><div class="admin-panel-title">Effective Permission Preview</div><div class="admin-panel-subtitle">Select a role and scope before changing a user.</div></div>
+            </div>
+            <div class="admin-panel-body">
+              <div class="field-row">
+                <div class="field"><label>Role</label><select id="previewRole" onchange="renderPermissionPreview()"></select></div>
+                <div class="field"><label>Scope</label><select id="previewScope" onchange="renderPermissionPreview()"></select></div>
+              </div>
+              <div style="margin-top:12px;" class="permission-preview" id="standalonePermissionPreview"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-requests" class="admin-view">
+        <div class="admin-panel">
+          <div class="admin-panel-header">
+            <div><div class="admin-panel-title">Access Requests</div><div class="admin-panel-subtitle">Approve, deny, or scope cross-branch and cross-organization clinical access.</div></div>
+            <button class="btn primary" onclick="openRequestDrawer()">Create Request</button>
+          </div>
+          <div class="table-scroll"><table class="admin-table" id="requestsTable"></table></div>
+        </div>
+      </section>
+
+      <section id="view-consent" class="admin-view">
+        <div class="admin-panel">
+          <div class="admin-panel-header">
+            <div><div class="admin-panel-title">Consent Events</div><div class="admin-panel-subtitle">Consent is recorded as an authorization event with purpose, duration, data scope, and revocation state.</div></div>
+            <button class="btn primary" onclick="openConsentDrawer()">Record Consent</button>
+          </div>
+          <div class="table-scroll"><table class="admin-table" id="consentTable"></table></div>
+        </div>
+      </section>
+
+      <section id="view-decision" class="admin-view">
+        <div class="admin-grid two">
+          <div class="admin-panel">
+            <div class="admin-panel-header">
+              <div><div class="admin-panel-title">Authorization Determination</div><div class="admin-panel-subtitle">Inspect the computed outcome before an action reaches PMS.</div></div>
+            </div>
+            <div class="admin-panel-body">
+              <div class="drawer-form">
+                <div class="field-row">
+                  <div class="field"><label>User</label><select id="decisionUser" onchange="evaluateDecision()"></select></div>
+                  <div class="field"><label>Action</label><select id="decisionAction" onchange="evaluateDecision()"></select></div>
+                </div>
+                <div class="field-row">
+                  <div class="field"><label>Patient / Resource</label><select id="decisionPatient" onchange="evaluateDecision()"></select></div>
+                  <div class="field"><label>Relationship</label><select id="decisionRelationship" onchange="evaluateDecision()"></select></div>
+                </div>
+                <button class="btn primary" onclick="logDecision()">Log Decision</button>
+              </div>
+            </div>
+          </div>
+          <div class="admin-panel">
+            <div class="admin-panel-header">
+              <div><div class="admin-panel-title">Decision Result</div><div class="admin-panel-subtitle">Allow, deny, or limited view based on role, scope, and consent.</div></div>
+            </div>
+            <div class="admin-panel-body"><div class="decision-card" id="decisionResult"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-audit" class="admin-view">
+        <div class="admin-panel">
+          <div class="admin-panel-header">
+            <div><div class="admin-panel-title">Audit Log</div><div class="admin-panel-subtitle">Mandatory prototype events for governance and protected clinical access.</div></div>
+            <div class="toolbar">
+              <select id="auditFilter" onchange="renderAudit()"><option value="">All events</option></select>
+              <button class="btn" onclick="resetGovernanceState()">Reset Prototype State</button>
+            </div>
+          </div>
+          <div class="admin-panel-body"><div class="audit-list" id="auditList"></div></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawerOnBackdrop(event)">
+    <aside class="drawer" role="dialog" aria-modal="true">
+      <div class="drawer-header">
+        <div>
+          <div class="eyebrow" id="drawerKicker">Admin</div>
+          <div class="drawer-title" id="drawerTitle">Edit</div>
+        </div>
+        <button class="btn ghost" onclick="closeDrawer()">Close</button>
+      </div>
+      <div class="drawer-body" id="drawerBody"></div>
+      <div class="drawer-footer" id="drawerFooter"></div>
+    </aside>
+  </div>
+
+  <div class="toast"></div>
+  <script src="../pms_prototype/data.js"></script>
+  <script src="../pms_prototype/prototype.js"></script>
+  <script>
+    const GOVERNANCE_KEY = 'hearintel_governance_state';
+    const ROLE_DEFS = {
+      front_desk: {
+        label: 'Front Desk Officer',
+        description: 'Registers patients, books appointments, checks in visits, and manages queues without clinical record access.',
+        permissions: ['patients.register', 'patients.demographics', 'appointments.manage', 'queue.manage', 'settings.view'],
+        denied: 'Clinical notes, audiograms, diagnosis, reports, and assessment workspaces.'
+      },
+      audiologist: {
+        label: 'Audiologist',
+        description: 'Accesses assigned or authorized patients and records assessment findings.',
+        permissions: ['patients.view', 'clinical.view', 'clinical.write', 'rehab.manage', 'settings.view'],
+        denied: 'Final sign-off, unrestricted organization review, and user governance.'
+      },
+      lead_audiologist: {
+        label: 'Lead Audiologist',
+        description: 'Reviews clinical work, reassigns assessments, and signs reports within scope.',
+        permissions: ['patients.view', 'clinical.view', 'clinical.write', 'clinical.review', 'reports.sign', 'rehab.manage', 'settings.view'],
+        denied: 'Role assignment and organization access governance.'
+      },
+      org_admin: {
+        label: 'Organization Admin',
+        description: 'Manages organization users, roles, branches, subscription context, and access workflows.',
+        permissions: ['dashboard.view', 'patients.view', 'patients.register', 'patients.demographics', 'finance.manage', 'settings.view', 'settings.manage', 'staff.manage', 'branches.manage', 'governance.manage'],
+        denied: 'Unrestricted clinical data by default.'
+      },
+      super_admin: {
+        label: 'Super Admin',
+        description: 'Platform governance across organizations and exceptional administrative oversight.',
+        permissions: ['dashboard.view', 'patients.view', 'settings.view', 'settings.manage', 'staff.manage', 'branches.manage', 'governance.manage', 'platform.manage'],
+        denied: 'Routine clinical authorship unless explicitly assigned a clinical role.'
+      }
+    };
+    const SCOPE_DEFS = {
+      assigned_patients: 'Assigned patients',
+      branch: 'Branch only',
+      multi_branch: 'Multiple branches',
+      organization: 'Organization-wide',
+      platform: 'Platform governance'
+    };
+    const PERMISSION_LABELS = {
+      'dashboard.view': 'View dashboard',
+      'patients.view': 'View authorized patient records',
+      'patients.register': 'Register patients',
+      'patients.demographics': 'Manage demographics',
+      'appointments.manage': 'Manage appointments',
+      'queue.manage': 'Manage queue',
+      'clinical.view': 'View clinical record',
+      'clinical.write': 'Write assessment',
+      'clinical.review': 'Review clinical work',
+      'reports.sign': 'Sign reports',
+      'rehab.manage': 'Manage rehab/device care',
+      'finance.manage': 'Manage billing',
+      'settings.view': 'View settings',
+      'settings.manage': 'Manage settings',
+      'staff.manage': 'Manage users',
+      'branches.manage': 'Manage branches',
+      'governance.manage': 'Manage governance',
+      'platform.manage': 'Manage platform'
+    };
+    const DEFAULT_STATE = {
+      selectedOrgId: 'org-lagos',
+      selectedOrgType: '',
+      organizations: [
+        { id:'org-lagos', name:'Lagos Central Hearing Clinic', type:'Clinic', subscription:'Business', status:'Active', owner:'Dr. Tunde Salako', branches:[
+          { id:'lagos-central', name:'Lagos Central', city:'Lagos', status:'Active' },
+          { id:'lekki-annex', name:'Lekki Annex', city:'Lagos', status:'Active' },
+          { id:'ikorodu-outreach', name:'Ikorodu Outreach', city:'Lagos', status:'Pilot' }
+        ] },
+        { id:'org-luth', name:'LUTH Department of Otolaryngology', type:'Hospital', subscription:'Enterprise', status:'Active', owner:'Prof. Adeyemi', branches:[
+          { id:'luth-main', name:'ENT Department', city:'Lagos', status:'Active' },
+          { id:'luth-rehab', name:'Audiology Rehab Unit', city:'Lagos', status:'Active' }
+        ] },
+        { id:'org-fuhsi', name:'FUHSI Audiology Program', type:'University', subscription:'Academic', status:'Active', owner:'Dr. Nkem Nwosu', branches:[
+          { id:'fuhsi-clinic', name:'Teaching Clinic', city:'Ila-Orangun', status:'Active' },
+          { id:'fuhsi-research', name:'Research Registry', city:'Ila-Orangun', status:'Restricted' }
+        ] },
+        { id:'org-solo', name:'Ola Martins Hearing Practice', type:'Solo Practice', subscription:'Solo', status:'Active', owner:'Ola Martins', branches:[
+          { id:'solo-main', name:'Main Practice', city:'Ibadan', status:'Active' }
+        ] }
+      ],
+      users: [
+        { id:'u-chioma', name:'Chioma Okoro', email:'chioma.o@lagoshearing.org', orgId:'org-lagos', role:'front_desk', scope:'branch', branches:['lagos-central'], patients:[], status:'Active', lastActive:'Today 08:42' },
+        { id:'u-amina', name:'Amina Bello, Au.D.', email:'amina.b@lagoshearing.org', orgId:'org-lagos', role:'audiologist', scope:'assigned_patients', branches:['lagos-central'], patients:['amaia','emeka'], status:'Active', lastActive:'Today 09:18' },
+        { id:'u-chika', name:'Dr. Chika Okafor, Au.D.', email:'chika.okafor@lagoshearing.org', orgId:'org-lagos', role:'lead_audiologist', scope:'organization', branches:['lagos-central','lekki-annex'], patients:['amaia','david','emeka'], status:'Active', lastActive:'Today 09:31' },
+        { id:'u-tunde', name:'Dr. Tunde Salako', email:'salako@lagoshearing.org', orgId:'org-lagos', role:'org_admin', scope:'organization', branches:['lagos-central','lekki-annex','ikorodu-outreach'], patients:[], status:'Active', lastActive:'Today 07:55' },
+        { id:'u-luth-admin', name:'Prof. Adeyemi', email:'adeyemi@luth.ng', orgId:'org-luth', role:'org_admin', scope:'organization', branches:['luth-main','luth-rehab'], patients:[], status:'Active', lastActive:'Today 08:05' },
+        { id:'u-luth-clinician', name:'Dr. Halima Yusuf', email:'halima.yusuf@luth.ng', orgId:'org-luth', role:'lead_audiologist', scope:'multi_branch', branches:['luth-main','luth-rehab'], patients:['zainab'], status:'Active', lastActive:'Today 09:04' },
+        { id:'u-fuhsi-admin', name:'Dr. Nkem Nwosu', email:'nkem.nwosu@fuhsi.edu.ng', orgId:'org-fuhsi', role:'org_admin', scope:'organization', branches:['fuhsi-clinic','fuhsi-research'], patients:[], status:'Active', lastActive:'Yesterday 16:30' },
+        { id:'u-fuhsi-student', name:'Ife Adebayo', email:'ife.adebayo@fuhsi.edu.ng', orgId:'org-fuhsi', role:'audiologist', scope:'assigned_patients', branches:['fuhsi-clinic'], patients:[], status:'Invited', lastActive:'Never' },
+        { id:'u-solo-owner', name:'Ola Martins', email:'ola@martinshearing.ng', orgId:'org-solo', role:'org_admin', scope:'organization', branches:['solo-main'], patients:[], status:'Active', lastActive:'Today 06:48' },
+        { id:'u-platform', name:'HearIntel Super Admin', email:'platform@hearintel.local', orgId:'platform', role:'super_admin', scope:'platform', branches:[], patients:[], status:'Active', lastActive:'Today 06:20' }
+      ],
+      patients: [
+        { id:'amaia', name:'Amaia Okafor', mrn:'NG-26-01234', orgId:'org-lagos', branchId:'lagos-central', record:'Active Care Plan' },
+        { id:'david', name:'David Mensah', mrn:'NG-26-00981', orgId:'org-lagos', branchId:'lekki-annex', record:'Active Care Plan' },
+        { id:'emeka', name:'Emeka Eze', mrn:'NG-26-02104', orgId:'org-lagos', branchId:'lagos-central', record:'ENT Referral' },
+        { id:'zainab', name:'Zainab Musa', mrn:'NG-26-03188', orgId:'org-luth', branchId:'luth-main', record:'External clinical record' }
+      ],
+      requests: [
+        { id:'req-1001', patientId:'zainab', requester:'Amina Bello, Au.D.', requesterOrg:'Lagos Central Hearing Clinic', holdingOrg:'LUTH Department of Otolaryngology', purpose:'ENT transfer review', scope:'Audiology battery + report summary', duration:'14 days', status:'Pending' },
+        { id:'req-1002', patientId:'david', requester:'Chioma Okoro', requesterOrg:'Lagos Central Hearing Clinic', holdingOrg:'Lagos Central Hearing Clinic', purpose:'Branch appointment transfer', scope:'Identity + appointment workflow', duration:'Visit episode', status:'Pending' }
+      ],
+      consents: [
+        { id:'con-7001', patientId:'amaia', fromOrg:'Lagos Central Hearing Clinic', toOrg:'LUTH Department of Otolaryngology', purpose:'Specialist ENT referral', scope:'Report summary + tympanometry', expires:'2026-10-08', status:'Active' }
+      ],
+      audit: [
+        { type:'User invited', detail:'Organization Admin invited Amina Bello as Audiologist, Lagos Central, assigned patients.', actor:'Dr. Tunde Salako', time:'Today 07:42' },
+        { type:'Role changed', detail:'Chioma Okoro changed from Data Officer to Front Desk Officer.', actor:'Dr. Tunde Salako', time:'Today 07:50' },
+        { type:'Patient found', detail:'MRN NG-26-01234 matched through identity index; clinical record authorization evaluated.', actor:'Chioma Okoro', time:'Today 08:44' },
+        { type:'Access request created', detail:'Lagos Central requested scoped access to LUTH record for Zainab Musa.', actor:'Amina Bello', time:'Today 09:02' }
+      ]
+    };
+
+    let state = loadState();
+    let drawerMode = null;
+    let editingId = null;
+
+    function clone(obj) { return JSON.parse(JSON.stringify(obj)); }
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(GOVERNANCE_KEY);
+        return sanitizeState(raw ? mergeStoredState(JSON.parse(raw)) : clone(DEFAULT_STATE));
+      } catch(e) {
+        return sanitizeState(clone(DEFAULT_STATE));
+      }
+    }
+    function mergeStoredState(stored) {
+      const merged = Object.assign(clone(DEFAULT_STATE), stored || {});
+      ['organizations','users','patients','requests','consents','audit'].forEach(key => {
+        if (Array.isArray(stored?.[key])) merged[key] = mergeById(DEFAULT_STATE[key], stored[key]);
+      });
+      return merged;
+    }
+    function mergeById(defaultRows, storedRows) {
+      const rows = clone(storedRows || []);
+      (defaultRows || []).forEach(defaultRow => {
+        if (!rows.some(row => row.id && row.id === defaultRow.id)) rows.push(clone(defaultRow));
+      });
+      return rows;
+    }
+    function sanitizeState(nextState) {
+      delete nextState.breakGlass;
+      nextState.audit = (nextState.audit || []).filter(a => !String(a.type || '').toLowerCase().includes('break') && !String(a.detail || '').toLowerCase().includes('break-glass'));
+      if (nextState.selectedOrgType === undefined) nextState.selectedOrgType = '';
+      if (!governanceOrgsForState(nextState).some(o => o.id === nextState.selectedOrgId)) nextState.selectedOrgId = nextState.organizations[0]?.id || 'platform';
+      return nextState;
+    }
+    function governanceOrgsForState(sourceState) {
+      return (sourceState.organizations || []).concat([{ id:'platform', name:'HearIntel Network', type:'Platform', subscription:'Internal', status:'Active', owner:'HearIntel', branches:[] }]);
+    }
+    function saveState() { localStorage.setItem(GOVERNANCE_KEY, JSON.stringify(state)); }
+    function addAudit(type, detail, actor) {
+      state.audit.unshift({ type, detail, actor: actor || currentAdminName(), time:'Now' });
+      saveState();
+      renderAll();
+    }
+    function currentAdminName() {
+      const admin = state.users.find(u => u.role === 'org_admin' && u.status === 'Active');
+      return admin ? admin.name : 'Governance Admin';
+    }
+    function orgName(orgId) {
+      if (orgId === 'platform') return 'HearIntel Network';
+      const org = state.organizations.find(o => o.id === orgId);
+      return org ? org.name : orgId;
+    }
+    function governanceOrgs() {
+      return governanceOrgsForState(state);
+    }
+    function orgMeta(orgId) {
+      return governanceOrgs().find(o => o.id === orgId);
+    }
+    function branchName(branchId) {
+      for (const org of state.organizations) {
+        const branch = org.branches.find(b => b.id === branchId);
+        if (branch) return branch.name;
+      }
+      return branchId || 'None';
+    }
+    function patientName(patientId) {
+      const patient = state.patients.find(p => p.id === patientId);
+      return patient ? patient.name + ' (' + patient.mrn + ')' : patientId;
+    }
+    function roleLabel(role) { return ROLE_DEFS[role] ? ROLE_DEFS[role].label : role; }
+    function scopeLabel(scope) { return SCOPE_DEFS[scope] || scope; }
+    function badge(status) {
+      const key = String(status || '').toLowerCase();
+      const cls = key.includes('active') || key.includes('approved') ? 'success' : key.includes('pending') || key.includes('review') ? 'warning' : key.includes('denied') || key.includes('revoked') || key.includes('inactive') ? 'danger' : 'neutral';
+      return '<span class="badge ' + cls + '">' + status + '</span>';
+    }
+    function switchView(view) {
+      document.querySelectorAll('.admin-view').forEach(el => el.classList.remove('active'));
+      document.getElementById('view-' + view).classList.add('active');
+      document.querySelectorAll('[data-view-link]').forEach(el => el.classList.toggle('active', el.dataset.viewLink === view));
+      renderAll();
+    }
+    function renderAll() {
+      renderMetrics();
+      renderDashboardQueue();
+      renderDashboardAudit();
+      renderOrganizations();
+      renderUsers();
+      renderPermissions();
+      renderAccessRequests();
+      renderConsents();
+      hydrateDecisionInputs();
+      evaluateDecision();
+      renderAudit();
+      if (window.lucide) lucide.createIcons();
+    }
+    function renderMetrics() {
+      const activeUsers = state.users.filter(u => u.status === 'Active').length;
+      const pending = state.requests.filter(r => r.status === 'Pending').length;
+      const activeConsents = state.consents.filter(c => c.status === 'Active').length;
+      const html = [
+        ['Organizations', state.organizations.length, 'Subscription owners and trust boundaries'],
+        ['Active Users', activeUsers, 'Individual authenticated accounts'],
+        ['Pending Requests', pending, 'Waiting for access decision'],
+        ['Active Consent', activeConsents, 'Scoped authorization events'],
+        ['Audit Events', state.audit.length, 'Recorded governance decisions']
+      ].map(m => '<div class="metric-card"><span>' + m[0] + '</span><strong>' + m[1] + '</strong><p>' + m[2] + '</p></div>').join('');
+      document.getElementById('metricGrid').innerHTML = html;
+    }
+    function renderDashboardQueue() {
+      const rows = [
+        ...state.requests.filter(r => r.status === 'Pending').map(r => ({ type:'Access Request', subject:patientName(r.patientId), owner:r.requester, status:r.status }))
+      ];
+      document.getElementById('dashboardQueueTable').innerHTML = '<thead><tr><th>Type</th><th>Subject</th><th>Owner</th><th>Status</th></tr></thead><tbody>' +
+        (rows.length ? rows.map(r => '<tr><td><strong>' + r.type + '</strong></td><td>' + r.subject + '</td><td>' + r.owner + '</td><td>' + badge(r.status) + '</td></tr>').join('') : '<tr><td colspan="4"><div class="empty-inline">No pending governance work.</div></td></tr>') +
+        '</tbody>';
+    }
+    function renderDashboardAudit() {
+      document.getElementById('dashboardAuditList').innerHTML = state.audit.slice(0, 5).map(auditHtml).join('');
+    }
+    function renderOrganizations() {
+      const selected = state.organizations.find(o => o.id === state.selectedOrgId) || state.organizations[0];
+      document.getElementById('orgCards').innerHTML = state.organizations.map(org => (
+        '<button class="org-card ' + (org.id === selected.id ? 'selected' : '') + '" onclick="selectOrg(\'' + org.id + '\')">' +
+          '<div>' + badge(org.status) + '</div><h3>' + org.name + '</h3><p>' + org.type + ' - ' + org.subscription + ' subscription</p>' +
+          '<div class="scope-chip-list"><span class="scope-chip">' + org.branches.length + ' branch' + (org.branches.length === 1 ? '' : 'es') + '</span><span class="scope-chip">Owner: ' + org.owner + '</span></div>' +
+        '</button>'
+      )).join('');
+      document.getElementById('branchPanelSubtitle').textContent = selected.name + ' branch scope controls.';
+      document.getElementById('branchList').innerHTML = selected.branches.map(b => (
+        '<div class="branch-item"><div><strong>' + b.name + '</strong><small>' + b.city + ' - branch id ' + b.id + '</small></div><div>' + badge(b.status) + '</div></div>'
+      )).join('');
+    }
+    function selectOrg(orgId) {
+      state.selectedOrgId = orgId;
+      const org = orgMeta(orgId);
+      if (org) state.selectedOrgType = org.type;
+      saveState();
+      renderOrganizations();
+      renderUsers();
+    }
+    function addBranchToSelected() {
+      const org = state.organizations.find(o => o.id === state.selectedOrgId);
+      if (!org) return;
+      const count = org.branches.length + 1;
+      const branch = { id:org.id.replace('org-', '') + '-branch-' + count, name:'New Branch ' + count, city:'Pending', status:'Draft' };
+      org.branches.push(branch);
+      addAudit('Branch created', org.name + ' added ' + branch.name + ' in Draft status.');
+      notify('Branch added to selected organization.');
+    }
+    function renderUsers() {
+      const roleFilter = document.getElementById('roleFilter');
+      if (roleFilter && roleFilter.options.length <= 1) {
+        roleFilter.innerHTML = '<option value="">All roles</option>' + Object.keys(ROLE_DEFS).map(k => '<option value="' + k + '">' + roleLabel(k) + '</option>').join('');
+      }
+      renderUsersOrgControls();
+      const q = (document.getElementById('userSearch')?.value || '').toLowerCase();
+      const rf = roleFilter ? roleFilter.value : '';
+      const selected = orgMeta(state.selectedOrgId) || governanceOrgs()[0];
+      document.getElementById('usersPanelTitle').textContent = selected.name + ' Team & Roles';
+      document.getElementById('usersPanelSubtitle').textContent = selected.type + ' organization scope. Assign role, branch reach, and patient-level access inside this organization.';
+      const users = state.users.filter(u => u.orgId === selected.id && (!q || [u.name,u.email,roleLabel(u.role),scopeLabel(u.scope)].join(' ').toLowerCase().includes(q)) && (!rf || u.role === rf));
+      document.getElementById('usersTable').innerHTML = '<thead><tr><th>User</th><th>Role</th><th>Scope</th><th>Status</th><th>Last Active</th><th></th></tr></thead><tbody>' +
+        (users.length ? users.map(u => '<tr><td><strong>' + u.name + '</strong><small>' + u.email + '</small></td><td>' + roleLabel(u.role) + '</td><td>' + scopeSummary(u) + '</td><td>' + badge(u.status) + '</td><td>' + u.lastActive + '</td><td><div class="row-actions"><button class="btn" onclick="openUserDrawer(\'' + u.id + '\')">Edit</button><button class="btn" onclick="publishUserToPms(\'' + u.id + '\')">Use in PMS</button><button class="btn" onclick="toggleUserStatus(\'' + u.id + '\')">' + (u.status === 'Active' ? 'Deactivate' : 'Activate') + '</button></div></td></tr>').join('') : '<tr><td colspan="6"><div class="empty-inline">No users match this organization and filter.</div></td></tr>') +
+        '</tbody>';
+    }
+    function renderUsersOrgControls() {
+      const typeTarget = document.getElementById('usersOrgTypes');
+      const cardTarget = document.getElementById('usersOrgCards');
+      if (!typeTarget || !cardTarget) return;
+      const orgs = governanceOrgs();
+      const types = Array.from(new Set(orgs.map(o => o.type)));
+      const selectedType = state.selectedOrgType || '';
+      typeTarget.innerHTML = '<button class="' + (!selectedType ? 'active' : '') + '" onclick="selectOrgType(\'\')">All</button>' +
+        types.map(type => '<button class="' + (selectedType === type ? 'active' : '') + '" onclick="selectOrgType(\'' + type + '\')">' + type + '</button>').join('');
+      const visibleOrgs = selectedType ? orgs.filter(o => o.type === selectedType) : orgs;
+      if (!visibleOrgs.some(o => o.id === state.selectedOrgId) && visibleOrgs[0]) state.selectedOrgId = visibleOrgs[0].id;
+      cardTarget.innerHTML = visibleOrgs.map(org => {
+        const members = state.users.filter(u => u.orgId === org.id);
+        const activeMembers = members.filter(u => u.status === 'Active').length;
+        return '<button class="org-card ' + (org.id === state.selectedOrgId ? 'selected' : '') + '" onclick="selectOrg(\'' + org.id + '\')">' +
+          '<div>' + badge(org.status) + '</div><h3>' + org.name + '</h3><p>' + org.type + ' - ' + org.subscription + ' subscription</p>' +
+          '<div class="scope-chip-list"><span class="scope-chip">' + members.length + ' user' + (members.length === 1 ? '' : 's') + '</span><span class="scope-chip">' + activeMembers + ' active</span><span class="scope-chip">' + org.branches.length + ' branch' + (org.branches.length === 1 ? '' : 'es') + '</span></div>' +
+        '</button>';
+      }).join('');
+    }
+    function selectOrgType(type) {
+      state.selectedOrgType = type;
+      const visible = type ? governanceOrgs().filter(o => o.type === type) : governanceOrgs();
+      if (visible[0]) state.selectedOrgId = visible[0].id;
+      saveState();
+      renderUsers();
+    }
+    function scopeSummary(user) {
+      const chunks = ['<span class="scope-chip">' + scopeLabel(user.scope) + '</span>'];
+      if (user.branches.length) chunks.push(...user.branches.map(id => '<span class="scope-chip">' + branchName(id) + '</span>'));
+      if (user.patients.length) chunks.push(...user.patients.map(id => '<span class="scope-chip">' + patientName(id).split(' (')[0] + '</span>'));
+      return '<div class="scope-chip-list">' + chunks.join('') + '</div>';
+    }
+    function renderPermissions() {
+      document.getElementById('permissionsTable').innerHTML = '<thead><tr><th>Role</th><th>Purpose</th><th>Allowed Permissions</th><th>Does Not Grant</th></tr></thead><tbody>' +
+        Object.keys(ROLE_DEFS).map(key => {
+          const role = ROLE_DEFS[key];
+          return '<tr><td><strong>' + role.label + '</strong></td><td>' + role.description + '</td><td><div class="scope-chip-list">' + role.permissions.map(p => '<span class="scope-chip">' + (PERMISSION_LABELS[p] || p) + '</span>').join('') + '</div></td><td>' + role.denied + '</td></tr>';
+        }).join('') + '</tbody>';
+      const roleSelect = document.getElementById('previewRole');
+      const scopeSelect = document.getElementById('previewScope');
+      if (roleSelect && !roleSelect.options.length) roleSelect.innerHTML = Object.keys(ROLE_DEFS).map(k => '<option value="' + k + '">' + roleLabel(k) + '</option>').join('');
+      if (scopeSelect && !scopeSelect.options.length) scopeSelect.innerHTML = Object.keys(SCOPE_DEFS).map(k => '<option value="' + k + '">' + scopeLabel(k) + '</option>').join('');
+      renderPermissionPreview();
+    }
+    function renderPermissionPreview(targetId, roleValue, scopeValue) {
+      const target = document.getElementById(targetId || 'standalonePermissionPreview');
+      if (!target) return;
+      const role = roleValue || document.getElementById('previewRole')?.value || 'front_desk';
+      const scope = scopeValue || document.getElementById('previewScope')?.value || 'branch';
+      const permissions = effectivePermissions(role, scope);
+      target.innerHTML = permissions.map(p => '<div><span>' + (PERMISSION_LABELS[p] || p) + '</span><code>' + p + '</code></div>').join('');
+    }
+    function effectivePermissions(role, scope) {
+      const base = (ROLE_DEFS[role]?.permissions || []).slice();
+      if (role === 'front_desk' && scope === 'branch' && base.indexOf('dashboard.view') === -1) base.unshift('dashboard.view');
+      return Array.from(new Set(base));
+    }
+    function renderAccessRequests() {
+      document.getElementById('requestsTable').innerHTML = '<thead><tr><th>Patient</th><th>Requester</th><th>Holding Org</th><th>Purpose</th><th>Scope</th><th>Status</th><th></th></tr></thead><tbody>' +
+        state.requests.map(r => '<tr><td><strong>' + patientName(r.patientId) + '</strong><small>' + r.duration + '</small></td><td>' + r.requester + '<small>' + r.requesterOrg + '</small></td><td>' + r.holdingOrg + '</td><td>' + r.purpose + '</td><td>' + r.scope + '</td><td>' + badge(r.status) + '</td><td><div class="row-actions"><button class="btn primary" onclick="decideRequest(\'' + r.id + '\', \'Approved\')">Approve</button><button class="btn" onclick="decideRequest(\'' + r.id + '\', \'Denied\')">Deny</button></div></td></tr>').join('') +
+        '</tbody>';
+    }
+    function renderConsents() {
+      document.getElementById('consentTable').innerHTML = '<thead><tr><th>Patient</th><th>From</th><th>To</th><th>Purpose</th><th>Scope</th><th>Expires</th><th>Status</th><th></th></tr></thead><tbody>' +
+        state.consents.map(c => '<tr><td><strong>' + patientName(c.patientId) + '</strong></td><td>' + c.fromOrg + '</td><td>' + c.toOrg + '</td><td>' + c.purpose + '</td><td>' + c.scope + '</td><td>' + c.expires + '</td><td>' + badge(c.status) + '</td><td><div class="row-actions"><button class="btn" onclick="revokeConsent(\'' + c.id + '\')">Revoke</button></div></td></tr>').join('') +
+        '</tbody>';
+    }
+    function hydrateDecisionInputs() {
+      const userSel = document.getElementById('decisionUser');
+      if (!userSel || userSel.options.length) return;
+      userSel.innerHTML = state.users.map(u => '<option value="' + u.id + '">' + u.name + ' - ' + roleLabel(u.role) + '</option>').join('');
+      document.getElementById('decisionAction').innerHTML = [
+        ['search','Find patient'], ['demographics','View demographics'], ['clinical','Open clinical record'], ['write','Modify assessment'], ['sign','Sign report'], ['invite','Invite/change user access']
+      ].map(o => '<option value="' + o[0] + '">' + o[1] + '</option>').join('');
+      document.getElementById('decisionPatient').innerHTML = state.patients.map(p => '<option value="' + p.id + '">' + p.name + ' - ' + p.mrn + '</option>').join('');
+      document.getElementById('decisionRelationship').innerHTML = [
+        ['same_branch','Same org, same branch'], ['same_org_other_branch','Same org, different branch'], ['different_org_no_consent','Different org, no consent'], ['different_org_consent','Different org, consent granted']
+      ].map(o => '<option value="' + o[0] + '">' + o[1] + '</option>').join('');
+    }
+    function evaluateDecision() {
+      const result = document.getElementById('decisionResult');
+      if (!result) return null;
+      const user = state.users.find(u => u.id === document.getElementById('decisionUser')?.value) || state.users[0];
+      const action = document.getElementById('decisionAction')?.value || 'search';
+      const relationship = document.getElementById('decisionRelationship')?.value || 'same_branch';
+      let status = 'Denied';
+      let cls = 'danger';
+      let visible = 'No protected clinical data.';
+      let rationale = 'Role, scope, relationship, consent, or workflow state does not authorize the action.';
+      const permissions = effectivePermissions(user.role, user.scope);
+      const has = p => permissions.indexOf(p) !== -1;
+      if (relationship === 'different_org_no_consent' && (action === 'search' || action === 'demographics')) {
+        status = 'Limited Identity View'; cls = 'warning'; visible = 'Patient exists plus permitted identity fields.'; rationale = 'External clinical record is denied until consent or approved access exists.';
+      } else if (relationship === 'different_org_consent' && action !== 'invite') {
+        status = 'Allowed With Consent Scope'; cls = 'success'; visible = 'Only data categories named in consent.'; rationale = 'Consent event authorizes scoped access for purpose and duration.';
+      } else if (action === 'invite') {
+        status = has('governance.manage') ? 'Allowed' : 'Denied';
+        cls = has('governance.manage') ? 'success' : 'danger';
+        visible = has('governance.manage') ? 'User, role, branch, and scope administration.' : visible;
+        rationale = has('governance.manage') ? 'Governance permission authorizes role/scope management.' : 'Only governance roles manage access.';
+      } else if (action === 'clinical' || action === 'write') {
+        status = (has('clinical.view') || has('clinical.write')) && user.scope !== 'branch' ? 'Allowed' : 'Denied';
+        cls = status === 'Allowed' ? 'success' : 'danger';
+        visible = status === 'Allowed' ? 'Authorized clinical record workspace.' : visible;
+        rationale = status === 'Allowed' ? 'Clinical role and scope permit access.' : 'Clinical role and non-branch patient scope required.';
+      } else if (action === 'sign') {
+        status = has('reports.sign') ? 'Allowed' : 'Denied';
+        cls = status === 'Allowed' ? 'success' : 'danger';
+        visible = status === 'Allowed' ? 'Report review and sign-off.' : visible;
+        rationale = status === 'Allowed' ? 'Lead authority permits sign-off.' : 'Sign-off requires lead clinical authority.';
+      } else if (action === 'search' || action === 'demographics') {
+        status = has('patients.view') || has('patients.demographics') || has('patients.register') ? 'Allowed' : 'Denied';
+        cls = status === 'Allowed' ? 'success' : 'danger';
+        visible = status === 'Allowed' ? 'Patient identity and authorized administrative fields.' : visible;
+        rationale = status === 'Allowed' ? 'Patient lookup or demographic permission is present.' : rationale;
+      }
+      result.innerHTML = '<div style="margin-bottom:10px;">' + badge(status) + '</div><h3>' + status + '</h3><p>' + rationale + '</p><div style="margin-top:12px;font-size:12.5px;"><strong>Visible data:</strong><br><span class="muted">' + visible + '</span></div><div style="margin-top:10px;font-size:12.5px;"><strong>Audit:</strong><br><span class="muted">Decision records user, organization, branch, action, resource, relationship, and outcome.</span></div>';
+      return { status, user, action };
+    }
+    function renderAudit() {
+      const filter = document.getElementById('auditFilter');
+      if (filter && filter.options.length <= 1) {
+        const types = Array.from(new Set(state.audit.map(a => a.type)));
+        filter.innerHTML = '<option value="">All events</option>' + types.map(t => '<option value="' + t + '">' + t + '</option>').join('');
+      }
+      const selected = filter ? filter.value : '';
+      const events = selected ? state.audit.filter(a => a.type === selected) : state.audit;
+      document.getElementById('auditList').innerHTML = events.map(auditHtml).join('');
+    }
+    function auditHtml(a) {
+      return '<div class="audit-item"><strong>' + a.type + '<small>' + a.actor + '</small></strong><span>' + a.detail + '</span><time>' + a.time + '</time></div>';
+    }
+    function openDrawer(mode, title, body, footer, id) {
+      drawerMode = mode;
+      editingId = id || null;
+      document.getElementById('drawerKicker').textContent = mode;
+      document.getElementById('drawerTitle').textContent = title;
+      document.getElementById('drawerBody').innerHTML = body;
+      document.getElementById('drawerFooter').innerHTML = footer;
+      document.getElementById('drawerBackdrop').classList.add('active');
+      if (window.lucide) lucide.createIcons();
+    }
+    function closeDrawer() {
+      document.getElementById('drawerBackdrop').classList.remove('active');
+      drawerMode = null;
+      editingId = null;
+    }
+    function closeDrawerOnBackdrop(event) {
+      if (event.target.id === 'drawerBackdrop') closeDrawer();
+    }
+    function openUserDrawer(userId) {
+      const user = userId ? state.users.find(u => u.id === userId) : { id:'u-' + Date.now(), name:'', email:'', orgId:state.selectedOrgId, role:'front_desk', scope:'branch', branches:defaultBranchIdsForOrg(state.selectedOrgId), patients:[], status:'Active', lastActive:'Never' };
+      const orgOptions = governanceOrgs().map(o => '<option value="' + o.id + '"' + (user.orgId === o.id ? ' selected' : '') + '>' + o.name + '</option>').join('');
+      const body = '<form class="drawer-form" oninput="renderPermissionPreview(\'drawerPermissionPreview\', document.getElementById(\'drawerRole\').value, document.getElementById(\'drawerScope\').value)">' +
+        '<div class="field"><label>Name</label><input id="drawerName" value="' + user.name + '" placeholder="Full name"></div>' +
+        '<div class="field"><label>Email</label><input id="drawerEmail" value="' + user.email + '" placeholder="name@organization.org"></div>' +
+        '<div class="field-row"><div class="field"><label>Organization</label><select id="drawerOrg">' + orgOptions + '</select></div><div class="field"><label>Status</label><select id="drawerStatus"><option' + (user.status === 'Active' ? ' selected' : '') + '>Active</option><option' + (user.status === 'Inactive' ? ' selected' : '') + '>Inactive</option><option' + (user.status === 'Invited' ? ' selected' : '') + '>Invited</option></select></div></div>' +
+        '<div class="field-row"><div class="field"><label>Role</label><select id="drawerRole">' + Object.keys(ROLE_DEFS).map(k => '<option value="' + k + '"' + (user.role === k ? ' selected' : '') + '>' + roleLabel(k) + '</option>').join('') + '</select></div><div class="field"><label>Scope</label><select id="drawerScope">' + Object.keys(SCOPE_DEFS).map(k => '<option value="' + k + '"' + (user.scope === k ? ' selected' : '') + '>' + scopeLabel(k) + '</option>').join('') + '</select></div></div>' +
+        '<div class="field"><label>Branch IDs</label><input id="drawerBranches" value="' + user.branches.join(', ') + '" placeholder="lagos-central, lekki-annex"></div>' +
+        '<div class="field"><label>Assigned Patient IDs</label><input id="drawerPatients" value="' + user.patients.join(', ') + '" placeholder="amaia, emeka"></div>' +
+        '<div class="field"><label>Effective Permission Preview</label><div class="permission-preview" id="drawerPermissionPreview"></div></div>' +
+      '</form>';
+      const footer = '<button class="btn" onclick="closeDrawer()">Cancel</button><button class="btn primary" onclick="saveUserFromDrawer()">Save User</button>';
+      openDrawer(userId ? 'Edit User' : 'Invite User', userId ? 'Edit User Access' : 'Invite User', body, footer, user.id);
+      renderPermissionPreview('drawerPermissionPreview', user.role, user.scope);
+    }
+    function defaultBranchIdsForOrg(orgId) {
+      const org = orgMeta(orgId);
+      return org && org.branches.length ? [org.branches[0].id] : [];
+    }
+    function saveUserFromDrawer() {
+      const user = {
+        id: editingId || 'u-' + Date.now(),
+        name: document.getElementById('drawerName').value.trim(),
+        email: document.getElementById('drawerEmail').value.trim(),
+        orgId: document.getElementById('drawerOrg').value,
+        role: document.getElementById('drawerRole').value,
+        scope: document.getElementById('drawerScope').value,
+        branches: csv('drawerBranches'),
+        patients: csv('drawerPatients'),
+        status: document.getElementById('drawerStatus').value,
+        lastActive: editingId ? (state.users.find(u => u.id === editingId)?.lastActive || 'Never') : 'Invited'
+      };
+      if (!user.name || !user.email) { notify('Name and email are required.'); return; }
+      const idx = state.users.findIndex(u => u.id === user.id);
+      if (idx >= 0) state.users[idx] = user; else state.users.push(user);
+      addAudit(idx >= 0 ? 'Role/scope changed' : 'User invited', user.name + ' assigned ' + roleLabel(user.role) + ' with ' + scopeLabel(user.scope) + ' scope.');
+      closeDrawer();
+      notify('User access saved.');
+    }
+    function csv(id) {
+      return document.getElementById(id).value.split(',').map(v => v.trim()).filter(Boolean);
+    }
+    function toggleUserStatus(userId) {
+      const user = state.users.find(u => u.id === userId);
+      if (!user) return;
+      user.status = user.status === 'Active' ? 'Inactive' : 'Active';
+      addAudit('User status changed', user.name + ' marked ' + user.status + '.');
+      notify('User status updated.');
+    }
+    function publishUserToPms(userId) {
+      const user = state.users.find(u => u.id === userId);
+      if (!user) return;
+      const roleToPreset = { front_desk:'receptionist', audiologist:'audiologist', lead_audiologist:'lead', org_admin:'admin', super_admin:'super_admin' };
+      const preset = PMS_AUTH_PRESETS[roleToPreset[user.role]] || PMS_AUTH_PRESETS.admin;
+      const context = Object.assign({}, preset, {
+        identityName:user.name,
+        organizationName:orgName(user.orgId),
+        organizationType:user.orgId === 'platform' ? 'Platform' : (state.organizations.find(o => o.id === user.orgId)?.type || 'Organization'),
+        role:user.role,
+        roleLabel:roleLabel(user.role),
+        scopeType:user.scope,
+        scopeLabel:scopeLabel(user.scope),
+        branchName:user.scope === 'organization' ? 'All Branches' : user.branches.map(branchName).join(', '),
+        branchIds:user.branches,
+        assignedPatientIds:user.patients,
+        permissions:effectivePermissions(user.role, user.scope)
+      });
+      savePmsAuthContext(context);
+      addAudit('PMS context changed', user.name + ' published as active PMS simulated user.');
+      notify('PMS now uses ' + user.name + ' as the simulated user.');
+    }
+    function publishCurrentAdmin() {
+      const admin = state.users.find(u => u.role === 'org_admin') || state.users.find(u => u.role === 'super_admin');
+      if (admin) publishUserToPms(admin.id);
+    }
+    function decideRequest(id, status) {
+      const req = state.requests.find(r => r.id === id);
+      if (!req) return;
+      req.status = status;
+      addAudit('Access request ' + status.toLowerCase(), req.requester + ' request for ' + patientName(req.patientId) + ' was ' + status.toLowerCase() + '.');
+      notify('Access request ' + status.toLowerCase() + '.');
+    }
+    function revokeConsent(id) {
+      const consent = state.consents.find(c => c.id === id);
+      if (!consent) return;
+      consent.status = 'Revoked';
+      addAudit('Consent revoked', 'Consent for ' + patientName(consent.patientId) + ' revoked.');
+      notify('Consent revoked.');
+    }
+    function logDecision() {
+      const decision = evaluateDecision();
+      if (!decision) return;
+      addAudit('Authorization decision', decision.status + ' for ' + decision.user.name + ' attempting ' + decision.action + ' on ' + patientName(document.getElementById('decisionPatient').value) + '.');
+      notify('Decision logged.');
+    }
+    function openRequestDrawer() {
+      const body = '<div class="drawer-form"><div class="field"><label>Patient</label><select id="newReqPatient">' + state.patients.map(p => '<option value="' + p.id + '">' + p.name + ' - ' + p.mrn + '</option>').join('') + '</select></div><div class="field"><label>Requester</label><input id="newReqRequester" value="External clinician"></div><div class="field-row"><div class="field"><label>Requester Org</label><input id="newReqRequesterOrg" value="Abuja National Ear Centre"></div><div class="field"><label>Holding Org</label><input id="newReqHoldingOrg" value="Lagos Central Hearing Clinic"></div></div><div class="field"><label>Purpose</label><input id="newReqPurpose" value="Scoped referral review"></div><div class="field"><label>Scope</label><input id="newReqScope" value="Report summary + audiology battery"></div><div class="field"><label>Duration</label><input id="newReqDuration" value="30 days"></div></div>';
+      openDrawer('Access Request', 'Create Access Request', body, '<button class="btn" onclick="closeDrawer()">Cancel</button><button class="btn primary" onclick="saveRequest()">Create Request</button>');
+    }
+    function saveRequest() {
+      const req = { id:'req-' + Date.now(), patientId:document.getElementById('newReqPatient').value, requester:document.getElementById('newReqRequester').value, requesterOrg:document.getElementById('newReqRequesterOrg').value, holdingOrg:document.getElementById('newReqHoldingOrg').value, purpose:document.getElementById('newReqPurpose').value, scope:document.getElementById('newReqScope').value, duration:document.getElementById('newReqDuration').value, status:'Pending' };
+      state.requests.unshift(req);
+      addAudit('Access request created', req.requester + ' requested ' + req.scope + ' for ' + patientName(req.patientId) + '.');
+      closeDrawer();
+    }
+    function openConsentDrawer() {
+      const body = '<div class="drawer-form"><div class="field"><label>Patient</label><select id="newConsentPatient">' + state.patients.map(p => '<option value="' + p.id + '">' + p.name + ' - ' + p.mrn + '</option>').join('') + '</select></div><div class="field-row"><div class="field"><label>From Organization</label><input id="newConsentFrom" value="Lagos Central Hearing Clinic"></div><div class="field"><label>To Organization</label><input id="newConsentTo" value="LUTH Department of Otolaryngology"></div></div><div class="field"><label>Purpose</label><input id="newConsentPurpose" value="Specialist referral"></div><div class="field"><label>Data Scope</label><input id="newConsentScope" value="Report summary + tympanometry"></div><div class="field"><label>Expires</label><input id="newConsentExpires" type="date" value="2026-10-08"></div></div>';
+      openDrawer('Consent', 'Record Consent Event', body, '<button class="btn" onclick="closeDrawer()">Cancel</button><button class="btn primary" onclick="saveConsent()">Record Consent</button>');
+    }
+    function saveConsent() {
+      const consent = { id:'con-' + Date.now(), patientId:document.getElementById('newConsentPatient').value, fromOrg:document.getElementById('newConsentFrom').value, toOrg:document.getElementById('newConsentTo').value, purpose:document.getElementById('newConsentPurpose').value, scope:document.getElementById('newConsentScope').value, expires:document.getElementById('newConsentExpires').value, status:'Active' };
+      state.consents.unshift(consent);
+      addAudit('Consent granted', consent.scope + ' consent granted for ' + patientName(consent.patientId) + ' until ' + consent.expires + '.');
+      closeDrawer();
+    }
+    function openOrgDrawer() {
+      const body = '<div class="drawer-form"><div class="field"><label>Organization Name</label><input id="newOrgName" value="New Hearing Organization"></div><div class="field-row"><div class="field"><label>Type</label><select id="newOrgType"><option>Clinic</option><option>Hospital</option><option>University</option><option>Research Institution</option><option>Solo Practice</option></select></div><div class="field"><label>Subscription</label><select id="newOrgSub"><option>Business</option><option>Enterprise</option><option>Academic</option><option>Solo</option></select></div></div><div class="field"><label>Owner</label><input id="newOrgOwner" value="Organization Owner"></div></div>';
+      openDrawer('Organization', 'Add Organization', body, '<button class="btn" onclick="closeDrawer()">Cancel</button><button class="btn primary" onclick="saveOrganization()">Add Organization</button>');
+    }
+    function saveOrganization() {
+      const id = 'org-' + Date.now();
+      const org = { id, name:document.getElementById('newOrgName').value, type:document.getElementById('newOrgType').value, subscription:document.getElementById('newOrgSub').value, status:'Active', owner:document.getElementById('newOrgOwner').value, branches:[{ id:id.replace('org-', '') + '-main', name:'Main Branch', city:'Pending', status:'Draft' }] };
+      state.organizations.push(org);
+      state.selectedOrgId = id;
+      addAudit('Organization created', org.name + ' added as ' + org.type + ' organization.');
+      closeDrawer();
+    }
+    function resetGovernanceState() {
+      if (!confirm('Reset governance prototype state?')) return;
+      localStorage.removeItem(GOVERNANCE_KEY);
+      state = clone(DEFAULT_STATE);
+      renderAll();
+      notify('Governance prototype state reset.');
+    }
+    document.addEventListener('DOMContentLoaded', renderAll);
+  </script>
+</body>
+</html>

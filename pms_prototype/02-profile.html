@@ -501,6 +501,7 @@
     }
 
     function renderProfile() {
+      if (!document.getElementById('profName')) return;
       const patientId = getActivePatientId();
       const p = window.HearIntelDB ? window.HearIntelDB.getPatient(patientId) : null;
       if (!p) return;
