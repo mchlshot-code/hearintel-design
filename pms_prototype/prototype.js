@@ -882,20 +882,21 @@ function renderRoleSwitcherHtml(authContext) {
   var isAdmin = r === 'organization_admin' || r === 'org_admin';
   var isSuper = r === 'super_admin';
 
+  var chevronSvg = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="%2338BDF8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+
   return '<div class="auth-context-card">'
-    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">'
-    +   '<span class="auth-context-label" style="margin:0;font-size:10px;text-transform:uppercase;letter-spacing:0.06em;">Active Role</span>'
-    +   '<select onchange="setPmsAuthPreset(this.value)" style="font-size:10.5px;font-weight:700;padding:2px 6px;border:1px solid rgba(56,189,248,0.4);border-radius:4px;background:#0F172A;color:#38BDF8;cursor:pointer;" title="Switch simulated demo role">'
-    +     '<option value="lead"' + (isLead ? ' selected' : '') + '>Lead Audiologist (All Access)</option>'
-    +     '<option value="receptionist"' + (isRec ? ' selected' : '') + '>Front Desk (Receptionist)</option>'
-    +     '<option value="audiologist"' + (isAud ? ' selected' : '') + '>Audiologist (Clinical Only)</option>'
-    +     '<option value="admin"' + (isAdmin ? ' selected' : '') + '>Organization Admin</option>'
-    +     '<option value="super_admin"' + (isSuper ? ' selected' : '') + '>Super Admin</option>'
+    + '<div class="auth-context-label" style="font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:rgba(255,255,255,0.45);margin-bottom:3px;">Signed in as</div>'
+    + '<div class="auth-context-name" style="font-weight:700;font-size:13px;color:#FFFFFF;line-height:1.25;">' + authContext.identityName + '</div>'
+    + '<div style="margin-top:5px;">'
+    +   '<select onchange="setPmsAuthPreset(this.value)" style="display:inline-flex;align-items:center;border-radius:999px;padding:3px 20px 3px 9px;background:rgba(14,165,233,0.22);color:#38BDF8;border:1px solid rgba(56,189,248,0.5);font-size:10.5px;font-weight:700;letter-spacing:0.02em;cursor:pointer;outline:none;-webkit-appearance:none;-moz-appearance:none;appearance:none;background-image:url(\'' + chevronSvg + '\');background-repeat:no-repeat;background-position:right 7px center;" title="Switch role context">'
+    +     '<option value="lead" style="background:#0F172A;color:#FFFFFF;"' + (isLead ? ' selected' : '') + '>Lead Audiologist</option>'
+    +     '<option value="receptionist" style="background:#0F172A;color:#FFFFFF;"' + (isRec ? ' selected' : '') + '>Front Desk Officer</option>'
+    +     '<option value="audiologist" style="background:#0F172A;color:#FFFFFF;"' + (isAud ? ' selected' : '') + '>Audiologist</option>'
+    +     '<option value="admin" style="background:#0F172A;color:#FFFFFF;"' + (isAdmin ? ' selected' : '') + '>Organization Admin</option>'
+    +     '<option value="super_admin" style="background:#0F172A;color:#FFFFFF;"' + (isSuper ? ' selected' : '') + '>Super Admin</option>'
     +   '</select>'
     + '</div>'
-    + '<div class="auth-context-name" style="font-weight:700;font-size:13px;color:#FFFFFF;">' + authContext.identityName + '</div>'
-    + '<div class="auth-context-role" style="margin-top:5px;display:inline-flex;align-items:center;border-radius:999px;padding:3px 9px;background:rgba(14,165,233,0.22);color:#38BDF8;border:1px solid rgba(56,189,248,0.45);font-size:10.5px;font-weight:700;letter-spacing:0.02em;">' + authContext.roleLabel + '</div>'
-    + '<div class="auth-context-scope" style="font-size:10.5px;color:rgba(255,255,255,0.55);margin-top:4px;">' + authContext.scopeLabel + ' &middot; ' + authContext.branchName + '</div>'
+    + '<div class="auth-context-scope" style="font-size:10.5px;color:rgba(255,255,255,0.55);margin-top:5px;">' + authContext.scopeLabel + ' &middot; ' + authContext.branchName + '</div>'
     + '</div>';
 }
 
