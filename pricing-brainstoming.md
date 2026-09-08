@@ -1,0 +1,3 @@
+Transparent baselines convert better: Replacing "TBD" with transparent base figures (e.g. "Starting at $X/month") builds immediate clinical credibility and filters out unqualified leads.
+Hybrid dynamic model works best: A base subscription plus dynamic scaling based on active clinician seats, branch locations, or monthly patient encounter volume matches actual clinic growth.
+Interactive estimator: We can add an interactive tier calculator/slider to the landing page allowing practice owners to estimate their exact monthly cost before booking a demo.
