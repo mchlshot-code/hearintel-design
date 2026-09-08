@@ -24,11 +24,37 @@
     }
     .auth-card {
       width: 100%;
-      max-width: 520px;
+      max-width: 680px;
       background: var(--white);
       border-radius: var(--radius-md);
       padding: 32px;
       box-shadow: 0 16px 36px rgba(0, 0, 0, 0.24);
+    }
+    .auth-summary {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--border);
+      margin-bottom: 18px;
+    }
+    .auth-summary div { background: var(--surface); padding: 10px; }
+    .auth-summary span {
+      display: block;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 4px;
+    }
+    .auth-summary strong {
+      display: block;
+      font-size: 12.5px;
+      color: var(--text-primary);
+      line-height: 1.25;
     }
   </style>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
@@ -43,24 +69,56 @@
       </div>
 
       <form onsubmit="handleOnboardingSubmit(event)">
+        <div class="auth-summary">
+          <div><span>Identity</span><strong id="summaryIdentity">Dr. Chika Okafor</strong></div>
+          <div><span>Organization</span><strong id="summaryOrg">Lagos Central Hearing Clinic</strong></div>
+          <div><span>Role</span><strong id="summaryRole">Lead Audiologist</strong></div>
+          <div><span>Scope</span><strong id="summaryScope">Organization-wide</strong></div>
+        </div>
         <div class="form-grid" style="grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;">
           <div class="field" style="grid-column:1 / -1;">
             <label for="onbRole">Clinical Role</label>
-            <select id="onbRole">
-              <option selected>Lead Audiologist (Au.D.)</option>
-              <option>Clinical Audiologist</option>
-              <option>Otolaryngologist / Specialist Surgeon</option>
-              <option>Hearing Care Professional (HCP)</option>
-              <option>Clinic Practice Administrator</option>
+            <select id="onbRole" onchange="refreshAuthSummary()">
+              <option value="lead" selected>Lead Audiologist</option>
+              <option value="audiologist">Audiologist</option>
+              <option value="receptionist">Receptionist</option>
+              <option value="admin">Organization Admin</option>
             </select>
           </div>
           <div class="field" style="grid-column:1 / -1;">
             <label for="onbFacility">Institution / Workspace</label>
-            <select id="onbFacility">
-              <option selected>Lagos Central Hearing Clinic (Default Facility)</option>
-              <option>LUTH Department of Otolaryngology</option>
-              <option>Abuja National Ear Centre</option>
-              <option>Create New Private Practice Workspace</option>
+            <select id="onbFacility" onchange="refreshAuthSummary()">
+              <option value="Lagos Central Hearing Clinic" selected>Lagos Central Hearing Clinic</option>
+              <option value="LUTH Department of Otolaryngology">LUTH Department of Otolaryngology</option>
+              <option value="Abuja National Ear Centre">Abuja National Ear Centre</option>
+              <option value="Solo Practice">Create New Solo Practice Workspace</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="onbOrgType">Organization Type</label>
+            <select id="onbOrgType" onchange="refreshAuthSummary()">
+              <option selected>Clinic</option>
+              <option>Hospital</option>
+              <option>University</option>
+              <option>Solo Practice</option>
+              <option>Research Institution</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="onbScope">Access Scope</label>
+            <select id="onbScope" onchange="refreshAuthSummary()">
+              <option value="organization" selected>Organization-wide</option>
+              <option value="branch">Branch only</option>
+              <option value="assigned_patients">Assigned patients only</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="onbBranch">Primary Branch / Location</label>
+            <select id="onbBranch" onchange="refreshAuthSummary()">
+              <option selected>Lagos Central</option>
+              <option>Lekki Annex</option>
+              <option>Ikorodu Outreach</option>
+              <option>All Branches</option>
             </select>
           </div>
           <div class="field">
@@ -83,17 +141,43 @@
   <script>
     function handleOnboardingSubmit(event) {
       event.preventDefault();
-      const role = document.getElementById('onbRole').value;
+      const roleKey = document.getElementById('onbRole').value;
+      const role = document.getElementById('onbRole').selectedOptions[0].textContent;
       const facility = document.getElementById('onbFacility').value;
+      const orgType = document.getElementById('onbOrgType').value;
+      const scopeType = document.getElementById('onbScope').value;
+      const scopeLabel = document.getElementById('onbScope').selectedOptions[0].textContent;
+      const branchName = document.getElementById('onbBranch').value;
       const phone = document.getElementById('onbPhone').value;
       
       localStorage.setItem('hearintel_clinician_role', role);
       localStorage.setItem('hearintel_clinician_facility', facility);
       localStorage.setItem('hearintel_clinician_phone', phone);
+      if (typeof PMS_AUTH_PRESETS !== 'undefined' && PMS_AUTH_PRESETS[roleKey]) {
+        const context = Object.assign({}, PMS_AUTH_PRESETS[roleKey], {
+          identityName: localStorage.getItem('hearintel_reg_name') || PMS_AUTH_PRESETS[roleKey].identityName,
+          organizationName: facility,
+          organizationType: orgType,
+          scopeType: scopeType,
+          scopeLabel: scopeLabel,
+          branchName: branchName
+        });
+        savePmsAuthContext(context);
+      }
 
       notify('Welcome to Clinical PMS! Workspace initialized.');
       setTimeout(() => location.href = '00-dashboard.html', 600);
     }
+
+    function refreshAuthSummary() {
+      const storedName = localStorage.getItem('hearintel_reg_name') || 'Dr. Chika Okafor';
+      document.getElementById('summaryIdentity').textContent = storedName;
+      document.getElementById('summaryOrg').textContent = document.getElementById('onbFacility').value;
+      document.getElementById('summaryRole').textContent = document.getElementById('onbRole').selectedOptions[0].textContent;
+      document.getElementById('summaryScope').textContent = document.getElementById('onbScope').selectedOptions[0].textContent;
+    }
+
+    document.addEventListener('DOMContentLoaded', refreshAuthSummary);
   </script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {

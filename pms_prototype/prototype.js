@@ -1,5 +1,172 @@
 // HearIntel PMS Master Engine & Universal UI Coordinator
 
+var PMS_AUTH_DEFAULT_CONTEXT = {
+  identityName: 'Dr. Chika Okafor, Au.D.',
+  organizationName: 'Lagos Central Hearing Clinic',
+  organizationType: 'Clinic',
+  role: 'lead_audiologist',
+  roleLabel: 'Lead Audiologist',
+  scopeType: 'organization',
+  scopeLabel: 'Organization-wide',
+  branchName: 'All Branches',
+  branchIds: ['lagos-central', 'lekki-annex'],
+  assignedPatientIds: ['amaia', 'david', 'emeka'],
+  permissions: [
+    'dashboard.view',
+    'patients.view',
+    'clinical.view',
+    'clinical.write',
+    'clinical.review',
+    'reports.sign',
+    'rehab.manage',
+    'settings.view',
+    'settings.manage'
+  ]
+};
+
+var PMS_AUTH_PRESETS = {
+  receptionist: {
+    identityName: 'Chioma Okoro',
+    organizationName: 'Lagos Central Hearing Clinic',
+    organizationType: 'Clinic',
+    role: 'receptionist',
+    roleLabel: 'Receptionist',
+    scopeType: 'branch',
+    scopeLabel: 'Branch only',
+    branchName: 'Lagos Central',
+    branchIds: ['lagos-central'],
+    assignedPatientIds: [],
+    permissions: [
+      'dashboard.view',
+      'patients.register',
+      'patients.demographics',
+      'appointments.manage',
+      'queue.manage',
+      'settings.view'
+    ]
+  },
+  audiologist: {
+    identityName: 'Amina Bello, Au.D.',
+    organizationName: 'Lagos Central Hearing Clinic',
+    organizationType: 'Clinic',
+    role: 'audiologist',
+    roleLabel: 'Audiologist',
+    scopeType: 'assigned_patients',
+    scopeLabel: 'Assigned patients',
+    branchName: 'Lagos Central',
+    branchIds: ['lagos-central'],
+    assignedPatientIds: ['amaia', 'emeka'],
+    permissions: [
+      'dashboard.view',
+      'patients.view',
+      'clinical.view',
+      'clinical.write',
+      'rehab.manage',
+      'settings.view'
+    ]
+  },
+  lead: PMS_AUTH_DEFAULT_CONTEXT,
+  admin: {
+    identityName: 'Dr. Tunde Salako',
+    organizationName: 'Lagos Central Hearing Clinic',
+    organizationType: 'Clinic',
+    role: 'organization_admin',
+    roleLabel: 'Organization Admin',
+    scopeType: 'organization',
+    scopeLabel: 'Organization-wide',
+    branchName: 'All Branches',
+    branchIds: ['lagos-central', 'lekki-annex', 'ikorodu-outreach'],
+    assignedPatientIds: [],
+    permissions: [
+      'dashboard.view',
+      'patients.view',
+      'patients.register',
+      'patients.demographics',
+      'clinical.view',
+      'clinical.review',
+      'reports.sign',
+      'rehab.manage',
+      'finance.manage',
+      'settings.view',
+      'settings.manage',
+      'staff.manage',
+      'branches.manage'
+    ]
+  }
+};
+
+var PMS_ROUTE_PERMISSIONS = {
+  dashboard: ['dashboard.view'],
+  patients: ['patients.view', 'patients.register', 'patients.demographics'],
+  registry: ['patients.view', 'patients.register', 'patients.demographics'],
+  profile: ['patients.view', 'patients.demographics'],
+  assessment: ['clinical.view', 'clinical.write'],
+  history: ['clinical.view', 'clinical.write'],
+  otoscopy: ['clinical.view', 'clinical.write'],
+  pta: ['clinical.view', 'clinical.write'],
+  immittance: ['clinical.view', 'clinical.write'],
+  speech: ['clinical.view', 'clinical.write'],
+  electrophysiology: ['clinical.view', 'clinical.write'],
+  conclusion: ['clinical.view', 'clinical.write', 'clinical.review'],
+  screening: ['clinical.write', 'patients.register'],
+  media: ['clinical.view'],
+  settings: ['settings.view', 'settings.manage', 'staff.manage']
+};
+
+function getStoredAuthContext() {
+  try {
+    var raw = localStorage.getItem('hearintel_pms_auth_context');
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) {
+    return null;
+  }
+}
+
+function getPmsAuthContext() {
+  var stored = getStoredAuthContext();
+  return Object.assign({}, PMS_AUTH_DEFAULT_CONTEXT, stored || {});
+}
+
+function savePmsAuthContext(context) {
+  localStorage.setItem('hearintel_pms_auth_context', JSON.stringify(Object.assign({}, getPmsAuthContext(), context)));
+}
+
+function setPmsAuthPreset(presetKey) {
+  var preset = PMS_AUTH_PRESETS[presetKey];
+  if (!preset) return;
+  savePmsAuthContext(preset);
+  notify('Access context switched to ' + preset.roleLabel + '.');
+  setTimeout(function() { window.location.reload(); }, 450);
+}
+
+function hasPmsPermission(permission) {
+  var ctx = getPmsAuthContext();
+  return (ctx.permissions || []).indexOf(permission) !== -1;
+}
+
+function canAccessPmsArea(area) {
+  var required = PMS_ROUTE_PERMISSIONS[area] || [];
+  if (!required.length) return true;
+  return required.some(function(permission) { return hasPmsPermission(permission); });
+}
+
+function authLockedNavHtml(label, title) {
+  return '<div class="nav-item disabled" title="' + (title || 'Restricted by current role and scope') + '">'
+    + '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>'
+    + '<span class="nav-label">' + label + '</span>'
+    + '</div>';
+}
+
+function renderAuthDenied(areaLabel) {
+  var ctx = getPmsAuthContext();
+  return '<div class="auth-denied-panel">'
+    + '<div class="auth-denied-icon"><i data-lucide="shield-alert"></i></div>'
+    + '<h2>' + areaLabel + ' is outside this demo role</h2>'
+    + '<p>' + ctx.roleLabel + ' access is limited to ' + ctx.scopeLabel.toLowerCase() + '. Switch role context in Settings to preview another authorization path.</p>'
+    + '<a class="btn primary" href="11-settings.html">Open Authorization Settings</a>'
+    + '</div>';
+}
+
 // ── UI Utilities ──────────────────────────────────────────────────────────────
 
 /**
@@ -561,6 +728,7 @@ function patientShell(active) {
   const patientId = getActivePatientId();
   const patient = (window.HearIntelDB && window.HearIntelDB.getPatient(patientId)) || { name: 'Amaia O.', mrn: 'LCC-26-01248', age: 46, gender: 'Female' };
   const currentTheme = getActiveTheme();
+  const authContext = getPmsAuthContext();
 
   const isRegistry   = active === 'patients' || active === 'registry';
   const isProfile    = active === 'profile';
@@ -590,29 +758,35 @@ function patientShell(active) {
         '<div style="margin-bottom:12px;"><div style="display:inline-flex;align-items:center;padding:2px 4px;"><div style="color:#FFFFFF;font-size:22px;font-weight:800;letter-spacing:-0.03em;font-family:var(--font-heading);">Clinical<span style="color:var(--brand);"> PMS</span></div></div></div>',
         '<div class="brand-sub">Practice Management</div>',
       '</div>',
+      '<div class="auth-context-card">',
+        '<div class="auth-context-label">Signed in as</div>',
+        '<div class="auth-context-name">' + authContext.identityName + '</div>',
+        '<div class="auth-context-role">' + authContext.roleLabel + '</div>',
+        '<div class="auth-context-scope">' + authContext.scopeLabel + ' &middot; ' + authContext.branchName + '</div>',
+      '</div>',
       '<nav class="nav-group">',
         '<div class="nav-section">Clinical Ops</div>',
-        '<a class="nav-item ' + (active === 'dashboard' ? 'active' : '') + '" href="00-dashboard.html" title="Dashboard">',
-          '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>',
-          '<span class="nav-label">Dashboard</span>',
-        '</a>',
-        '<a class="nav-item ' + (showPatientSub ? 'active' : '') + '" href="01-registry.html" title="Patients">',
-          '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>',
-          '<span class="nav-label">Patients</span>',
-        '</a>',
+        canAccessPmsArea('dashboard') ? '<a class="nav-item ' + (active === 'dashboard' ? 'active' : '') + '" href="00-dashboard.html" title="Dashboard">'
+        + '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg></span>'
+        + '<span class="nav-label">Dashboard</span>'
+        + '</a>' : authLockedNavHtml('Dashboard'),
+        canAccessPmsArea('patients') ? '<a class="nav-item ' + (showPatientSub ? 'active' : '') + '" href="01-registry.html" title="Patients">'
+        + '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>'
+        + '<span class="nav-label">Patients</span>'
+        + '</a>' : authLockedNavHtml('Patients'),
         patientSub,
-        '<a class="nav-item ' + (active === 'screening' ? 'active' : '') + '" href="13-workspace-screening.html?patient=' + patientId + '" title="Hearing Screening">',
-          '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg></span>',
-          '<span class="nav-label">Screening</span>',
-        '</a>',
-        '<a class="nav-item ' + (active === 'media' ? 'active' : '') + '" href="10-media.html?patient=' + patientId + '" title="Clinical Media">',
-          '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/></svg></span>',
-          '<span class="nav-label">Clinical Media</span>',
-        '</a>',
-        '<a class="nav-item ' + (active === 'settings' ? 'active' : '') + '" href="11-settings.html" title="Settings">',
-          '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83-2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>',
-          '<span class="nav-label">Settings</span>',
-        '</a>',
+        canAccessPmsArea('screening') ? '<a class="nav-item ' + (active === 'screening' ? 'active' : '') + '" href="13-workspace-screening.html?patient=' + patientId + '" title="Hearing Screening">'
+        + '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg></span>'
+        + '<span class="nav-label">Screening</span>'
+        + '</a>' : authLockedNavHtml('Screening'),
+        canAccessPmsArea('media') ? '<a class="nav-item ' + (active === 'media' ? 'active' : '') + '" href="10-media.html?patient=' + patientId + '" title="Clinical Media">'
+        + '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/></svg></span>'
+        + '<span class="nav-label">Clinical Media</span>'
+        + '</a>' : authLockedNavHtml('Clinical Media'),
+        canAccessPmsArea('settings') ? '<a class="nav-item ' + (active === 'settings' ? 'active' : '') + '" href="11-settings.html" title="Settings">'
+        + '<span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83-2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>'
+        + '<span class="nav-label">Settings</span>'
+        + '</a>' : authLockedNavHtml('Settings'),
       '</nav>',
       assessBlock ? '<div class="sidebar-divider"></div>' : '',
       assessBlock,
@@ -651,6 +825,12 @@ const MODULE_SHORT_NAMES = {
   'conclusion': 'Management'
 };
 
+function getCurrentClinicalDate() {
+  const d = new Date();
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
 function getModuleStatus(patient, moduleKey, isActive) {
   if (!patient) return { status: 'not-started', icon: '○', label: 'Not Started', date: '' };
 
@@ -666,49 +846,49 @@ function getModuleStatus(patient, moduleKey, isActive) {
       return { status: 'attention', icon: '!', label: 'Needs Attention', date: 'Flagged' };
     }
     if (latestAssess || testInstances.length > 0) {
-      const d = testInstances[0]?.date || latestAssess?.date || '20 May 2026';
+      const d = testInstances[0]?.date || latestAssess?.date || getCurrentClinicalDate();
       return { status: 'done', icon: '✓', label: 'Done', date: d };
     }
   }
 
   if (moduleKey === 'otoscopy') {
     if (latestAssess?.otoscopy || testInstances.length > 0) {
-      const d = testInstances[0]?.date || latestAssess?.date || '20 May 2026';
+      const d = testInstances[0]?.date || latestAssess?.date || getCurrentClinicalDate();
       return { status: 'done', icon: '✓', label: 'Done', date: d };
     }
   }
 
   if (moduleKey === 'pta') {
     if (latestAssess?.ptaRight !== undefined || testInstances.length > 0) {
-      const d = testInstances[0]?.date || latestAssess?.date || '20 May 2026';
+      const d = testInstances[0]?.date || latestAssess?.date || getCurrentClinicalDate();
       return { status: 'done', icon: '✓', label: 'Done', date: d };
     }
   }
 
   if (moduleKey === 'immittance') {
     if (latestAssess?.tymp || testInstances.length > 0) {
-      const d = testInstances[0]?.date || latestAssess?.date || '20 May 2026';
+      const d = testInstances[0]?.date || latestAssess?.date || getCurrentClinicalDate();
       return { status: 'done', icon: '✓', label: 'Done', date: d };
     }
   }
 
   if (moduleKey === 'speech') {
     if (latestAssess?.speech || testInstances.length > 0) {
-      const d = testInstances[0]?.date || latestAssess?.date || '20 May 2026';
+      const d = testInstances[0]?.date || latestAssess?.date || getCurrentClinicalDate();
       return { status: 'done', icon: '✓', label: 'Done', date: d };
     }
   }
 
   if (moduleKey === 'electrophysiology') {
     if (testInstances.length > 0 || (patient.media && patient.media.some(m => m.category === 'Electrophysiology'))) {
-      const d = testInstances[0]?.date || '20 May 2026';
+      const d = testInstances[0]?.date || getCurrentClinicalDate();
       return { status: 'done', icon: '✓', label: 'Done', date: d };
     }
   }
 
   if (moduleKey === 'conclusion') {
     if (latestAssess?.recommendations || patient.carePlan?.length > 0 || testInstances.length > 0) {
-      const d = testInstances[0]?.date || latestAssess?.date || '20 May 2026';
+      const d = testInstances[0]?.date || latestAssess?.date || getCurrentClinicalDate();
       return { status: 'done', icon: '✓', label: 'Done', date: d };
     }
   }
@@ -784,22 +964,41 @@ function getTestInstances(moduleKey, patientId) {
   const patient = (window.HearIntelDB && window.HearIntelDB.getPatient(patientId));
   if (!patient) return [];
   if (!patient.testInstances) patient.testInstances = {};
+  
+  const today = getCurrentClinicalDate();
+  const shortName = MODULE_SHORT_NAMES[moduleKey] || moduleKey.toUpperCase();
+
   if (!patient.testInstances[moduleKey]) {
-    const latestAssess = (patient.assessments && patient.assessments[0]) || null;
-    const date = latestAssess?.date || '20 May 2026';
-    const shortName = MODULE_SHORT_NAMES[moduleKey] || moduleKey.toUpperCase();
     patient.testInstances[moduleKey] = [
       {
         id: moduleKey + '-inst-1',
         instanceNumber: 1,
-        name: `${shortName} — Baseline (${date})`,
-        date: date,
+        name: `${shortName} — Baseline (${today})`,
+        date: today,
         clinician: 'Dr. Chika Okafor, Au.D.',
         status: 'completed',
         isDefaultName: true
       }
     ];
     if (window.HearIntelDB && window.HearIntelDB.savePatient) {
+      window.HearIntelDB.savePatient(patient);
+    }
+  } else {
+    // Dynamically migrate any hardcoded legacy dates in default instance names
+    let changed = false;
+    patient.testInstances[moduleKey].forEach(inst => {
+      if (inst.date === '20 May 2026' || inst.date === '7 Sep 2026') {
+        inst.date = today;
+        changed = true;
+      }
+      if (inst.isDefaultName || (inst.name && (inst.name.includes('20 May 2026') || inst.name.includes('7 Sep 2026')))) {
+        inst.name = inst.instanceNumber === 1 
+          ? `${shortName} — Baseline (${inst.date})`
+          : `${shortName} — Reassessment ${inst.instanceNumber} — ${inst.date}`;
+        changed = true;
+      }
+    });
+    if (changed && window.HearIntelDB && window.HearIntelDB.savePatient) {
       window.HearIntelDB.savePatient(patient);
     }
   }
@@ -823,7 +1022,7 @@ function handleReassess(moduleKey) {
   const instances = getTestInstances(moduleKey, patientId);
   const nextNum = instances.length + 1;
   const shortName = MODULE_SHORT_NAMES[moduleKey] || moduleKey.toUpperCase();
-  const today = '7 Sep 2026';
+  const today = getCurrentClinicalDate();
   const defaultName = `${shortName} — Reassessment ${nextNum} — ${today}`;
 
   const newInstance = {
@@ -856,7 +1055,7 @@ function handleHubReassess(moduleKey, targetUrl) {
   const instances = getTestInstances(moduleKey, patientId);
   const nextNum = instances.length + 1;
   const shortName = MODULE_SHORT_NAMES[moduleKey] || moduleKey.toUpperCase();
-  const today = '7 Sep 2026';
+  const today = getCurrentClinicalDate();
   const defaultName = `${shortName} — Reassessment ${nextNum} — ${today}`;
 
   const newInstance = {
@@ -976,6 +1175,7 @@ function workspaceShell(active, content) {
   const patientId = getActivePatientId();
   const patient = (window.HearIntelDB && window.HearIntelDB.getPatient(patientId)) || { name: 'Amaia O.', mrn: 'LCC-26-01248', age: 46, gender: 'Female' };
   const currentTheme = getActiveTheme();
+  const authContext = getPmsAuthContext();
   const assessHref = '03-assessment-hub.html?patient=' + patientId;
 
   // Unconditional, decoupled navigation steps
@@ -994,6 +1194,12 @@ function workspaceShell(active, content) {
       '<div class="brand">',
         '<div style="margin-bottom:12px;"><div style="display:inline-flex;align-items:center;padding:2px 4px;"><div style="color:#FFFFFF;font-size:22px;font-weight:800;letter-spacing:-0.03em;font-family:var(--font-heading);">Clinical<span style="color:var(--brand);"> PMS</span></div></div></div>',
         '<div class="brand-sub">Assessment</div>',
+      '</div>',
+      '<div class="auth-context-card">',
+        '<div class="auth-context-label">Signed in as</div>',
+        '<div class="auth-context-name">' + authContext.identityName + '</div>',
+        '<div class="auth-context-role">' + authContext.roleLabel + '</div>',
+        '<div class="auth-context-scope">' + authContext.scopeLabel + ' &middot; ' + authContext.branchName + '</div>',
       '</div>',
       '<nav class="nav-group">',
         '<div class="nav-section">Clinical Ops</div>',
@@ -1077,9 +1283,9 @@ function workspaceShell(active, content) {
         }).join(''),
       '</nav>',
       '<div class="workspace-body">',
-        safetyGateHtml,
-        instanceStripHtml,
-        content,
+        canAccessPmsArea(active) ? safetyGateHtml : '',
+        canAccessPmsArea(active) ? instanceStripHtml : '',
+        canAccessPmsArea(active) ? content : renderAuthDenied(MODULE_SHORT_NAMES[active] || 'Assessment'),
       '</div>',
     '</div>'
   ].join('');
@@ -1094,6 +1300,12 @@ document.addEventListener('DOMContentLoaded', function() {
   shellHolders.forEach(function(holder) {
     var activePage = holder.getAttribute('data-shell');
     holder.outerHTML = patientShell(activePage);
+    if (!canAccessPmsArea(activePage)) {
+      var main = document.querySelector('main.main');
+      if (main) {
+        main.innerHTML = '<section class="page">' + renderAuthDenied(activePage.charAt(0).toUpperCase() + activePage.slice(1)) + '</section>';
+      }
+    }
   });
 
   var wsHolders = document.querySelectorAll('[data-workspace-page]');

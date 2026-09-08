@@ -80,7 +80,7 @@
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
             <div style="display:flex;align-items:center;gap:8px;">
               <h3 style="font-size:14px;color:var(--right-ear);font-weight:700;">Right Ear (AD)</h3>
-              <span class="badge neutral" id="adMetaBadge">Otocam 4K · 20 May 2026</span>
+              <span class="badge neutral" id="adMetaBadge">Otocam 4K</span>
             </div>
             <span class="badge">Intact TM</span>
           </div>
@@ -130,7 +130,7 @@
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
             <div style="display:flex;align-items:center;gap:8px;">
               <h3 style="font-size:14px;color:var(--left-ear);font-weight:700;">Left Ear (AS)</h3>
-              <span class="badge neutral" id="asMetaBadge">Otocam 4K · 20 May 2026</span>
+              <span class="badge neutral" id="asMetaBadge">Otocam 4K</span>
             </div>
             <span class="badge">Intact TM</span>
           </div>
@@ -241,6 +241,11 @@
     document.addEventListener('DOMContentLoaded', function() {
       const pid = getActivePatientId();
       document.getElementById('btnHistory').href = '04-workspace-history.html?patient=' + pid;
+      const today = (typeof getCurrentClinicalDate === 'function') ? getCurrentClinicalDate() : '';
+      const adBadge = document.getElementById('adMetaBadge');
+      const asBadge = document.getElementById('asMetaBadge');
+      if (adBadge && today) adBadge.textContent = 'Otocam 4K · ' + today;
+      if (asBadge && today) asBadge.textContent = 'Otocam 4K · ' + today;
       // (Next button removed — navigation handled by Hub & tab rail)
     
     // Autosave: persist form fields per patient/module/instance
