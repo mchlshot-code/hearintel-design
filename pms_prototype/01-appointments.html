@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clinical PMS - Appointments & Room Schedule</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Scheduler Specific Styles */
+    .schedule-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .date-nav-group {
+      display: inline-flex;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 3px;
+      box-shadow: var(--shadow-subtle);
+    }
+    .date-nav-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      padding: 6px 12px;
+      font-size: 12.5px;
+      font-weight: 600;
+      border-radius: var(--radius-xs);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 120ms ease;
+    }
+    .date-nav-btn:hover {
+      background: var(--bg-subtle);
+    }
+    .date-display {
+      padding: 6px 14px;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      font-family: var(--font-heading);
+      border-left: 1px solid var(--border-light);
+      border-right: 1px solid var(--border-light);
+    }
+    .booth-grid-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+    }
+    .booth-grid-header {
+      display: grid;
+      grid-template-columns: 85px repeat(3, minmax(280px, 1fr));
+      border-bottom: 2px solid var(--border);
+      background: var(--bg-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .booth-col-header {
+      padding: 12px 14px;
+      border-right: 1px solid var(--border-light);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .booth-col-header:last-child { border-right: none; }
+    .booth-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .booth-hardware {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      font-family: var(--font-mono);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .time-slot-row {
+      display: grid;
+      grid-template-columns: 85px repeat(3, minmax(280px, 1fr));
+      border-bottom: 1px solid var(--border-light);
+      min-height: 108px;
+      transition: background 120ms ease;
+    }
+    .time-slot-row:last-child { border-bottom: none; }
+    .time-label-cell {
+      padding: 12px 10px;
+      border-right: 1px solid var(--border);
+      background: var(--bg-subtle);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 2px;
+    }
+    .schedule-cell {
+      padding: 8px;
+      border-right: 1px solid var(--border-light);
+      position: relative;
+      background: var(--surface);
+      transition: all 140ms ease;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .schedule-cell:last-child { border-right: none; }
+    .schedule-cell.drag-over {
+      background: rgba(8, 145, 178, 0.08) !important;
+      outline: 2px dashed var(--brand);
+      outline-offset: -2px;
+    }
+    .schedule-cell:hover .add-slot-btn {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .add-slot-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 120ms ease;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+    .add-slot-btn:hover {
+      background: var(--brand);
+      color: #fff;
+      border-color: var(--brand);
+    }
+    /* Draggable Appointment Card */
+    .apt-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--brand);
+      border-radius: var(--radius-sm);
+      padding: 9px 11px;
+      cursor: grab;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .apt-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.09);
+      border-color: var(--brand);
+    }
+    .apt-card.dragging {
+      opacity: 0.45;
+      cursor: grabbing;
+      transform: scale(0.98);
+    }
+    .apt-card.status-active {
+      border-left-color: #10B981;
+      background: linear-gradient(to right, rgba(16,185,129,0.04), var(--surface));
+    }
+    .apt-card.status-checked-in {
+      border-left-color: #F59E0B;
+    }
+    .apt-card.status-confirmed {
+      border-left-color: #0284C7;
+    }
+    .apt-card.status-completed {
+      border-left-color: var(--text-tertiary);
+      opacity: 0.85;
+    }
+    .apt-header-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .apt-patient-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+    .apt-patient-name:hover {
+      color: var(--brand);
+      text-decoration: underline;
+    }
+    .apt-meta-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+    .apt-tag {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 3px;
+      background: var(--bg-subtle);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-light);
+    }
+    .pulse-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10B981;
+      margin-right: 4px;
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      animation: pulse 1.6s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    .apt-action-btn {
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-xs);
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 120ms ease;
+      text-decoration: none;
+    }
+    .apt-action-btn:hover {
+      background: var(--brand-hover);
+    }
+  </style>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+  <div data-shell="appointments"></div>
+  <main class="main">
+      <section class="page" style="max-width:1400px;margin:0 auto;padding:24px 28px;">
+
+        <!-- Top Overview & Controls Header -->
+        <div class="schedule-header">
+          <div>
+            <div class="eyebrow" style="margin-bottom:2px;display:flex;align-items:center;gap:6px;">
+              <span class="badge teal" style="font-size:10.5px;">Daily Schedule</span>
+              <span>Lagos Central Hearing Clinic &middot; Appointment Schedule</span>
+            </div>
+            <h1 class="page-title" style="margin:0 0 4px;font-size:24px;">Appointments &amp; Room Schedule</h1>
+            <p style="font-size:12.5px;color:var(--text-secondary);margin:0;">
+              Drag and drop appointments between rooms and time slots to reschedule.
+            </p>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <div class="date-nav-group">
+              <button class="date-nav-btn" onclick="navDate(-1)" title="Previous Day">&#8592; Prev</button>
+              <div class="date-display" id="currentScheduleDate">Today</div>
+              <button class="date-nav-btn" onclick="navDate(1)" title="Next Day">Next &#8594;</button>
+              <button class="date-nav-btn" onclick="resetToToday()" style="color:var(--brand);">Today</button>
+            </div>
+
+            <button class="btn primary" onclick="openBookModal()" style="display:inline-flex;align-items:center;gap:6px;font-weight:600;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              + Book Appointment
+            </button>
+          </div>
+        </div>
+
+        <!-- Metric KPI Cards -->
+        <div class="stat-row" style="margin-bottom:20px;">
+          <div class="stat-cell active" style="cursor:default;">
+            <div class="stat-label">Total Scheduled</div>
+            <div class="stat-value" id="kpiTotal">9</div>
+            <div class="stat-note">Appointments booked today</div>
+          </div>
+          <div class="stat-cell" style="cursor:default;">
+            <div class="stat-label">In Room</div>
+            <div class="stat-value" style="color:#10B981;" id="kpiActive">2</div>
+            <div class="stat-note">Actively undergoing assessment</div>
+          </div>
+          <div class="stat-cell" style="cursor:default;">
+            <div class="stat-label">Checked In / Waiting</div>
+            <div class="stat-value" style="color:#F59E0B;" id="kpiWaiting">2</div>
+            <div class="stat-note">Ready for booth transfer</div>
+          </div>
+          <div class="stat-cell" style="cursor:default;">
+            <div class="stat-label">Booth Utilization</div>
+            <div class="stat-value" id="kpiUtil">82%</div>
+            <div class="stat-note">3 Specialized sound suites active</div>
+          </div>
+        </div>
+
+        <!-- Filter & Control Bar -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:12px;">
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:flex;align-items:center;gap:6px;">
+              Room Filter:
+              <select id="boothFilter" onchange="filterSchedule()" style="padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:var(--radius-xs);background:var(--surface);">
+                <option value="all" selected>All Rooms (3)</option>
+                <option value="booth1">Room 1 (Diagnostic)</option>
+                <option value="booth2">Room 2 (Pediatric / ABR)</option>
+                <option value="fitting">Consult &amp; Fitting Suite</option>
+              </select>
+            </label>
+            <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:flex;align-items:center;gap:6px;">
+              Clinician:
+              <select id="clinicianFilter" onchange="filterSchedule()" style="padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:var(--radius-xs);background:var(--surface);">
+                <option value="all" selected>All Clinicians</option>
+                <option value="chika">Dr. Chika Okafor, Au.D. (Lead)</option>
+                <option value="amina">Amina Bello, Au.D.</option>
+              </select>
+            </label>
+          </div>
+
+          <div style="font-size:12px;color:var(--text-tertiary);display:flex;align-items:center;gap:12px;">
+            <span style="display:inline-flex;align-items:center;gap:4px;"><span class="pulse-dot"></span> In Room</span>
+            <span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:7px;height:7px;border-radius:50%;background:#F59E0B;display:inline-block;"></span> Waiting</span>
+            <span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:7px;height:7px;border-radius:50%;background:#0284C7;display:inline-block;"></span> Confirmed</span>
+            <span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:7px;height:7px;border-radius:50%;background:var(--text-tertiary);display:inline-block;"></span> Completed</span>
+          </div>
+        </div>
+
+        <!-- Master Sound Booth Grid -->
+        <div class="booth-grid-container">
+          <div class="booth-grid-header">
+            <div class="booth-col-header" style="background:var(--bg-subtle);justify-content:center;text-align:center;">
+              <span style="font-size:11.5px;font-weight:700;color:var(--text-secondary);">TIME</span>
+            </div>
+            <div class="booth-col-header" id="col-booth1">
+              <div class="booth-title">
+                <span>Room 1</span>
+                <span class="badge neutral" style="font-size:10px;">Diagnostic</span>
+              </div>
+              <div class="booth-hardware">Otometrics Madsen Astera &middot; Titan Tymp</div>
+            </div>
+            <div class="booth-col-header" id="col-booth2">
+              <div class="booth-title">
+                <span>Room 2</span>
+                <span class="badge neutral" style="font-size:10px;">Pediatric &amp; E-Phys</span>
+              </div>
+              <div class="booth-hardware">Interacoustics Eclipse ABR &middot; VRA Setup</div>
+            </div>
+            <div class="booth-col-header" id="col-fitting">
+              <div class="booth-title">
+                <span>Consult &amp; Fitting Suite</span>
+                <span class="badge neutral" style="font-size:10px;">Fitting</span>
+              </div>
+              <div class="booth-hardware">Audioscan Verifit 2 &middot; Oticon/Phonak Hi-Pro</div>
+            </div>
+          </div>
+
+          <div id="scheduleGridBody">
+            <!-- Dynamic Time Slot Rows -->
+          </div>
+        </div>
+
+      </section>
+    </main>
+  </div>
+
+  <!-- Booking Modal -->
+  <div class="modal-backdrop" id="bookAppointmentModal">
+    <div class="modal-dialog" style="max-width:540px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border-light);">
+        <div>
+          <h3 style="margin:0;font-size:15px;color:var(--text-primary);">Book Clinical Appointment</h3>
+          <p style="margin:2px 0 0;font-size:11.5px;color:var(--text-secondary);">Schedule patient into a dedicated sound booth or consult suite.</p>
+        </div>
+        <button class="btn ghost" onclick="closeModal('bookAppointmentModal')" style="font-size:16px;padding:0 8px;">&times;</button>
+      </div>
+      <form id="bookForm" onsubmit="handleBookSubmit(event)" style="padding:20px;">
+        <div class="form-grid" style="grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="field" style="grid-column:1 / -1;">
+            <label for="bookPatientSelect">Patient *</label>
+            <select id="bookPatientSelect" required style="font-size:13px;padding:8px 10px;">
+              <!-- Populated from HearIntelDB -->
+            </select>
+          </div>
+          <div class="field">
+            <label for="bookBoothSelect">Sound Suite / Room *</label>
+            <select id="bookBoothSelect" required style="font-size:13px;padding:8px 10px;">
+              <option value="booth1">Room 1 (Diagnostic)</option>
+              <option value="booth2">Room 2 (Pediatric / ABR)</option>
+              <option value="fitting">Consult &amp; Fitting Suite</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="bookTimeSelect">Start Time *</label>
+            <select id="bookTimeSelect" required style="font-size:13px;padding:8px 10px;">
+              <option value="08:00">08:00 AM</option>
+              <option value="09:00" selected>09:00 AM</option>
+              <option value="10:00">10:00 AM</option>
+              <option value="11:00">11:00 AM</option>
+              <option value="12:00">12:00 PM</option>
+              <option value="13:00">01:00 PM</option>
+              <option value="14:00">02:00 PM</option>
+              <option value="15:00">03:00 PM</option>
+              <option value="16:00">04:00 PM</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="bookDurationSelect">Duration</label>
+            <select id="bookDurationSelect" style="font-size:13px;padding:8px 10px;">
+              <option value="30 min">30 min (Quick Check / Screen)</option>
+              <option value="45 min">45 min (Tymp / Follow-up)</option>
+              <option value="60 min" selected>60 min (Standard Evaluation)</option>
+              <option value="90 min">90 min (Comprehensive Battery)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="bookClinicianSelect">Clinician *</label>
+            <select id="bookClinicianSelect" required style="font-size:13px;padding:8px 10px;">
+              <option value="Dr. Chika Okafor, Au.D.">Dr. Chika Okafor, Au.D. (Lead)</option>
+              <option value="Amina Bello, Au.D.">Amina Bello, Au.D.</option>
+            </select>
+          </div>
+          <div class="field" style="grid-column:1 / -1;">
+            <label for="bookProcedureInput">Procedure / Reason *</label>
+            <input type="text" id="bookProcedureInput" required placeholder="e.g. Diagnostic Battery + PTA, REM Fine-Tuning" style="font-size:13px;padding:8px 10px;">
+          </div>
+          <div class="field" style="grid-column:1 / -1;">
+            <label for="bookStatusSelect">Initial Status</label>
+            <select id="bookStatusSelect" style="font-size:13px;padding:8px 10px;">
+              <option value="Confirmed" selected>Confirmed</option>
+              <option value="Checked In">Checked In (Waiting Room)</option>
+              <option value="In Room">In Room (Active Now)</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border-light);">
+          <button type="button" class="btn" onclick="closeModal('bookAppointmentModal')">Cancel</button>
+          <button type="submit" class="btn primary">Schedule Appointment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Appointment Details & Action Modal -->
+  <div class="modal-backdrop" id="aptDetailModal">
+    <div class="modal-dialog" style="max-width:500px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border-light);">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <h3 id="detailPatientName" style="margin:0;font-size:15px;color:var(--text-primary);">Appointment</h3>
+          <span id="detailStatusBadge" class="badge"></span>
+        </div>
+        <button class="btn ghost" onclick="closeModal('aptDetailModal')" style="font-size:16px;padding:0 8px;">&times;</button>
+      </div>
+      <div style="padding:20px;">
+        <div style="background:var(--bg-subtle);border-radius:var(--radius-sm);padding:12px;margin-bottom:14px;border:1px solid var(--border-light);">
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;">
+            <span style="color:var(--text-secondary);">Procedure:</span>
+            <strong id="detailProcedure" style="color:var(--text-primary);"></strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;">
+            <span style="color:var(--text-secondary);">Room / Suite:</span>
+            <strong id="detailBooth" style="color:var(--text-primary);"></strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;">
+            <span style="color:var(--text-secondary);">Scheduled Time:</span>
+            <strong id="detailTime" style="color:var(--text-primary);"></strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;">
+            <span style="color:var(--text-secondary);">Attending Clinician:</span>
+            <strong id="detailClinician" style="color:var(--text-primary);"></strong>
+          </div>
+        </div>
+
+        <div class="field" style="margin-bottom:16px;">
+          <label style="font-size:12px;">Update Status:</label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">
+            <button type="button" class="btn" style="font-size:11.5px;padding:4px 8px;" onclick="updateCurrentAptStatus('Confirmed')">Confirmed</button>
+            <button type="button" class="btn" style="font-size:11.5px;padding:4px 8px;color:#D97706;border-color:#F59E0B;" onclick="updateCurrentAptStatus('Checked In')">Checked In</button>
+            <button type="button" class="btn primary" style="font-size:11.5px;padding:4px 8px;background:#10B981;border-color:#059669;" onclick="updateCurrentAptStatus('In Room')">&#9679; In Room</button>
+            <button type="button" class="btn" style="font-size:11.5px;padding:4px 8px;" onclick="updateCurrentAptStatus('Completed')">&#10003; Completed</button>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px solid var(--border-light);">
+          <button type="button" class="btn" style="color:var(--status-alert-text);border-color:rgba(239,68,68,0.3);" onclick="deleteCurrentApt()">Remove</button>
+          <div style="display:flex;gap:8px;">
+            <a id="detailRecordLink" class="btn" href="#">Patient Record</a>
+            <a id="detailStartLink" class="btn primary" href="#">Start Assessment &rarr;</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast"></div>
+
+  <script src="data.js"></script>
+  <script src="prototype.js"></script>
+  <script>
+    // Master Appointment Store
+    const DEFAULT_APPOINTMENTS = [
+      {
+        id: 'apt-101',
+        patientId: 'amaia',
+        patientName: 'Amaia Okafor',
+        mrn: 'LCC-26-01248',
+        booth: 'booth1',
+        time: '09:00',
+        duration: '90 min',
+        procedure: 'Comprehensive Diagnostic Battery + PTA',
+        clinician: 'Dr. Chika Okafor, Au.D.',
+        status: 'In Room'
+      },
+      {
+        id: 'apt-102',
+        patientId: 'david',
+        patientName: 'David Mensah',
+        mrn: 'LCC-26-00892',
+        booth: 'booth1',
+        time: '11:00',
+        duration: '60 min',
+        procedure: 'Annual Hearing Review & Tympanometry',
+        clinician: 'Dr. Chika Okafor, Au.D.',
+        status: 'Confirmed'
+      },
+      {
+        id: 'apt-103',
+        patientId: 'emeka',
+        patientName: 'Emeka Eze',
+        mrn: 'LCC-26-01402',
+        booth: 'booth1',
+        time: '14:00',
+        duration: '60 min',
+        procedure: 'Asymmetric Loss & Threshold Masking',
+        clinician: 'Dr. Chika Okafor, Au.D.',
+        status: 'Confirmed'
+      },
+      {
+        id: 'apt-104',
+        patientId: 'amaia',
+        patientName: 'Zainab Abiola',
+        mrn: 'LCC-26-01822',
+        booth: 'booth2',
+        time: '09:00',
+        duration: '60 min',
+        procedure: 'Pediatric Play Audiometry + DPOAE',
+        clinician: 'Amina Bello, Au.D.',
+        status: 'Checked In'
+      },
+      {
+        id: 'apt-105',
+        patientId: 'david',
+        patientName: 'Kemi Adeleke',
+        mrn: 'LCC-26-01934',
+        booth: 'booth2',
+        time: '11:00',
+        duration: '90 min',
+        procedure: 'Tone-Burst ABR Diagnostic Thresholds',
+        clinician: 'Dr. Chika Okafor, Au.D.',
+        status: 'Confirmed'
+      },
+      {
+        id: 'apt-106',
+        patientId: 'emeka',
+        patientName: 'Tunde Balogun',
+        mrn: 'LCC-26-02011',
+        booth: 'booth2',
+        time: '14:00',
+        duration: '45 min',
+        procedure: 'School Screening Referral Confirmation',
+        clinician: 'Amina Bello, Au.D.',
+        status: 'Confirmed'
+      },
+      {
+        id: 'apt-107',
+        patientId: 'amaia',
+        patientName: 'Babatunde Adeleke',
+        mrn: 'LCC-26-00451',
+        booth: 'fitting',
+        time: '10:00',
+        duration: '60 min',
+        procedure: 'Oticon Real 1 Fitting & Speech Mapping',
+        clinician: 'Dr. Chika Okafor, Au.D.',
+        status: 'Completed'
+      },
+      {
+        id: 'apt-108',
+        patientId: 'david',
+        patientName: 'Funke Akindele',
+        mrn: 'LCC-26-01129',
+        booth: 'fitting',
+        time: '13:00',
+        duration: '60 min',
+        procedure: 'Tinnitus Retraining & Sound Masking Fitting',
+        clinician: 'Amina Bello, Au.D.',
+        status: 'Checked In'
+      },
+      {
+        id: 'apt-109',
+        patientId: 'emeka',
+        patientName: 'Chioma Adeleke',
+        mrn: 'LCC-26-01588',
+        booth: 'fitting',
+        time: '15:00',
+        duration: '45 min',
+        procedure: 'Bilateral Silicone Ear Impression Casting',
+        clinician: 'Amina Bello, Au.D.',
+        status: 'Confirmed'
+      }
+    ];
+
+    const STORAGE_KEY = 'hearintel_appointments_schedule';
+    let appointments = [];
+    let activeAptId = null;
+    let draggedAptId = null;
+    let currentDateOffset = 0;
+
+    const TIME_SLOTS = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
+    const BOOTHS = [
+      { id: 'booth1', name: 'Room 1', label: 'Diagnostic' },
+      { id: 'booth2', name: 'Room 2', label: 'Pediatric & ABR' },
+      { id: 'fitting', name: 'Consult & Fitting', label: 'Fitting' }
+    ];
+
+    function loadAppointments() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          appointments = JSON.parse(stored);
+        } else {
+          appointments = JSON.parse(JSON.stringify(DEFAULT_APPOINTMENTS));
+          saveAppointments();
+        }
+      } catch (e) {
+        appointments = JSON.parse(JSON.stringify(DEFAULT_APPOINTMENTS));
+      }
+    }
+
+    function saveAppointments() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appointments));
+      } catch (e) {}
+    }
+
+    function updateDateDisplay() {
+      const now = new Date();
+      now.setDate(now.getDate() + currentDateOffset);
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const str = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+      var _sd=document.getElementById('currentScheduleDate');if(_sd)_sd.textContent=(currentDateOffset===0?'Today — ':'')+str;
+    }
+
+    function navDate(delta) {
+      currentDateOffset += delta;
+      updateDateDisplay();
+      renderSchedule();
+      notify('Switched schedule date.');
+    }
+
+    function resetToToday() {
+      currentDateOffset = 0;
+      updateDateDisplay();
+      renderSchedule();
+      notify('Viewing today’s booth schedule.');
+    }
+
+    function renderSchedule() {
+      const bFilter = document.getElementById('boothFilter').value;
+      const cFilter = document.getElementById('clinicianFilter').value;
+
+      // Update KPIs
+      document.getElementById('kpiTotal').textContent = appointments.length;
+      document.getElementById('kpiActive').textContent = appointments.filter(a => a.status === 'In Room').length;
+      document.getElementById('kpiWaiting').textContent = appointments.filter(a => a.status === 'Checked In').length;
+
+      // Update Column Visibility
+      BOOTHS.forEach(b => {
+        const colHeader = document.getElementById('col-' + b.id);
+        if (colHeader) {
+          colHeader.style.display = (bFilter === 'all' || bFilter === b.id) ? 'flex' : 'none';
+        }
+      });
+
+      const container = document.getElementById('scheduleGridBody');
+      let html = '';
+
+      TIME_SLOTS.forEach(time => {
+        html += `<div class="time-slot-row">`;
+        html += `<div class="time-label-cell"><span>${time}</span><span style="font-size:10px;color:var(--text-tertiary);">${parseInt(time,10) < 12 ? 'AM' : 'PM'}</span></div>`;
+
+        BOOTHS.forEach(b => {
+          const isVisible = (bFilter === 'all' || bFilter === b.id);
+          const cellDisplay = isVisible ? '' : 'display:none;';
+          
+          // Find matching appointments
+          const cellApts = appointments.filter(a => {
+            if (a.booth !== b.id || a.time !== time) return false;
+            if (cFilter === 'chika' && !a.clinician.includes('Chika')) return false;
+            if (cFilter === 'amina' && !a.clinician.includes('Amina')) return false;
+            return true;
+          });
+
+          html += `
+            <div class="schedule-cell" style="${cellDisplay}"
+                 data-booth="${b.id}" data-time="${time}"
+                 ondragover="handleDragOver(event)"
+                 ondragleave="handleDragLeave(event)"
+                 ondrop="handleDrop(event, '${b.id}', '${time}')">
+              <button type="button" class="add-slot-btn" onclick="openBookModal('${b.id}', '${time}')" title="Book ${b.name} at ${time}">+ Add</button>
+          `;
+
+          cellApts.forEach(apt => {
+            let statusClass = 'status-confirmed';
+            let statusBadge = '<span class="badge neutral" style="font-size:10px;">Confirmed</span>';
+            if (apt.status === 'In Room') {
+              statusClass = 'status-active';
+              statusBadge = '<span class="badge success" style="font-size:10px;"><span class="pulse-dot"></span> In Suite</span>';
+            } else if (apt.status === 'Checked In') {
+              statusClass = 'status-checked-in';
+              statusBadge = '<span class="badge warning" style="font-size:10px;">Checked In</span>';
+            } else if (apt.status === 'Completed') {
+              statusClass = 'status-completed';
+              statusBadge = '<span class="badge neutral" style="font-size:10px;">&#10003; Done</span>';
+            }
+
+            html += `
+              <div class="apt-card ${statusClass}" id="${apt.id}" draggable="true"
+                   ondragstart="handleDragStart(event, '${apt.id}')"
+                   ondragend="handleDragEnd(event)"
+                   onclick="openAptDetail('${apt.id}')">
+                <div class="apt-header-line">
+                  <div>
+                    <span class="apt-patient-name">${apt.patientName}</span>
+                    <span style="font-family:var(--font-mono);font-size:10.5px;color:var(--text-tertiary);margin-left:4px;">${apt.mrn}</span>
+                  </div>
+                  ${statusBadge}
+                </div>
+                <div style="font-size:11.5px;font-weight:600;color:var(--text-primary);line-height:1.35;">
+                  ${apt.procedure}
+                </div>
+                <div class="apt-meta-line">
+                  <span>${apt.duration} &middot; <strong style="color:var(--text-secondary);">${apt.clinician.split(',')[0]}</strong></span>
+                  <a class="apt-action-btn" href="03-start-encounter.html?patient=${apt.patientId}" onclick="event.stopPropagation();">
+                    Start &rarr;
+                  </a>
+                </div>
+              </div>
+            `;
+          });
+
+          html += `</div>`;
+        });
+
+        html += `</div>`;
+      });
+
+      container.innerHTML = html;
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function filterSchedule() {
+      renderSchedule();
+    }
+
+    // ── Drag and Drop Handlers ──
+    function handleDragStart(e, aptId) {
+      draggedAptId = aptId;
+      e.dataTransfer.setData('text/plain', aptId);
+      e.dataTransfer.effectAllowed = 'move';
+      const el = document.getElementById(aptId);
+      if (el) setTimeout(() => el.classList.add('dragging'), 0);
+    }
+
+    function handleDragEnd(e) {
+      if (draggedAptId) {
+        const el = document.getElementById(draggedAptId);
+        if (el) el.classList.remove('dragging');
+      }
+      draggedAptId = null;
+      document.querySelectorAll('.schedule-cell').forEach(c => c.classList.remove('drag-over'));
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      e.currentTarget.classList.add('drag-over');
+    }
+
+    function handleDragLeave(e) {
+      e.currentTarget.classList.remove('drag-over');
+    }
+
+    function handleDrop(e, targetBooth, targetTime) {
+      e.preventDefault();
+      e.currentTarget.classList.remove('drag-over');
+      const aptId = e.dataTransfer.getData('text/plain') || draggedAptId;
+      if (!aptId) return;
+
+      const apt = appointments.find(a => a.id === aptId);
+      if (!apt) return;
+
+      const oldBoothName = BOOTHS.find(b => b.id === apt.booth)?.name || apt.booth;
+      const newBoothName = BOOTHS.find(b => b.id === targetBooth)?.name || targetBooth;
+
+      apt.booth = targetBooth;
+      apt.time = targetTime;
+      saveAppointments();
+      renderSchedule();
+
+      notify(`Rescheduled ${apt.patientName} to ${newBoothName} at ${targetTime}.`);
+    }
+
+    // ── Booking Modal Logic ──
+    function openBookModal(prefillBooth = 'booth1', prefillTime = '09:00') {
+      const patientSelect = document.getElementById('bookPatientSelect');
+      const patients = window.HearIntelDB ? window.HearIntelDB.getAllPatients() : [];
+      
+      patientSelect.innerHTML = patients.map(p => `
+        <option value="${p.id}" data-name="${p.name}" data-mrn="${p.mrn}">
+          ${p.name} (${p.age}y, ${p.gender} &middot; ${p.mrn})
+        </option>
+      `).join('');
+
+      document.getElementById('bookBoothSelect').value = prefillBooth;
+      document.getElementById('bookTimeSelect').value = prefillTime;
+      openModal('bookAppointmentModal');
+    }
+
+    function handleBookSubmit(e) {
+      e.preventDefault();
+      const patientSelect = document.getElementById('bookPatientSelect');
+      const selectedOpt = patientSelect.options[patientSelect.selectedIndex];
+      const patientId = selectedOpt.value;
+      const patientName = selectedOpt.getAttribute('data-name');
+      const mrn = selectedOpt.getAttribute('data-mrn');
+
+      const booth = document.getElementById('bookBoothSelect').value;
+      const time = document.getElementById('bookTimeSelect').value;
+      const duration = document.getElementById('bookDurationSelect').value;
+      const clinician = document.getElementById('bookClinicianSelect').value;
+      const procedure = document.getElementById('bookProcedureInput').value;
+      const status = document.getElementById('bookStatusSelect').value;
+
+      const newApt = {
+        id: 'apt-' + Date.now(),
+        patientId,
+        patientName,
+        mrn,
+        booth,
+        time,
+        duration,
+        procedure,
+        clinician,
+        status
+      };
+
+      appointments.push(newApt);
+      saveAppointments();
+      closeModal('bookAppointmentModal');
+      renderSchedule();
+      notify(`Appointment scheduled for ${patientName} in ${BOOTHS.find(b => b.id === booth)?.name} at ${time}.`);
+      document.getElementById('bookForm').reset();
+    }
+
+    // ── Details Modal Logic ──
+    function openAptDetail(aptId) {
+      activeAptId = aptId;
+      const apt = appointments.find(a => a.id === aptId);
+      if (!apt) return;
+
+      document.getElementById('detailPatientName').textContent = apt.patientName;
+      document.getElementById('detailProcedure').textContent = apt.procedure;
+      document.getElementById('detailBooth').textContent = BOOTHS.find(b => b.id === apt.booth)?.name || apt.booth;
+      document.getElementById('detailTime').textContent = `${apt.time} (${apt.duration})`;
+      document.getElementById('detailClinician').textContent = apt.clinician;
+
+      const badge = document.getElementById('detailStatusBadge');
+      badge.textContent = apt.status;
+      badge.className = 'badge ' + (apt.status === 'In Room' ? 'success' : (apt.status === 'Checked In' ? 'warning' : 'neutral'));
+
+      document.getElementById('detailRecordLink').href = '02-profile.html?patient=' + apt.patientId;
+      document.getElementById('detailStartLink').href = '03-start-encounter.html?patient=' + apt.patientId;
+
+      openModal('aptDetailModal');
+    }
+
+    function updateCurrentAptStatus(newStatus) {
+      if (!activeAptId) return;
+      const apt = appointments.find(a => a.id === activeAptId);
+      if (!apt) return;
+
+      apt.status = newStatus;
+      saveAppointments();
+      renderSchedule();
+      closeModal('aptDetailModal');
+      notify(`Updated ${apt.patientName}'s status to "${newStatus}".`);
+    }
+
+    function deleteCurrentApt() {
+      if (!activeAptId) return;
+      const apt = appointments.find(a => a.id === activeAptId);
+      if (!apt) return;
+
+      appointments = appointments.filter(a => a.id !== activeAptId);
+      saveAppointments();
+      renderSchedule();
+      closeModal('aptDetailModal');
+      notify(`Removed appointment for ${apt.patientName}.`);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      loadAppointments();
+      updateDateDisplay();
+      renderSchedule();
+    });
+  </script>
+</body>
+</html>
