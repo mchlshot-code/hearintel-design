@@ -1,5 +1,8 @@
 // HearIntel PMS Master Engine & Universal UI Coordinator
 
+var PMS_ROLE_SOLO = 'solo';
+var PMS_LEGACY_ROLE_SOLO_PRACTITIONER = 'solo_practitioner';
+
 var PMS_AUTH_DEFAULT_CONTEXT = {
   identityName: 'Dr. Chika Okafor, Au.D.',
   organizationName: 'Lagos Central Hearing Clinic',
@@ -104,7 +107,7 @@ var PMS_AUTH_PRESETS = {
     identityName: 'Ola Martins',
     organizationName: 'Ola Martins Hearing Practice',
     organizationType: 'Solo Practice',
-    role: 'solo_practitioner',
+    role: PMS_ROLE_SOLO,
     roleLabel: 'Solo Practitioner',
     scopeType: 'organization',
     scopeLabel: 'Organization-wide',
@@ -184,7 +187,12 @@ function getStoredAuthContext() {
 
 function getPmsAuthContext() {
   var stored = getStoredAuthContext();
-  return Object.assign({}, PMS_AUTH_DEFAULT_CONTEXT, stored || {});
+  return normalizePmsAuthContext(Object.assign({}, PMS_AUTH_DEFAULT_CONTEXT, stored || {}));
+}
+
+function normalizePmsAuthContext(context) {
+  if (context.role === PMS_LEGACY_ROLE_SOLO_PRACTITIONER) context.role = PMS_ROLE_SOLO;
+  return context;
 }
 
 function savePmsAuthContext(context) {
@@ -903,7 +911,7 @@ function renderRoleSwitcherHtml(authContext) {
   var isRec  = r === 'receptionist' || r === 'front_desk';
   var isAud  = r === 'audiologist';
   var isAdmin = r === 'organization_admin' || r === 'org_admin';
-  var isSolo = r === 'solo_practitioner' || r === 'solo';
+  var isSolo = r === PMS_ROLE_SOLO;
   var isSuper = r === 'super_admin';
 
   var chevronSvg = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="%2338BDF8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';

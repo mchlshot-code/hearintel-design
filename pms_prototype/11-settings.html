@@ -141,14 +141,14 @@
               <div style="margin-bottom:20px;">
                 <h3 style="font-size:13px;font-weight:600;margin-bottom:10px;">Change Password</h3>
                 <div class="form-grid">
-                  <div class="field"><label>Current Password</label><input type="password" value="••••••••••••"></div>
-                  <div class="field"><label>New Password</label><input type="password" placeholder="Min. 8 characters"></div>
+                  <div class="field"><label for="setCurrentPassword">Current Password</label><input id="setCurrentPassword" type="password" autocomplete="current-password" placeholder="Current password"></div>
+                  <div class="field"><label for="setNewPassword">New Password</label><input id="setNewPassword" type="password" placeholder="Min. 8 characters"></div>
                 </div>
               </div>
 
               <div style="margin-bottom:20px;border-top:1px solid var(--border-light);padding-top:16px;">
                 <h3 style="font-size:13px;font-weight:600;margin-bottom:10px;">Two-Factor Authentication (2FA)</h3>
-                <label class="check-item" style="margin-bottom:6px;"><input type="checkbox" checked onchange="notify('2FA status updated.')"> Require authenticator app security code on new device sign-in</label>
+                <label class="check-item" style="margin-bottom:6px;" for="set2faRequired"><input id="set2faRequired" data-setting="account.require2fa" type="checkbox" checked onchange="notify('2FA status updated.')"> Require authenticator app security code on new device sign-in</label>
                 <div style="font-size:12px;color:var(--text-secondary);">Last verified with Authenticator App on 20 May 2026.</div>
               </div>
 
@@ -182,22 +182,22 @@
 
               <h3 style="font-size:13px;font-weight:600;margin-bottom:12px;">Diagnostic Protocol Rules</h3>
               <div class="check-grid" style="margin-bottom:20px;">
-                <label class="check-item"><input type="checkbox" checked onchange="notify('Preference saved.')"> Flag Pure Tone Asymmetry (>15 dB at 2+ adjacent frequencies)</label>
-                <label class="check-item"><input type="checkbox" checked onchange="notify('Preference saved.')"> Automatically generate Care Plan follow-up recall on assessment completion</label>
-                <label class="check-item"><input type="checkbox" checked onchange="notify('Preference saved.')"> Require case history intake before PTA threshold matrix unlock</label>
-                <label class="check-item"><input type="checkbox" checked onchange="notify('Preference saved.')"> Enforce Real-Ear Measurement (REM) verification on Hearing Aid pathway</label>
-                <label class="check-item"><input type="checkbox" checked onchange="notify('Preference saved.')"> Show shaded speech banana area on diagnostic audiogram</label>
+                <label class="check-item" for="prefAsymmetryFlag"><input id="prefAsymmetryFlag" data-setting="clinical.asymmetryFlag" type="checkbox" checked onchange="notify('Preference saved.')"> Flag Pure Tone Asymmetry (>15 dB at 2+ adjacent frequencies)</label>
+                <label class="check-item" for="prefCarePlanRecall"><input id="prefCarePlanRecall" data-setting="clinical.carePlanRecall" type="checkbox" checked onchange="notify('Preference saved.')"> Automatically generate Care Plan follow-up recall on assessment completion</label>
+                <label class="check-item" for="prefCaseHistory"><input id="prefCaseHistory" data-setting="clinical.caseHistoryRequired" type="checkbox" checked onchange="notify('Preference saved.')"> Require case history intake before PTA threshold matrix unlock</label>
+                <label class="check-item" for="prefRemVerification"><input id="prefRemVerification" data-setting="clinical.remVerification" type="checkbox" checked onchange="notify('Preference saved.')"> Enforce Real-Ear Measurement (REM) verification on Hearing Aid pathway</label>
+                <label class="check-item" for="prefSpeechBanana"><input id="prefSpeechBanana" data-setting="clinical.speechBanana" type="checkbox" checked onchange="notify('Preference saved.')"> Show shaded speech banana area on diagnostic audiogram</label>
               </div>
 
               <h3 style="font-size:13px;font-weight:600;margin-bottom:12px;border-top:1px solid var(--border-light);padding-top:16px;">Units & Default Landing Page</h3>
               <div class="form-grid">
                 <div class="field">
-                  <label>Hearing Level Unit</label>
-                  <select><option selected>dB HL (ANSI / ISO Standard)</option><option>dB SPL</option></select>
+                  <label for="hlUnit">Hearing Level Unit</label>
+                  <select id="hlUnit" data-setting="clinical.hlUnit"><option selected>dB HL (ANSI / ISO Standard)</option><option>dB SPL</option></select>
                 </div>
                 <div class="field">
-                  <label>Default Startup Screen</label>
-                  <select><option selected>Clinical Worklist (00-dashboard.html)</option><option>Patient Registry (01-registry.html)</option></select>
+                  <label for="startupScreen">Default Startup Screen</label>
+                  <select id="startupScreen" data-setting="clinical.startupScreen"><option selected>Clinical Worklist (00-dashboard.html)</option><option>Patient Registry (01-registry.html)</option></select>
                 </div>
               </div>
             </div>
@@ -212,10 +212,10 @@
               </div>
 
               <div class="check-grid" style="grid-template-columns:1fr;gap:12px;">
-                <label class="check-item"><input type="checkbox" checked onchange="notify('Notification updated.')"> In-app toast alerts for upcoming scheduled Care Plan recalls (48 hrs prior)</label>
-                <label class="check-item"><input type="checkbox" checked onchange="notify('Notification updated.')"> Immediate alert banner when asymmetric threshold drop or safety flag is recorded</label>
-                <label class="check-item"><input type="checkbox" checked onchange="notify('Notification updated.')"> Incomplete assessment draft reminders for current clinic session</label>
-                <label class="check-item"><input type="checkbox" onchange="notify('Notification updated.')"> Daily morning summary email of scheduled clinical appointments</label>
+                <label class="check-item" for="notifCarePlanRecall"><input id="notifCarePlanRecall" data-setting="notifications.carePlanRecall" type="checkbox" checked onchange="notify('Notification updated.')"> In-app toast alerts for upcoming scheduled Care Plan recalls (48 hrs prior)</label>
+                <label class="check-item" for="notifThresholdDrop"><input id="notifThresholdDrop" data-setting="notifications.thresholdDrop" type="checkbox" checked onchange="notify('Notification updated.')"> Immediate alert banner when asymmetric threshold drop or safety flag is recorded</label>
+                <label class="check-item" for="notifDraftReminder"><input id="notifDraftReminder" data-setting="notifications.draftReminder" type="checkbox" checked onchange="notify('Notification updated.')"> Incomplete assessment draft reminders for current clinic session</label>
+                <label class="check-item" for="notifDailyEmail"><input id="notifDailyEmail" data-setting="notifications.dailyEmail" type="checkbox" onchange="notify('Notification updated.')"> Daily morning summary email of scheduled clinical appointments</label>
               </div>
             </div>
 
@@ -233,8 +233,8 @@
               </div>
 
               <div class="form-grid" style="margin-bottom:20px;">
-                <div class="field"><label>Facility Name</label><input value="Lagos Central Hearing Clinic"></div>
-                <div class="field"><label>Primary Consultation Room</label><input value="Room 1 (General Audiology & Diagnostic)"></div>
+                <div class="field"><label for="facilityName">Facility Name</label><input id="facilityName" value="Lagos Central Hearing Clinic"></div>
+                <div class="field"><label for="primaryRoom">Primary Consultation Room</label><input id="primaryRoom" value="Room 1 (General Audiology & Diagnostic)"></div>
               </div>
 
               <h3 style="font-size:13px;font-weight:600;margin-bottom:10px;">Clinical Team Members (3)</h3>
@@ -249,29 +249,7 @@
                       <th style="text-align:right;"></th>
                     </tr>
                   </thead>
-                  <tbody>
-                    <tr>
-                      <td><strong>Dr. Chika Okafor</strong><div style="font-size:11px;color:var(--text-secondary);">chika.okafor@lagoshearing.org</div></td>
-                      <td>Lead Audiologist</td>
-                      <td>AUD-NG-2026-081</td>
-                      <td><span class="badge success">Organization-wide clinical review</span></td>
-                      <td style="text-align:right;color:var(--text-secondary);font-size:11.5px;">Current User</td>
-                    </tr>
-                    <tr>
-                      <td><strong>Amina Bello</strong><div style="font-size:11px;color:var(--text-secondary);">amina.b@lagoshearing.org</div></td>
-                      <td>Clinical Audiologist</td>
-                      <td>AUD-NG-2025-114</td>
-                      <td><span class="badge teal">Assigned patients</span></td>
-                      <td style="text-align:right;color:var(--text-secondary);font-size:11.5px;">Governance controlled</td>
-                    </tr>
-                    <tr>
-                      <td><strong>Kelechi Musa</strong><div style="font-size:11px;color:var(--text-secondary);">kelechi.m@lagoshearing.org</div></td>
-                      <td>Hearing Care Professional</td>
-                      <td>HCP-NG-2024-009</td>
-                      <td><span class="badge teal">Branch only</span></td>
-                      <td style="text-align:right;color:var(--text-secondary);font-size:11.5px;">Governance controlled</td>
-                    </tr>
-                  </tbody>
+                  <tbody id="teamRosterBody"></tbody>
                 </table>
               </div>
             </div>
@@ -297,7 +275,7 @@
 
               <div style="border-top:1px solid var(--border-light);padding-top:16px;">
                 <h3 style="font-size:13px;font-weight:600;margin-bottom:8px;">Patient Consent Verification</h3>
-                <label class="check-item"><input type="checkbox" checked onchange="notify('Consent rule updated.')"> Enforce explicit digital consent recording before pure tone testing</label>
+                <label class="check-item" for="privacyConsentRequired"><input id="privacyConsentRequired" data-setting="privacy.consentRequired" type="checkbox" checked onchange="notify('Consent rule updated.')"> Enforce explicit digital consent recording before pure tone testing</label>
               </div>
             </div>
 
@@ -312,16 +290,16 @@
 
               <div class="form-grid" style="grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;">
                 <div class="field">
-                  <label>Color Theme</label>
-                  <select onchange="notify('Theme set to ' + this.value);">
+                  <label for="appearanceTheme">Color Theme</label>
+                  <select id="appearanceTheme" data-setting="appearance.theme" onchange="notify('Theme set to ' + this.value);">
                     <option selected>Clinical Light (Standard High-Contrast)</option>
                     <option>Dark Mode (High Contrast)</option>
                     <option>System Default</option>
                   </select>
                 </div>
                 <div class="field">
-                  <label>Interface Density</label>
-                  <select onchange="notify('Density updated.');">
+                  <label for="appearanceDensity">Interface Density</label>
+                  <select id="appearanceDensity" data-setting="appearance.density" onchange="notify('Density updated.');">
                     <option selected>High-Density Tabular (Standard)</option>
                     <option>Comfortable (Spacious)</option>
                   </select>
@@ -338,11 +316,127 @@
   <script src="data.js"></script>
   <script src="prototype.js"></script>
   <script>
+    const SETTINGS_KEY = 'hearintel_pms_settings';
+    const DEFAULT_SETTINGS_MODEL = {
+      account: { require2fa: true },
+      clinical: {
+        asymmetryFlag: true,
+        carePlanRecall: true,
+        caseHistoryRequired: true,
+        remVerification: true,
+        speechBanana: true,
+        hlUnit: 'dB HL (ANSI / ISO Standard)',
+        startupScreen: 'Clinical Worklist (00-dashboard.html)'
+      },
+      notifications: {
+        carePlanRecall: true,
+        thresholdDrop: true,
+        draftReminder: true,
+        dailyEmail: false
+      },
+      privacy: { consentRequired: true },
+      appearance: {
+        theme: 'Clinical Light (Standard High-Contrast)',
+        density: 'High-Density Tabular (Standard)'
+      }
+    };
+
+    function cloneSettings(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function getSettingsValue(model, path) {
+      return path.split('.').reduce((current, key) => current && current[key], model);
+    }
+
+    function setSettingsValue(model, path, value) {
+      const keys = path.split('.');
+      const last = keys.pop();
+      const target = keys.reduce((current, key) => {
+        if (!current[key]) current[key] = {};
+        return current[key];
+      }, model);
+      target[last] = value;
+    }
+
+    function mergeSettings(defaults, saved) {
+      const merged = cloneSettings(defaults);
+      Object.keys(saved || {}).forEach(section => {
+        merged[section] = Object.assign({}, merged[section] || {}, saved[section] || {});
+      });
+      return merged;
+    }
+
+    function loadSettingsModel() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+        return mergeSettings(DEFAULT_SETTINGS_MODEL, saved);
+      } catch (e) {
+        return cloneSettings(DEFAULT_SETTINGS_MODEL);
+      }
+    }
+
+    let settingsModel = loadSettingsModel();
+
+    function bindSettingsModel() {
+      document.querySelectorAll('[data-setting]').forEach(control => {
+        const value = getSettingsValue(settingsModel, control.dataset.setting);
+        if (control.type === 'checkbox') control.checked = Boolean(value);
+        else if (value !== undefined) control.value = value;
+        control.addEventListener('change', function() {
+          const nextValue = control.type === 'checkbox' ? control.checked : control.value;
+          setSettingsValue(settingsModel, control.dataset.setting, nextValue);
+          localStorage.setItem(SETTINGS_KEY, JSON.stringify(settingsModel));
+        });
+      });
+    }
+
+    const TEAM_ROSTER = [
+      {
+        name: 'Dr. Chika Okafor',
+        email: 'chika.okafor@lagoshearing.org',
+        role: 'Lead Audiologist',
+        license: 'AUD-NG-2026-081',
+        scope: 'Organization-wide clinical review',
+        status: 'Current User'
+      },
+      {
+        name: 'Amina Bello',
+        email: 'amina.b@lagoshearing.org',
+        role: 'Clinical Audiologist',
+        license: 'AUD-NG-2025-114',
+        scope: 'Assigned patients',
+        status: 'Governance controlled'
+      },
+      {
+        name: 'Kelechi Musa',
+        email: 'kelechi.m@lagoshearing.org',
+        role: 'Hearing Care Professional',
+        license: 'HCP-NG-2024-009',
+        scope: 'Branch only',
+        status: 'Governance controlled'
+      }
+    ];
+
+    function renderTeamRoster() {
+      const tbody = document.getElementById('teamRosterBody');
+      if (!tbody) return;
+      tbody.innerHTML = TEAM_ROSTER.map(member => (
+        '<tr>' +
+          '<td><strong>' + member.name + '</strong><div style="font-size:11px;color:var(--text-secondary);">' + member.email + '</div></td>' +
+          '<td>' + member.role + '</td>' +
+          '<td>' + member.license + '</td>' +
+          '<td><span class="badge ' + (member.scope === 'Organization-wide clinical review' ? 'success' : 'teal') + '">' + member.scope + '</span></td>' +
+          '<td style="text-align:right;color:var(--text-secondary);font-size:11.5px;">' + member.status + '</td>' +
+        '</tr>'
+      )).join('');
+    }
+
     function isSoloPracticeContext() {
       try {
         if (typeof getPmsAuthContext !== 'function') return false;
         const ctx = getPmsAuthContext();
-        return ctx.organizationType === 'Solo Practice' || ctx.role === 'solo_practitioner' || ctx.role === 'solo';
+        return ctx.organizationType === 'Solo Practice' || ctx.role === PMS_ROLE_SOLO;
       } catch (e) {
         return false;
       }
@@ -367,7 +461,7 @@
         const titleInput = document.getElementById('setProfTitle');
         if (titleInput) titleInput.value = ctx.roleLabel + (solo ? ' & Practice Owner' : '');
       }
-      const facilityInput = document.querySelector('#pane-workspace input');
+      const facilityInput = document.getElementById('facilityName');
       if (facilityInput && ctx.organizationName) facilityInput.value = ctx.organizationName;
     }
 
@@ -394,6 +488,8 @@
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       applySettingsContext();
+      bindSettingsModel();
+      renderTeamRoster();
       if (window.lucide) lucide.createIcons();
     });
   </script>

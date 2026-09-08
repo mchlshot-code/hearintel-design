@@ -211,40 +211,7 @@
       <p class="subtitle">Select a prototype module to review the live interactive design system and clinical workflows.</p>
     </header>
 
-    <div class="grid">
-      <!-- Landing Page Card -->
-      <a href="./landing_page_prototype/index.html" class="card">
-        <div class="card-tag">Marketing &amp; Platform</div>
-        <div class="card-title">
-          Landing Page Prototype
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-        </div>
-        <p class="card-desc">Public-facing platform presentation covering HPMS, Hearing Health Registry, compliance architecture, roadmap, and contextual demo request.</p>
-        <span class="card-btn">Open Landing Page &rarr;</span>
-      </a>
-
-      <!-- PMS Workspace Card -->
-      <a href="./pms_prototype/00-dashboard.html" class="card secondary">
-        <div class="card-tag">Clinical Workspace &amp; EHR</div>
-        <div class="card-title">
-          Practice Management (PMS)
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-        </div>
-        <p class="card-desc">Clinical encounter workflows, interactive Pure Tone Audiometry (PTA), Otoscopy, Tympanometry, Speech, Patient Registry, and Diagnostic Conclusion.</p>
-        <span class="card-btn">Open PMS Dashboard &rarr;</span>
-      </a>
-
-      <!-- Admin Governance Card -->
-      <a href="./authorization_prototype/index.html" class="card secondary">
-        <div class="card-tag">Admin Governance &amp; Access</div>
-        <div class="card-title">
-          Admin Governance / Organization Access
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-        </div>
-        <p class="card-desc">Admin-only prototype for organization membership, branch scope, roles, consent, authorization decisions, and audit review.</p>
-        <span class="card-btn">Open Governance &rarr;</span>
-      </a>
-    </div>
+    <div class="grid" id="prototypeCards"></div>
 
     <!-- Quick Navigation Bar -->
     <div class="quick-links">
@@ -261,6 +228,47 @@
 
     <p class="footer-note">&copy; 2026 Clinical PMS. Medical Ink Design System v3.</p>
   </div>
+
+  <script>
+    const PROTOTYPE_CARDS = [
+      {
+        href: './landing_page_prototype/index.html',
+        tag: 'Marketing & Platform',
+        title: 'Landing Page Prototype',
+        description: 'Public-facing platform presentation covering HPMS, Hearing Health Registry, compliance architecture, roadmap, and contextual demo request.',
+        cta: 'Open Landing Page',
+        secondary: false
+      },
+      {
+        href: './pms_prototype/00-dashboard.html',
+        tag: 'Clinical Workspace & EHR',
+        title: 'Practice Management (PMS)',
+        description: 'Clinical encounter workflows, interactive Pure Tone Audiometry (PTA), Otoscopy, Tympanometry, Speech, Patient Registry, and Diagnostic Conclusion.',
+        cta: 'Open PMS Dashboard',
+        secondary: true
+      },
+      {
+        href: './authorization_prototype/index.html',
+        tag: 'Admin Governance & Access',
+        title: 'Admin Governance / Organization Access',
+        description: 'Admin-only prototype for organization membership, branch scope, roles, consent, authorization decisions, and audit review.',
+        cta: 'Open Governance',
+        secondary: true
+      }
+    ];
+
+    function renderPrototypeCard(card) {
+      const arrowIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>';
+      return '<a href="' + card.href + '" class="card' + (card.secondary ? ' secondary' : '') + '">' +
+        '<div class="card-tag">' + card.tag + '</div>' +
+        '<div class="card-title">' + card.title + arrowIcon + '</div>' +
+        '<p class="card-desc">' + card.description + '</p>' +
+        '<span class="card-btn">' + card.cta + ' &rarr;</span>' +
+      '</a>';
+    }
+
+    document.getElementById('prototypeCards').innerHTML = PROTOTYPE_CARDS.map(renderPrototypeCard).join('');
+  </script>
 
 </body>
 </html>
