@@ -224,11 +224,11 @@
               <div class="panel-header" style="padding:0 0 14px 0;margin-bottom:18px;">
                 <div>
                   <h2 class="panel-title">Institution & Team Workspace</h2>
-                  <p class="panel-subtitle">Organization profile and team roster. Role and scope changes are handled in Admin Governance.</p>
+                  <p class="panel-subtitle">Organization profile and team roster. Role and scope updates are handled by your admin team.</p>
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;">
-                  <span class="badge neutral">Governance controlled</span>
-                  <a class="btn" href="../authorization_prototype/index.html" style="font-size:11.5px;padding:4px 10px;">Manage in Governance &#8594;</a>
+                  <span class="badge neutral">Admin controlled</span>
+                  <button type="button" class="btn" onclick="openTeamInviteModal()" style="font-size:11.5px;padding:4px 10px;">Invite</button>
                 </div>
               </div>
 
@@ -237,7 +237,7 @@
                 <div class="field"><label for="primaryRoom">Primary Consultation Room</label><input id="primaryRoom" value="Room 1 (General Audiology & Diagnostic)"></div>
               </div>
 
-              <h3 style="font-size:13px;font-weight:600;margin-bottom:10px;">Clinical Team Members (3)</h3>
+              <h3 id="teamRosterTitle" style="font-size:13px;font-weight:600;margin-bottom:10px;">Clinical Team Members (3)</h3>
               <div class="table-container" style="border:none;margin-bottom:16px;">
                 <table>
                   <thead>
@@ -258,7 +258,7 @@
             <div class="surface settings-pane" id="pane-privacy" style="padding:24px;">
               <div class="panel-header" style="padding:0 0 14px 0;margin-bottom:18px;">
                 <div>
-                  <h2 class="panel-title">Privacy & Clinical Data Governance</h2>
+                  <h2 class="panel-title">Privacy & Clinical Data Controls</h2>
                   <p class="panel-subtitle">Data export, patient confidentiality preferences, and security compliance.</p>
                 </div>
                 <span class="badge success">Encrypted at Rest</span>
@@ -313,6 +313,36 @@
     </main>
   </div>
   <div class="toast"></div>
+  <div id="teamInviteModal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.35);z-index:2000;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target === this) closeTeamInviteModal();">
+    <div class="surface" style="width:min(440px,100%);padding:20px;border-radius:var(--radius);box-shadow:var(--shadow-modal);">
+      <div class="panel-header" style="padding:0 0 12px 0;margin-bottom:14px;">
+        <div>
+          <h2 class="panel-title">Invite Team Member</h2>
+          <p class="panel-subtitle">Send a workspace invitation for this clinic.</p>
+        </div>
+        <button type="button" class="btn ghost" onclick="closeTeamInviteModal()">Close</button>
+      </div>
+      <form onsubmit="submitTeamInvite(event)">
+        <div class="form-grid" style="grid-template-columns:1fr;gap:12px;margin-bottom:16px;">
+          <div class="field"><label for="inviteName">Full Name</label><input id="inviteName" placeholder="Team member name"></div>
+          <div class="field"><label for="inviteEmail">Email Address</label><input id="inviteEmail" type="email" placeholder="name@clinic.org"></div>
+          <div class="field">
+            <label for="inviteRole">Role</label>
+            <select id="inviteRole">
+              <option>Clinical Audiologist</option>
+              <option>Front Desk Officer</option>
+              <option>Hearing Care Professional</option>
+              <option>Lead Audiologist</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;">
+          <button type="button" class="btn" onclick="closeTeamInviteModal()">Cancel</button>
+          <button type="submit" class="btn primary">Send Invite</button>
+        </div>
+      </form>
+    </div>
+  </div>
   <script src="data.js"></script>
   <script src="prototype.js"></script>
   <script>
@@ -406,7 +436,7 @@
         role: 'Clinical Audiologist',
         license: 'AUD-NG-2025-114',
         scope: 'Assigned patients',
-        status: 'Governance controlled'
+        status: 'Admin controlled'
       },
       {
         name: 'Kelechi Musa',
@@ -414,13 +444,15 @@
         role: 'Hearing Care Professional',
         license: 'HCP-NG-2024-009',
         scope: 'Branch only',
-        status: 'Governance controlled'
+        status: 'Admin controlled'
       }
     ];
 
     function renderTeamRoster() {
       const tbody = document.getElementById('teamRosterBody');
       if (!tbody) return;
+      const title = document.getElementById('teamRosterTitle');
+      if (title) title.textContent = 'Clinical Team Members (' + TEAM_ROSTER.length + ')';
       tbody.innerHTML = TEAM_ROSTER.map(member => (
         '<tr>' +
           '<td><strong>' + member.name + '</strong><div style="font-size:11px;color:var(--text-secondary);">' + member.email + '</div></td>' +
@@ -430,6 +462,43 @@
           '<td style="text-align:right;color:var(--text-secondary);font-size:11.5px;">' + member.status + '</td>' +
         '</tr>'
       )).join('');
+    }
+
+    function openTeamInviteModal() {
+      const modal = document.getElementById('teamInviteModal');
+      if (!modal) return;
+      document.getElementById('inviteName').value = '';
+      document.getElementById('inviteEmail').value = '';
+      document.getElementById('inviteRole').value = 'Clinical Audiologist';
+      modal.style.display = 'flex';
+      setTimeout(function() { document.getElementById('inviteName').focus(); }, 0);
+    }
+
+    function closeTeamInviteModal() {
+      const modal = document.getElementById('teamInviteModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function submitTeamInvite(event) {
+      event.preventDefault();
+      const name = document.getElementById('inviteName').value.trim();
+      const email = document.getElementById('inviteEmail').value.trim();
+      const role = document.getElementById('inviteRole').value;
+      if (!name || !email) {
+        notify('Name and email are required.');
+        return;
+      }
+      TEAM_ROSTER.push({
+        name,
+        email,
+        role,
+        license: 'Pending',
+        scope: 'Pending assignment',
+        status: 'Invite sent'
+      });
+      renderTeamRoster();
+      closeTeamInviteModal();
+      notify('Invitation sent to ' + name + '.');
     }
 
     function isSoloPracticeContext() {

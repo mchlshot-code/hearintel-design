@@ -981,11 +981,15 @@
     }
 
     // ── Init ──
-    document.addEventListener('DOMContentLoaded', function() {
-            const pid = getActivePatientId();
+    let ptaInitialized = false;
+    function initializePtaWorkspace() {
+      if (ptaInitialized) return;
+      ptaInitialized = true;
+      requestAnimationFrame(function() {
+      const pid = getActivePatientId();
       var _bp = document.getElementById('btnPrevStep'); if (_bp) _bp.href = '05-workspace-otoscopy.html?patient=' + pid;
       var _bn = document.getElementById('btnNextStep'); if (_bn) _bn.href = '07-workspace-immittance.html?patient=' + pid;
-      document.getElementById('btnPrev').href = '05-workspace-otoscopy.html?patient=' + pid;
+      var _prev = document.getElementById('btnPrev'); if (_prev) _prev.href = '05-workspace-otoscopy.html?patient=' + pid;
       // (Next button removed — navigation handled by Hub & tab rail)
 
       drawAudiogram();
@@ -994,7 +998,12 @@
     
     // Autosave: persist form fields per patient/module/instance
     initModuleAutosave('pta', ['chkMasked', 'chkNR', 'chkSpeechBanana', 'transducerSelect', 'ptaImpressionText']);
-  });
+      });
+    }
+    document.addEventListener('pms:shell-ready', initializePtaWorkspace);
+    document.addEventListener('DOMContentLoaded', function() {
+      requestAnimationFrame(initializePtaWorkspace);
+    });
   </script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {

@@ -336,7 +336,7 @@ function renderPatientLimitedView(patient, areaLabel) {
       + '<div><span>Clinical Data</span><strong>Locked</strong></div>'
     + '</div>'
     + '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">'
-      + '<button class="btn" onclick="notify(\'Access request created for governance review.\')">Request Access</button>'
+      + '<button class="btn" onclick="notify(\'Access request sent to the admin team.\')">Request Access</button>'
       + '<a class="btn primary" href="01-registry.html">Return to Registry</a>'
     + '</div>'
     + '</div>';
@@ -860,8 +860,8 @@ function filterLookupResults(query) {
   list.innerHTML = matches.map(p => {
     const accessState = getPatientAccessState(p, 'profile');
     const clinicalHref = accessState.clinicalAllowed ? `03-start-encounter.html?patient=${p.id}` : '#';
-    const rowClick = accessState.identityVisible ? `location.href='02-profile.html?patient=${p.id}'` : `notify('Access request created for governance review.')`;
-    const actionClick = accessState.clinicalAllowed ? 'event.stopPropagation();' : "event.preventDefault();event.stopPropagation();notify('Access request created for governance review.');";
+    const rowClick = accessState.identityVisible ? `location.href='02-profile.html?patient=${p.id}'` : `notify('Access request sent to the admin team.')`;
+    const actionClick = accessState.clinicalAllowed ? 'event.stopPropagation();' : "event.preventDefault();event.stopPropagation();notify('Access request sent to the admin team.');";
     return `
     <div class="lookup-result-row" onclick="${rowClick}" title="${accessState.reason}">
       <div style="flex:1;min-width:0;padding-right:20px;">
@@ -1544,6 +1544,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   document.documentElement.setAttribute('data-theme', getActiveTheme());
+  document.dispatchEvent(new CustomEvent('pms:shell-ready'));
 });
 
 // ── MASTER CLINICAL REPORT ENGINE (LONGITUDINAL EMR & AUDIENCE SYSTEM) ──

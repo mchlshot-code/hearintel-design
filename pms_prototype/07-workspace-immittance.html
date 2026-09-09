@@ -611,11 +611,15 @@
     });
 
     // ── Init ──
-    document.addEventListener('DOMContentLoaded', function() {
-            const pid = getActivePatientId();
+    let immittanceInitialized = false;
+    function initializeImmittanceWorkspace() {
+      if (immittanceInitialized) return;
+      immittanceInitialized = true;
+      requestAnimationFrame(function() {
+      const pid = getActivePatientId();
       var _bp = document.getElementById('btnPrevStep'); if (_bp) _bp.href = '06-workspace-pta.html?patient=' + pid;
       var _bn = document.getElementById('btnNextStep'); if (_bn) _bn.href = '08-workspace-speech.html?patient=' + pid;
-      document.getElementById('prevStepBtn').href = '06-workspace-pta.html?patient=' + pid;
+      var _prev = document.getElementById('prevStepBtn'); if (_prev) _prev.href = '06-workspace-pta.html?patient=' + pid;
       // (Next button removed — navigation handled by Hub & tab rail)
 
       drawTympanogram('R');
@@ -626,7 +630,12 @@
     
     // Autosave: persist form fields per patient/module/instance
     initModuleAutosave('immittance', ['adPres', 'adComp', 'adEcv', 'adGrad', 'asPres', 'asComp', 'asEcv', 'asGrad', 'artR_i500', 'artR_i1k', 'artR_i2k', 'artR_c500', 'artR_c1k', 'artR_c2k', 'decayR', 'artL_i500', 'artL_i1k', 'artL_i2k', 'artL_c500', 'artL_c1k', 'artL_c2k', 'decayL', 'tympImpressionText']);
-  });
+      });
+    }
+    document.addEventListener('pms:shell-ready', initializeImmittanceWorkspace);
+    document.addEventListener('DOMContentLoaded', function() {
+      requestAnimationFrame(initializeImmittanceWorkspace);
+    });
   </script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {

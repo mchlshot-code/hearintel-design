@@ -553,11 +553,15 @@
     });
 
     // ── Init ──
-    document.addEventListener('DOMContentLoaded', function() {
-            const pid = getActivePatientId();
+    let speechInitialized = false;
+    function initializeSpeechWorkspace() {
+      if (speechInitialized) return;
+      speechInitialized = true;
+      requestAnimationFrame(function() {
+      const pid = getActivePatientId();
       var _bp = document.getElementById('btnPrevStep'); if (_bp) _bp.href = '07-workspace-immittance.html?patient=' + pid;
       var _bn = document.getElementById('btnNextStep'); if (_bn) _bn.href = '12-workspace-electrophysiology.html?patient=' + pid;
-      document.getElementById('prevStepBtn').href = '07-workspace-immittance.html?patient=' + pid;
+      var _prev = document.getElementById('prevStepBtn'); if (_prev) _prev.href = '07-workspace-immittance.html?patient=' + pid;
       // (Next button removed — navigation handled by Hub & tab rail)
 
       calculateSpeechIndices();
@@ -566,7 +570,12 @@
     
     // Autosave: persist form fields per patient/module/instance
     initModuleAutosave('speech', ['adSrtInput', 'adWrsInput', 'adWrs90Input', 'adMclInput', 'adUclInput', 'asSrtInput', 'asWrsInput', 'asWrs90Input', 'asMclInput', 'asUclInput', 'quickSinLevel', 'quickSinWords', 'tinLaterality', 'tinPitch', 'tinLoudness', 'tinMml', 'tinResidual', 'speechImpressionText']);
-  });
+      });
+    }
+    document.addEventListener('pms:shell-ready', initializeSpeechWorkspace);
+    document.addEventListener('DOMContentLoaded', function() {
+      requestAnimationFrame(initializeSpeechWorkspace);
+    });
   </script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
