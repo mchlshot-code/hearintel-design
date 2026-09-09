@@ -1,223 +1,230 @@
-# HearIntel — Brand Palette Book v3
+# HearIntel Brand Palette Book
 ## Medical Ink Design System
 
+---
+
+## Design Direction
+
+HearIntel should feel like a serious clinical workspace: calm, precise, and trustworthy, with enough warmth to avoid the coldness of generic hospital software.
+
+The visual system separates three jobs for color:
+
+- **Brand UI**: actions, focus states, selected navigation, and links.
+- **Clinical data**: audiology charts, measurement states, and ear-specific conventions.
+- **Operational status**: active, pending, warning, danger, and neutral system feedback.
+
+This separation keeps the product professional. The interface does not become decorative, and clinical colors remain meaningful.
 
 ---
 
-## Design Philosophy
+## Core Palette
 
-> Clinical precision meets human warmth. Every decision serves the audiologist's cognitive load — not decoration.
+### Brand UI
 
-- **Information hierarchy over decoration** — what matters most is largest, boldest, most prominent
-- **No emojis as icons** — Lucide SVG only (14px, stroke-width 1.75)
-- **Motion is purposeful** — 180ms ease for nav, 160ms for forms, 120ms for micro
-- **Color carries meaning** — brand cyan = system UI; teal = clinical data; red = right ear; blue = left ear
-- **Tasteful not rigid** — inspired by OrangeFarm sidebar layout, not copied from templates
-
----
-
-## Color System
-
-### Base Backgrounds
 | Token | Value | Use |
-|-------|-------|-----|
-| `--bg-page` | `#FAFAF9` | Warm off-white page background |
-| `--surface` | `#FFFFFF` | Cards, panels, inputs |
-| `--surface-2` | `#F5F4F2` | Hover surfaces, nested cards |
-| `--bg-subtle` | `#F0EFED` | Subtle sections, code blocks |
+| --- | --- | --- |
+| `--brand` | `#0891B2` | Primary buttons, selected UI, links, key focus states |
+| `--brand-hover` | `#0E7490` | Hover and pressed states |
+| `--brand-subtle` | `rgba(8,145,178,0.08)` | Selected backgrounds, soft active states |
+| `--brand-border` | `rgba(8,145,178,0.24)` | Selected borders and active outlines |
+| `--brand-glow` | `rgba(8,145,178,0.16)` | Focus glow and low-emphasis highlights |
 
-### Sidebar (Warm Ink)
+Design note: the cyan brand should be used sparingly. It is a signal for action and orientation, not a page background color.
+
+### Clinical Data
+
 | Token | Value | Use |
-|-------|-------|-----|
-| `--sidebar-bg` | `#1A1714` | Warm dark — medical premium (skill: `#1C1917`) |
-| `--sidebar-hover` | `rgba(255,255,255,0.05)` | Nav item hover |
-| `--sidebar-active` | `rgba(8,145,178,0.12)` | Active nav item tint |
-| `--sidebar-accent` | `#38BDF8` | Sky-400 — active indicator on dark bg |
-| `--sidebar-text` | `rgba(255,255,255,0.62)` | Inactive nav labels (WCAG AA: 5.8:1) |
+| --- | --- | --- |
+| `--teal-500` | `#00897B` | Clinical anchors, non-ear-specific data visualization |
+| `--teal-600` | `#00796B` | Clinical hover or stronger emphasis |
+| `--teal-subtle` | `rgba(0,137,123,0.08)` | Clinical data backgrounds |
+| `--right-ear` | `#DC2626` | Right ear audiogram and measurement marks |
+| `--left-ear` | `#2563EB` | Left ear audiogram and measurement marks |
 
-### Brand (System UI)
+Design rule: teal is for clinical content and data. It should not be used for primary navigation chrome, page headers, or generic buttons.
+
+### Surfaces
+
 | Token | Value | Use |
-|-------|-------|-----|
-| `--brand` | `#0891B2` | Primary brand cyan — buttons, links, focus |
-| `--brand-hover` | `#0E7490` | Hover state for brand elements |
-| `--brand-subtle` | `rgba(8,145,178,0.08)` | Active state background tint |
-| `--brand-border` | `rgba(8,145,178,0.25)` | Brand-colored borders |
+| --- | --- | --- |
+| `--bg-page` | `#FAFAF9` | Main page background |
+| `--bg-subtle` | `#F4F5F7` | Subtle bands, wells, secondary panels |
+| `--surface` | `#FFFFFF` | Cards, forms, tables, modals |
+| `--surface-2` | `#F9FAFB` | Nested areas inside cards |
+| `--surface-3` | `#F3F4F6` | Table headers and deeper nesting |
 
-### Clinical Data Colors (NOT UI chrome)
-| Value | Use |
-|-------|-----|
-| `#14B8A6` teal-500 | Clinical data visualization only |
-| `#DC2626` | Right ear (red) audiogram |
-| `#1D4ED8` | Left ear (blue) audiogram |
-| `#10B981` | Status active dot in registry tables |
+Design note: the base palette is intentionally warm-neutral. It should feel clinical without looking sterile or washed out.
 
-> **Rule**: Teal/green NEVER appears in sidebar chrome, nav, or header UI.
+### Sidebar
+
+| Token | Value | Use |
+| --- | --- | --- |
+| `--sidebar-bg` | `#1A1714` | Main app navigation shell |
+| `--sidebar-hover` | `rgba(255,255,255,0.05)` | Sidebar hover states |
+| `--sidebar-active` | `rgba(8,145,178,0.12)` | Active sidebar state |
+| `--sidebar-accent` | `#38BDF8` | Active indicator and brand mark on dark background |
+| `--sidebar-text` | `rgba(255,255,255,0.62)` | Inactive sidebar labels |
+| `--sidebar-text-active` | `#FFFFFF` | Active sidebar labels |
+
+Design rule: the sidebar should feel like a stable clinical instrument panel. Avoid gradients, bright blocks, or decorative effects.
 
 ### Text
-| Token | Value | Use |
-|-------|-------|-----|
-| `--text-primary` | `#0C0A09` | Body text, headings |
-| `--text-secondary` | `#44403C` | Supporting text, labels |
-| `--text-tertiary` | `#78716C` | Placeholders, meta, muted |
-| `--text-label` | `#A8A29E` | Section labels, table headers |
 
-### Semantic
 | Token | Value | Use |
-|-------|-------|-----|
-| `--status-danger` | `#DC2626` | Alerts, red flags |
-| `--status-warning` | `#D97706` | Caution states |
-| `--status-success` | `#059669` | Cleared, confirmed |
-| `--status-neutral` | `#78716C` | Default/inactive |
+| --- | --- | --- |
+| `--text-primary` | `#0C0A09` | Headings and primary body text |
+| `--text-secondary` | `#44403C` | Supporting text |
+| `--text-label` | `#78716C` | Form labels and table labels |
+| `--text-tertiary` | `#A8A29E` | Captions, metadata, quiet helper text |
+| `--text-muted` | `#D6D3D1` | Disabled or very low-emphasis text |
+
+### Status
+
+| Token | Value | Use |
+| --- | --- | --- |
+| `--success` | `#16A34A` | Confirmed, complete, active |
+| `--warning` | `#D97706` | Review needed, pending, caution |
+| `--danger` | `#DC2626` | Risk, alert, destructive action |
+| `--status-info-dot` | `#38BDF8` | Informational status dots |
+
+Design rule: use status colors as small signals. Prefer dots, borders, and text accents over large filled pills.
+
+---
+
+## Prototype Themes
+
+### Default: Medical Ink
+
+The default theme is the main HearIntel product direction.
+
+- Warm page background with white clinical surfaces.
+- Deep warm sidebar for stable app navigation.
+- Cyan brand accents for actions and active states.
+- Teal reserved for clinical measurement and data.
+- Red and blue preserved for audiology ear conventions.
+
+Use this theme for normal PMS demos, clinical workflows, and stakeholder walkthroughs.
+
+### Editorial
+
+The editorial theme is softer and more document-like.
+
+- Slightly lighter page surfaces.
+- Warmer dark sidebar.
+- Reduced shadow depth.
+- Quiet borders and softer contrast.
+
+Use this theme for patient-record review, report-heavy pages, or demos where the product should feel less operational and more consultative.
+
+### Layered
+
+The layered theme is higher contrast and more structured.
+
+- Cooler background contrast.
+- Stronger panel separation.
+- Deeper sidebar.
+- Clearer table and dashboard hierarchy.
+
+Use this theme for dense dashboards, registry review, or demos where scanning and comparison matter most.
 
 ---
 
 ## Typography
 
-### Font Stack
-| Role | Font | Weights |
-|------|------|---------|
-| Headings, Brand | **Figtree** | 600, 700 |
-| Body, Nav, UI | **DM Sans** | 400, 500, 600 |
-| Numerics, Data | **JetBrains Mono** | 400, 500, 600 |
+| Role | Font | Weight Range | Use |
+| --- | --- | --- | --- |
+| Headings and brand | Figtree | 600-800 | Page titles, card titles, brand lockup |
+| Body and controls | DM Sans | 400-700 | Forms, navigation, body copy, buttons |
+| Data and numerics | JetBrains Mono | 400-600 | MRNs, KPI values, audiology measurements |
 
-### Scale
-| Element | Size | Weight | Font |
-|---------|------|--------|------|
-| Brand name | 16px | 700 | Figtree |
-| Page title (h1) | 21px | 700 | Figtree |
-| Section title | 13.5px | 700 | Figtree |
-| Card title | 13.5px | 700 | Figtree |
-| Nav item | 13px | 400 | DM Sans |
-| Nav active | 13px | 500 | DM Sans |
-| Sub-nav item | 12px | 400 | DM Sans |
-| Body text | 13.5px | 400 | DM Sans |
-| Form label | 11.5px | 600 | DM Sans |
-| Form input | 13.5px | 400 | DM Sans |
-| Table cell | 13px | 400 | DM Sans |
-| Table header | 11px | 700 | Figtree |
-| KPI value | 22px | 700 | JetBrains Mono |
-| Caption/meta | 11px | 400 | DM Sans |
-| Section label | 9px | 700 | DM Sans |
-| Badge | 11px | 600 | DM Sans |
+Keep typography compact and readable. This is a professional tool, not a landing page.
 
 ---
 
-## Component Patterns
+## Component Guidance
 
-### Sidebar Rail (204px)
-```
-[Brand lockup — 18px 14px padding, border-bottom]
-[nav-group — padding 0 8px]
-  [nav-section — 9px uppercase label]
-  [nav-item — 34px min-height, 13px 400, border-left 2px transparent]
-    [nav-icon — 14px Lucide, opacity 0.55 → 1 active]
-    [nav-label — DM Sans]
-  [nav-sub — indent 22px, no connector line]
-    [nav-sub-item — 12px 400, border-left 2px transparent]
-[sidebar-assessment-block — neutral card, no color]
-  [label: CURRENT PATIENT]
-  [patient-name — Figtree 12.5px 600]
-  [resume link — 11px muted → hover]
-[sidebar-footer — border-top separator]
-  [footer-row: name + Switch]
-  [footer-meta: age · sex · mrn]
-  [theme-switch-bar]
-```
+### Navigation
 
-### Encounter Header
-- Background: `#1A1714` (matches sidebar, forms one dark band)
-- Patient name: Figtree 14.5px 600, `rgba(255,255,255,0.94)`
-- Meta: DM Sans 11.5px 400, `rgba(255,255,255,0.42)`
-- Actions: ghost btn, `rgba(255,255,255,0.82)`
-- Saved indicator: neutral dot, no color
+- Sidebar width: 204px.
+- Icons: Lucide SVG, 14px, consistent stroke.
+- Active state: subtle brand tint plus accent indicator.
+- Labels: sentence case or short title case.
+- Avoid large colorful navigation blocks.
 
-### Cards
-- Background: `var(--surface)` white
-- Border: `1px solid var(--border)` `#E7E5E4`
-- Radius: `var(--radius)` 8px
-- Shadow: `var(--shadow-card)` subtle
-- Title: Figtree 13.5px 700, no uppercase, `letter-spacing: -0.01em`
+### Cards And Panels
+
+- Use white surfaces with quiet borders.
+- Keep radii modest.
+- Use shadows for hierarchy, not decoration.
+- Avoid nested card stacks unless the inner element is a real control surface.
 
 ### Buttons
-| Variant | Style |
-|---------|-------|
-| Primary | `var(--brand)` bg, white text, 13px 600 |
-| Ghost | transparent bg, `var(--text-secondary)` text |
-| Danger | `var(--status-danger)` bg |
 
-### Form Fields
-- Label: DM Sans 11.5px 600, `var(--text-secondary)`
-- Input: DM Sans 13.5px 400, `var(--text-primary)`
-- Focus: `border-color: var(--brand)` + `box-shadow: 0 0 0 3px rgba(8,145,178,0.12)`
-- Radius: `var(--radius-sm)` 6px
+| Variant | Treatment |
+| --- | --- |
+| Primary | Brand background, white text, compact height |
+| Secondary | White surface, neutral border, primary text |
+| Ghost | Transparent, quiet text, hover surface |
+| Danger | Reserved for destructive or clinical-risk actions |
 
-### Registry Table
-- Row: clickable (`cursor: pointer`), full-row `onclick`
-- Density: default (10px) / compact (6px) / comfortable (14px) — user-controlled
-- Sort: column headers with directional indicator
-- Empty state: icon + title + description, centered, `48px` icon circle
+Primary buttons should be rare. A screen with too many primary buttons loses hierarchy.
 
-### Toast Notifications
-- Position: fixed bottom-right
-- Dark bg: `var(--text-primary)` with white text
-- Success: `#0F766E` teal-dark
-- Error: `#B91C1C`
-- Animation: `toastIn 220ms` + `toastOut 220ms at 2.8s`
-- Auto-dismiss: 3.2s
+### Forms
 
----
+- Labels should be clear, compact, and paired with fields.
+- Focus should use the brand border and soft focus ring.
+- Helper text should be short and useful.
+- Do not show active controls that do not save, notify, navigate, or visibly update the UI.
 
-## Spacing System
-| Token | Value |
-|-------|-------|
-| `--radius-xs` | 4px |
-| `--radius-sm` | 6px |
-| `--radius` | 8px |
-| `--radius-lg` | 12px |
+### Clinical Charts
+
+- Right ear remains red.
+- Left ear remains blue.
+- Teal may support neutral clinical measurement.
+- Chart colors should not be repurposed for generic UI decoration.
+- Diagrams should render immediately and redraw after user edits.
 
 ---
 
-## Motion
-| Context | Duration | Easing |
-|---------|----------|--------|
-| Sidebar nav transitions | 180ms | ease |
-| Form focus/hover | 160ms | ease |
-| Button/badge hover | 150ms | ease |
-| Micro interactions | 120ms | ease |
-| Toast entry | 220ms | ease |
-| Page-level transitions | — | none (SPA-style instant) |
+## Accessibility And Contrast
+
+- Maintain WCAG AA contrast for body text and controls.
+- Use color plus text or shape for clinical meaning.
+- Do not rely on color alone for pass/fail or right/left interpretation.
+- Focus states must be visible on keyboard navigation.
+- Avoid low-contrast gray text inside tables and form controls.
 
 ---
 
-## Anti-Patterns (NEVER do these)
-- ❌ Emojis as icons — use Lucide SVG only
-- ❌ Green/teal in sidebar chrome — clinical data only
-- ❌ Hardcoded colors like `#2DD4BF`, `#14B8A6` in nav/header
-- ❌ All-uppercase card titles — use Figtree with `letter-spacing: -0.01em`
-- ❌ Generic `monospace` font — always `var(--font-mono)`
-- ❌ Missing hover/focus states on interactive elements
-- ❌ `font-family: Inter` — DM Sans is the body font
-- ❌ Neon badges or traffic-light colors in UI chrome
-- ❌ `cursor: default` on anything interactive
-- ❌ `#FFFFFF` hardcoded backgrounds — use `var(--surface)`
+## Anti-Patterns
+
+- Do not use teal or green as generic navigation chrome.
+- Do not use gradients, orbs, or atmospheric backgrounds in PMS workflows.
+- Do not turn every action into a primary button.
+- Do not use neon badges or large traffic-light fills.
+- Do not expose raw internal keys such as permission slugs, branch IDs, or database values.
+- Do not use decorative controls that do not perform an action.
+- Do not use generic stock styling that makes the product feel unrelated to audiology.
 
 ---
 
 ## Page Inventory
 
-| Page | Role | Key Pattern |
-|------|------|-------------|
-| 00-dashboard | Clinical worklist | KPI strip + patient table + signal sidebar |
-| 01-registry | Patient list | Sortable table, density toggle, empty state |
-| 02-profile | Patient record | 4-tab layout, KPI tiles (JetBrains Mono 22px) |
-| 03-start-encounter | Assessment gate | Single CTA |
-| 04-workspace-history | Case history | Form-heavy, red flag grid, COSI goals |
-| 05-workspace-otoscopy | Ear canal imaging | Media upload + annotation |
-| 06-workspace-pta | Audiogram | SVG chart, right/left ear toggle, data entry |
-| 07-workspace-immittance | Tympanometry | Chart + interpretation |
-| 08-workspace-speech | Speech audiometry | SRT/WRS input |
-| 09-conclusion | Diagnosis + management | Pathway cards, ICD-10, care plan |
-| 10-media | Clinical media | File library |
-| 11-settings | Practice settings | Form-based |
-| 12-workspace-electrophysiology | ABR/ASSR/OAE | Advanced testing |
-| 13-workspace-screening | Hearing screening | Pass/Refer workflow |
+| Page | Role | Primary Pattern |
+| --- | --- | --- |
+| `00-dashboard` | Clinical worklist | KPI strip, patient table, signal sidebar |
+| `01-registry` | Patient list | Sortable table, density controls, empty state |
+| `02-profile` | Patient record | Tabbed clinical record with KPI tiles |
+| `03-start-encounter` | Assessment setup | Focused assessment launch form |
+| `03-assessment-hub` | Diagnostic hub | Module cards and assessment navigation |
+| `04-workspace-history` | Case history | Form-heavy intake and red flag review |
+| `05-workspace-otoscopy` | Otoscopy | Media upload and annotation |
+| `06-workspace-pta` | PTA | SVG audiogram and threshold matrix |
+| `07-workspace-immittance` | Tympanometry | Curve visualization and interpretation |
+| `08-workspace-speech` | Speech audiometry | SRT, WRS, QuickSIN, tinnitus inputs |
+| `09-conclusion` | Diagnosis and care plan | Pathway selection and final assessment |
+| `10-media` | Clinical media | File library and reports |
+| `11-settings` | Practice settings | Form-based preferences and team invite |
+| `12-workspace-electrophysiology` | Advanced testing | ABR, ASSR, OAE, VEMP review |
+| `13-workspace-screening` | Hearing screening | Pass/refer workflow |
+
