@@ -374,30 +374,41 @@ button:disabled:active {
 }
 .e-solution {
   display: grid;
-  grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
-  gap: var(--s12);
-  align-items: start;
+  grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
+  gap: clamp(var(--s8), 4vw, var(--s16));
+  align-items: center;
 }
-.e-solution h2 {
-  margin-top: var(--s3);
-  max-width: 16ch;
-}
-.e-solution-content { min-width: 0; }
-.e-solution-content p {
-  max-width: 60ch;
-  color: var(--text-secondary);
-}
-.e-solution-content .e-solution-rule {
+.e-solution-copy { min-width: 0; }
+.e-solution h2 { margin-top: var(--s4); max-width: 12ch; line-height: 1.06; }
+.e-solution-copy > p { max-width: 42ch; color: var(--text-secondary); margin-top: var(--s6); }
+.e-solution-copy .e-solution-rule {
   margin-top: var(--s4);
   font-size: var(--type-caption);
+  padding-left: var(--s4);
+  border-left: 2px solid var(--brand);
 }
-.e-solution-actions {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: var(--s3) var(--s6);
-  margin-top: var(--s8);
+.e-solution-actions { display: flex; align-items: center; flex-wrap: wrap; gap: var(--s3); margin-top: var(--s8); }
+.e-solution-visuals { display: grid; gap: var(--s3); min-width: 0; }
+.e-solution-figure {
+  background: var(--surface);
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius-md);
+  margin: 0;
+  min-width: 0;
+  padding: var(--s4);
+  box-shadow: var(--shadow-card);
 }
+.e-solution-figure-top { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s3); flex-wrap: wrap; padding-bottom: var(--s3); }
+.e-solution-figure-top span { font: 500 .625rem / 1.5 var(--font-mono); color: var(--brand-hover); letter-spacing: .1em; }
+.e-solution-figure-top strong { font: 600 var(--type-caption) / 1.4 var(--font-heading); color: var(--text-primary); }
+.e-solution-figure img { width: 100%; height: auto; border-radius: var(--radius-sm); border: var(--hairline) solid var(--border-light); }
+.e-solution-registry img { aspect-ratio: 540 / 219; object-fit: contain; background: var(--bg-page); }
+.e-solution-clinical img { max-height: 154px; object-fit: cover; object-position: top left; }
+.e-solution-figure figcaption { font-size: var(--type-small); color: var(--text-secondary); margin-top: var(--s2); }
+.e-footer-identity { display: flex; align-items: center; gap: var(--s4); min-width: 0; }
+.e-footer-logo { width: 138px; height: 55px; display: block; flex-shrink: 0; overflow: hidden; }
+.e-footer-logo img { width: 100%; height: 100%; object-fit: contain; }
+.e-footer-identity p { font-size: var(--type-small); color: var(--text-secondary); }
 .e-footer {
   padding-block: var(--s8);
   border-top: var(--hairline) solid var(--border);
@@ -895,6 +906,12 @@ button:disabled:active {
   }
   .e-solution { grid-template-columns: minmax(0, 1fr); gap: var(--s6); }
   .e-solution h2 { max-width: 20ch; }
+  .e-solution-visuals { gap: var(--s3); }
+  .e-solution-figure { padding: var(--s3); }
+  .e-solution-figure-top strong { display: none; }
+  .e-footer-identity { flex-wrap: wrap; gap: var(--s2) var(--s4); }
+  .e-footer-logo { width: 130px; }
+  .e-footer-identity p { width: 100%; }
   .e-solution-actions .e-btn { max-width: 100%; white-space: normal; text-align: center; }
   .e-section-intro {
     align-items: start;
@@ -1022,4 +1039,53 @@ button:disabled:active {
     transition: none !important;
     animation: none !important;
   }
+}
+
+/* Single-purpose sign-in screen; shared brand tokens and controls. */
+.e-signin {
+  display: grid;
+  grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+  min-height: min(760px, calc(100dvh - 80px));
+}
+.e-signin-story {
+  background: var(--sidebar-bg);
+  color: var(--on-ink);
+  padding: clamp(var(--s8), 6vw, var(--s20));
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--s12);
+}
+.e-signin-story h1 { font-size: clamp(2.5rem, 5vw, var(--type-hero)); line-height: 1.07; margin-top: var(--s6); max-width: 13ch; }
+.e-signin-story h1 span { color: var(--sidebar-accent); }
+.e-signin-story p { margin-top: var(--s6); color: var(--ink-copy); max-width: 45ch; }
+.e-signin-story .e-eyebrow { color: var(--sidebar-accent); }
+.e-signin-proof { padding-top: var(--s5); border-top: 1px solid var(--line-ink); font-size: var(--type-caption); color: var(--ink-copy); }
+.e-signin-panel { width: min(530px, 100%); margin: auto; padding: var(--s12) var(--s8); }
+.e-signin-panel h2 { font-size: clamp(2rem, 4vw, var(--type-title)); margin-bottom: var(--s3); }
+.e-signin-panel > p { color: var(--text-secondary); margin-bottom: var(--s8); }
+.e-signin-form { display: grid; gap: var(--s6); }
+.e-signin-form label { display: block; font-size: var(--type-caption); font-weight: 600; margin-bottom: var(--s2); }
+.e-signin-form input { min-height: 48px; width: 100%; padding: var(--s3) var(--s4); border: 1px solid var(--text-label); border-radius: var(--radius-sm); color: var(--text-primary); background: var(--surface); }
+.e-signin-form .e-btn { width: 100%; }
+.e-signin-form input:focus-visible { border-color: var(--brand-hover); }
+.e-password-wrap { position: relative; }
+.e-password-wrap input { padding-right: 83px; }
+.e-password-toggle { position: absolute; top: 4px; right: 4px; bottom: 4px; background: transparent; border: 0; padding: 0 var(--s3); font-size: var(--type-caption); color: var(--brand-hover); }
+.e-signin-secondary { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--s2); font-size: var(--type-caption); }
+.e-signin-secondary a { color: var(--brand-hover); font-weight: 600; }
+.e-signin-message { margin-top: var(--s5); color: var(--error-text); font-size: var(--type-caption); }
+.e-signin-message:empty { display: none; }
+.e-signin-destinations { margin-top: var(--s6); border-top: 1px solid var(--border); padding-top: var(--s5); }
+.e-signin-destinations h3 { font-size: var(--type-lead); margin-bottom: var(--s3); }
+.e-signin-destinations p { font-size: var(--type-caption); color: var(--text-secondary); }
+.e-signin-destinations ul { margin: var(--s3) 0; padding-left: var(--s6); color: var(--text-secondary); }
+.e-signin-note { display: block; color: var(--text-secondary); font-size: var(--type-small); margin-top: var(--s6); }
+@media (max-width: 767px) {
+  .e-signin { grid-template-columns: minmax(0, 1fr); min-height: auto; }
+  .e-signin-story { padding: var(--s10) var(--s6); gap: var(--s4); }
+  .e-signin-story h1 { font-size: 2.1rem; margin-top: var(--s3); }
+  .e-signin-story p { margin-top: var(--s3); }
+  .e-signin-proof { display: none; }
+  .e-signin-panel { padding: var(--s10) var(--s5); }
 }
