@@ -1543,6 +1543,55 @@ document.addEventListener('DOMContentLoaded', function() {
     holder.outerHTML = workspaceShell(pageKey, innerContent);
   });
 
+  // Restore clinical navigation on narrow screens without duplicating route lists.
+  (function initMobilePmsNavigation() {
+    var sidebar = document.querySelector('.app-shell > .sidebar, .workspace-shell > .sidebar');
+    if (!sidebar) return;
+    sidebar.id = 'pms-mobile-sidebar';
+
+    var bar = document.createElement('div');
+    bar.className = 'pms-mobile-bar';
+    bar.innerHTML = '<a href="00-dashboard.html" class="pms-mobile-brand">HearIntel <span>Clinical PMS</span></a>'
+      + '<button type="button" class="pms-mobile-menu" aria-controls="pms-mobile-sidebar" aria-expanded="false">Menu</button>';
+    document.body.appendChild(bar);
+
+    var backdrop = document.createElement('button');
+    backdrop.className = 'pms-mobile-backdrop';
+    backdrop.type = 'button';
+    backdrop.setAttribute('aria-label', 'Close navigation');
+    document.body.appendChild(backdrop);
+
+    var trigger = bar.querySelector('.pms-mobile-menu');
+    var smallScreen = window.matchMedia('(max-width: 768px)');
+    function setMobileMenu(open) {
+      open = Boolean(open && smallScreen.matches);
+      document.body.classList.toggle('pms-nav-open', open);
+      trigger.setAttribute('aria-expanded', String(open));
+      trigger.textContent = open ? 'Close' : 'Menu';
+      sidebar.inert = smallScreen.matches && !open;
+      if (open) {
+        var firstLink = sidebar.querySelector('a[href]');
+        if (firstLink) firstLink.focus();
+      }
+    }
+    trigger.addEventListener('click', function() {
+      setMobileMenu(trigger.getAttribute('aria-expanded') !== 'true');
+    });
+    backdrop.addEventListener('click', function() { setMobileMenu(false); trigger.focus(); });
+    sidebar.addEventListener('click', function(event) {
+      if (event.target.closest('a[href]')) setMobileMenu(false);
+    });
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape' && document.body.classList.contains('pms-nav-open')) {
+        setMobileMenu(false);
+        trigger.focus();
+      }
+    });
+    if (smallScreen.addEventListener) smallScreen.addEventListener('change', function() { setMobileMenu(false); });
+    else smallScreen.addListener(function() { setMobileMenu(false); });
+    setMobileMenu(false);
+  })();
+
   document.documentElement.setAttribute('data-theme', getActiveTheme());
   document.dispatchEvent(new CustomEvent('pms:shell-ready'));
 });
