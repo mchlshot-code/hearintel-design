@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <title>Sign in — HearIntel</title>
+  <meta name="description" content="Sign in to your approved HearIntel Registry or Clinical PMS workspace." />
+  <link rel="stylesheet" href="entry.css" />
+</head>
+<body>
+  <a class="e-skip" href="#main">Skip to sign in</a>
+  <header class="e-header">
+    <nav class="e-nav e-wrap" aria-label="Main navigation">
+      <a class="e-logo" href="index.html" aria-label="HearIntel home"><img src="assets/hearintel-logo.png" width="1536" height="614" alt="HearIntel" /></a>
+      <div class="e-links">
+        <a href="index.html#pms">Clinical PMS</a>
+        <a href="index.html#registry">Registry</a>
+        <a href="index.html#solution">Our approach</a>
+      </div>
+      <div class="e-actions">
+        <a class="e-btn ghost small" href="index.html">Back to home</a>
+        <button class="e-btn small e-menu" aria-label="Open navigation" aria-expanded="false" data-menu>Menu</button>
+      </div>
+    </nav>
+  </header>
+  <main id="main" class="e-signin">
+    <section class="e-signin-story">
+      <div>
+        <div class="e-eyebrow">Secure access to HearIntel</div>
+        <h1>Welcome<br /><span>back.</span></h1>
+        <p>One identity. Access to the Clinical PMS or National Registry workspaces approved for your role and facility.</p>
+      </div>
+      <div class="e-signin-proof">Identity is verified before workspace permissions are resolved. Sign-in does not grant access to unapproved products.</div>
+    </section>
+    <section class="e-signin-panel" aria-labelledby="signin-heading">
+      <div class="e-eyebrow">Your HearIntel account</div>
+      <h2 id="signin-heading">Sign in</h2>
+      <p>Enter your registered email address and password to continue.</p>
+      <form class="e-signin-form" id="signin-form" autocomplete="on">
+        <div>
+          <label for="signin-email">Email address</label>
+          <input id="signin-email" name="email" type="email" autocomplete="username" placeholder="you@facility.com" required maxlength="254" />
+        </div>
+        <div>
+          <label for="signin-password">Password</label>
+          <div class="e-password-wrap">
+            <input id="signin-password" name="password" type="password" autocomplete="current-password" required />
+            <button class="e-password-toggle" type="button" id="toggle-password" aria-label="Show password">Show</button>
+          </div>
+        </div>
+        <button class="e-btn primary" id="signin-submit" type="submit">Sign in securely</button>
+        <div class="e-signin-secondary">
+          <a href="index.html">Back to HearIntel</a>
+          <button class="e-plain" type="button" id="show-recovery">Forgot password?</button>
+        </div>
+      </form>
+      <form class="e-signin-form" id="mfa-form" hidden>
+        <p class="e-intro">Enter the six-digit code from your authenticator app.</p>
+        <div>
+          <label for="mfa-code">Authenticator code</label>
+          <input id="mfa-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" required />
+        </div>
+        <button class="e-btn primary" type="submit" id="mfa-submit">Verify and continue</button>
+        <button class="e-plain" type="button" id="mfa-cancel">Use a different account</button>
+      </form>
+      <form class="e-signin-form" id="recovery-form" hidden>
+        <p class="e-intro">We'll send a recovery link if an account exists for this address.</p>
+        <div><label for="recovery-email">Email address</label><input id="recovery-email" name="email" type="email" autocomplete="email" required /></div>
+        <button class="e-btn primary" type="submit" id="recovery-submit">Send recovery link</button>
+        <button class="e-plain" type="button" id="recovery-cancel">Back to sign in</button>
+      </form>
+      <div id="signin-status" class="e-signin-message" role="status" aria-live="polite"></div>
+      <div id="signin-result" class="e-signin-destinations" hidden></div>
+      <small class="e-signin-note" id="signin-availability"></small>
+    </section>
+  </main>
+  <footer class="e-footer e-wrap">
+    <div class="e-footer-identity">
+      <a class="e-footer-logo" href="index.html" aria-label="HearIntel home"><img src="assets/hearintel-logo.png" width="1536" height="614" alt="HearIntel" /></a>
+      <p>Connecting hearing care. Advancing insight.</p>
+    </div>
+    <nav aria-label="Footer">
+      <a class="e-textlink" href="access.html">Request access</a>
+      <a class="e-textlink" href="index.html#solution">Our approach</a>
+    </nav>
+  </footer>
+  <script src="navigation.js" defer></script>
+  <script src="signin-config.js"></script>
+  <script src="signin.js" type="module"></script>
+</body>
+</html>
