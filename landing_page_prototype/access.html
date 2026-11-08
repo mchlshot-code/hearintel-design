@@ -26,10 +26,10 @@
           <a href="index.html#pms">Clinical PMS</a
           ><a href="index.html#registry">Registry</a
           ><a href="index.html#solution">Our approach</a
-          ><a class="e-mobile-signin" href="access.html?view=signin">Sign in</a>
+          ><a class="e-mobile-signin" href="signin.html">Sign in</a>
         </div>
         <div class="e-actions">
-          <a class="hide-phone" href="access.html?view=signin">Sign in</a
+          <a class="hide-phone" href="signin.html">Sign in</a
           ><a class="e-btn primary small" href="access.html">Get started</a
           ><button
             class="e-btn small e-menu"
@@ -65,21 +65,28 @@
         </div>
         <div id="screen"></div>
         <p class="e-demo-note">Demonstration only. Applications entered here are not submitted.</p>
-        <details class="e-developer">
+        <details class="e-developer" hidden>
           <summary>Developer review · API mapping & preview controls</summary>
           <div id="developer-notes"></div>
         </details>
       </div>
     </main>
     <footer class="e-footer e-wrap">
-      <p>HearIntel · Connecting hearing care. Advancing insight.</p>
+      <div class="e-footer-identity">
+        <a class="e-footer-logo" href="index.html" aria-label="HearIntel home"><img src="assets/hearintel-logo.png" width="1536" height="614" alt="HearIntel" /></a>
+        <p>Connecting hearing care. Advancing insight.</p>
+      </div>
       <nav aria-label="Footer">
-        <a class="e-textlink" href="access.html?product=pms">PMS access</a
-        ><a class="e-textlink" href="access.html?product=registry"
-          >Registry access</a
-        ><a class="e-textlink" href="../index.html">Prototype hub</a>
+        <a class="e-textlink" href="access.html?product=pms">Clinical PMS</a>
+        <a class="e-textlink" href="access.html?product=registry">Registry</a>
+        <a class="e-textlink" href="signin.html">Sign in</a>
       </nav>
     </footer>
+    <script>
+      const accessQuery = new URLSearchParams(location.search);
+      if (accessQuery.get("view") === "signin") location.replace("signin.html");
+      if (accessQuery.get("dev") === "1") document.querySelector(".e-developer").hidden = false;
+    </script>
     <script src="navigation.js" defer></script>
     <script type="module" src="onboarding.js"></script>
   </body>
