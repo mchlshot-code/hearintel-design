@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>HearIntel responsive review</title>
+    <style>
+      body {
+        margin: 0;
+        background: #e7e5e4;
+      }
+      iframe {
+        display: block;
+        border: 0;
+        margin: 0 auto;
+        max-width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <iframe id="preview" title="Responsive HearIntel preview"></iframe>
+    <script>
+      const q = new URLSearchParams(location.search);
+      const frame = document.querySelector("iframe");
+      frame.width = Number(q.get("width")) || 390;
+      frame.height = Number(q.get("height")) || 1100;
+      const path = q.get("page") || "index.html";
+      frame.src =
+        "../landing_page_prototype/" +
+        (["index.html", "pms.html", "access.html"].includes(path)
+          ? path
+          : "index.html") +
+        (q.get("flow") ? "?" + q.get("flow") : "");
+    </script>
+  </body>
+</html>

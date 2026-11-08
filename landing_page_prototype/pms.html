@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clinical PMS — Practice Management System for Hearing Healthcare</title>
+  <meta name="description" content="Clinical PMS is a comprehensive practice management system purpose-built for hearing healthcare clinics and practitioners. Structured records, clinical evaluations, and longitudinal patient tracking.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="icon" type="image/png" href="./favicon.png?v=3.0">
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=2.0">
+</head>
+<body><div style="padding:var(--s3,12px);text-align:center;background:var(--bg-subtle);font-size:12px">Frontend preview · no applications are sent. <a href="index.html">HearIntel home</a></div>
+
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<!-- ══════════════════════════════════════════
+     NAVIGATION
+══════════════════════════════════════════ -->
+<nav class="nav" id="nav" role="navigation" aria-label="Main navigation">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand" aria-label="HearIntel home"><img src="assets/hearintel-logo.png" width="208" height="60" alt="HearIntel" style="width:208px;height:60px;object-fit:cover;background:var(--surface);border-radius:var(--radius-sm)"></a>
+
+      <ul class="nav-links" role="list">
+        <li><a href="#product" onclick="navClose()">Product</a></li>
+        <li><a href="#pricing" onclick="navClose()">For your practice</a></li>
+      </ul>
+
+      <a href="access.html?product=pms" class="btn btn-primary nav-cta" onclick="navClose()">Apply for PMS access</a>
+
+      <button class="nav-hamburger" id="navHamburger" aria-label="Open navigation menu" aria-expanded="false" onclick="navToggle()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile drawer -->
+<div class="nav-drawer" id="navDrawer" aria-hidden="true">
+  <a href="#product" onclick="navClose()">Product</a>
+  <a href="#pricing" onclick="navClose()">For your practice</a>
+  <a href="access.html?product=pms" class="btn btn-primary" onclick="navClose()">Apply for PMS access</a>
+</div>
+
+
+<main id="main">
+
+<!-- ══════════════════════════════════════════
+     HERO
+══════════════════════════════════════════ -->
+<section id="hero" aria-label="Hero">
+  <div class="container">
+    <div class="hero-inner">
+
+      <div class="hero-text">
+        <p class="section-eyebrow light hero-reveal-1">Clinical Practice Management</p>
+
+        <h1 class="hero-headline hero-reveal-2">
+          The clinical operating system for <em>hearing healthcare.</em>
+        </h1>
+
+        <p class="hero-description hero-reveal-3">
+          Clinical PMS is a comprehensive practice management system purpose-built for hearing care providers. Structured clinical records, longitudinal patient history, and streamlined daily practice workflows.
+        </p>
+
+        <p class="hero-sub hero-reveal-3">
+          Manage patient intake, diagnostic evaluations, clinical documentation, and longitudinal care plans in one focused platform.
+        </p>
+
+        <div class="hero-actions hero-reveal-4">
+          <a href="access.html?product=pms" class="btn btn-primary">Apply for PMS access</a>
+          <a href="#product" class="btn btn-ghost-dark">Explore the Product</a>
+        </div>
+      </div>
+
+      <div class="hero-screenshot hero-screenshot-reveal">
+        <div class="hero-screenshot-frame">
+          <img src="screenshots/dashboard.webp" alt="Clinical PMS clinical worklist — patient queue, recall status, and quick actions" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="screenshot-placeholder" style="display:none">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            <span>Dashboard screenshot</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     PROBLEM / OPPORTUNITY
+══════════════════════════════════════════ -->
+
+
+
+<!-- ══════════════════════════════════════════
+     PRODUCT
+══════════════════════════════════════════ -->
+<section id="product" class="section" aria-label="Product overview">
+  <div class="container">
+
+    <!-- Clinical Workspace -->
+    <div class="product-row">
+      <div class="product-text reveal">
+        <p class="section-eyebrow">Clinical Workspace</p>
+        <h2 class="section-headline">A complete clinical workspace for hearing care.</h2>
+        <p class="section-body">
+          Every tool a hearing care specialist needs — patient management, diagnostic evaluations, clinical documentation, and practice administration — in a single, structured system built for clinical workflows.
+        </p>
+        <div class="capability-tags">
+          <span class="capability-tag">Patient Directory</span>
+          <span class="capability-tag">Diagnostic Evaluations</span>
+          <span class="capability-tag">Clinical Documentation</span>
+          <span class="capability-tag">Care Plans</span>
+          <span class="capability-tag">Clinical Media</span>
+          <span class="capability-tag">Longitudinal History</span>
+          <span class="capability-tag">Practice Management</span>
+        </div>
+        <a href="access.html?product=pms" class="btn btn-ghost-light">Apply for PMS access</a>
+      </div>
+
+      <div class="reveal reveal-delay-2">
+        <div class="product-screenshot-wrap">
+          <img src="screenshots/audiogram.webp" alt="Pure Tone Audiometry workspace showing right and left ear threshold curves on an audiogram" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="screenshot-placeholder" style="display:none;aspect-ratio:16/10">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12h2M20 12h2M12 2v2M12 20v2"/><circle cx="12" cy="12" r="4"/></svg>
+            <span>Audiogram screenshot</span>
+          </div>
+          <p class="product-screenshot-caption">Diagnostic workspace — clinical threshold curves, bone conduction, and masking evaluations.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-divider"></div>
+
+    <!-- Longitudinal Tracking -->
+    <div class="product-row reverse">
+      <div class="product-text reveal">
+        <p class="section-eyebrow">Longitudinal Tracking</p>
+        <h2 class="section-headline">Track patient hearing health across encounters over time.</h2>
+        <p class="section-body">
+          Maintain complete clinical context across appointments. Review prior visits, monitor threshold shifts, and manage recall schedules with structured longitudinal patient records.
+        </p>
+        <div class="capability-tags">
+          <span class="capability-tag">Longitudinal Records</span>
+          <span class="capability-tag">Encounter Timelines</span>
+          <span class="capability-tag">Patient Recalls</span>
+          <span class="capability-tag">Historical Comparisons</span>
+          <span class="capability-tag">Progress Tracking</span>
+          <span class="capability-tag">Clinical Follow-up</span>
+        </div>
+        <a href="access.html?product=pms" class="btn btn-ghost-light">Apply for PMS access</a>
+      </div>
+
+      <div class="reveal reveal-delay-2">
+        <div class="product-screenshot-wrap">
+          <img src="screenshots/profile.webp" alt="Clinical PMS patient directory showing structured clinical records and visit tracking" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="screenshot-placeholder" style="display:none;aspect-ratio:16/10">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Patient records screenshot</span>
+          </div>
+          <p class="product-screenshot-caption">Patient records — structured longitudinal history, appointment tracking, and encounter management.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     CAPABILITIES
+══════════════════════════════════════════ -->
+<section id="capabilities" class="section" aria-label="Platform capabilities">
+  <div class="container">
+    <div class="capabilities-header reveal">
+      <p class="section-eyebrow">Practice Capabilities</p>
+      <h2 class="section-headline">Built for clinical clarity and practice efficiency.</h2>
+      <p class="section-body" style="margin-top:14px;">Clinical PMS brings patient history, diagnostic findings, and clinical documentation into a unified, structured workflow.</p>
+    </div>
+
+    <div class="capabilities-grid">
+      <div class="capability-card reveal">
+        <h3 class="capability-card-title">Structured Clinical Records</h3>
+        <p class="capability-card-body">Organized hearing care records make patient findings easy to record, review, and navigate across every visit in a consistent, standardized format.</p>
+      </div>
+
+      <div class="capability-card reveal reveal-delay-1">
+        <h3 class="capability-card-title">Longitudinal History</h3>
+        <p class="capability-card-body">Keep full clinical context across months and years, making it straightforward to compare prior visits, track progression, and monitor changes over time.</p>
+      </div>
+
+      <div class="capability-card reveal reveal-delay-2">
+        <h3 class="capability-card-title">Consistent Documentation</h3>
+        <p class="capability-card-body">Standardized clinical notes, care plans, and diagnostic records ensure high quality and clear documentation throughout your practice.</p>
+      </div>
+
+      <div class="capability-card reveal reveal-delay-3">
+        <h3 class="capability-card-title">Streamlined Practice Workflow</h3>
+        <p class="capability-card-body">Manage patient intake, active clinical encounters, and follow-up care from a single, responsive interface built specifically for clinical teams.</p>
+      </div>
+
+      <div class="capability-card reveal reveal-delay-4">
+        <h3 class="capability-card-title">Better Clinical Decisions</h3>
+        <p class="capability-card-body">Comprehensive diagnostic records and organized history give practitioners the clear context needed for informed, confident clinical care.</p>
+      </div>
+    </div>
+
+    <div class="capabilities-cta reveal">
+      <a href="access.html?product=pms" class="btn btn-primary">Apply for PMS access</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     PRICING
+══════════════════════════════════════════ -->
+<section id="pricing" class="section"><div class="container"><p class="section-eyebrow">Choose your practice pathway</p><h2 class="section-headline">Built around the way you work.</h2><p class="section-body">Apply for your independent practice, or on behalf of a healthcare facility. Each pathway asks for the evidence relevant to that practice.</p><a href="access.html?product=pms" class="btn btn-primary">Find your PMS pathway</a></div></section>
+
+
+<!-- ══════════════════════════════════════════
+     CONTACT / REQUEST A DEMO
+══════════════════════════════════════════ -->
+<section id="contact" class="section"><div class="container"><p class="section-eyebrow">Start with your practice</p><h2 class="section-headline">A clearer next step.</h2><p class="section-body">Apply as a solo practitioner or on behalf of your facility. Evidence is reviewed before access is activated.</p><a href="access.html?product=pms" class="btn btn-primary">Apply for PMS access</a></div></section>
+
+</main>
+
+
+<!-- ══════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════ -->
+<footer>
+  <div class="container">
+    <div class="footer-bottom" style="justify-content:space-between;align-items:center;display:flex;flex-wrap:wrap;gap:12px;">
+      <div style="display:inline-flex;align-items:center;"><div style="color:#FFFFFF;font-size:20px;font-weight:800;letter-spacing:-0.03em;font-family:var(--font-heading, 'Figtree', sans-serif);">Clinical<span style="color:var(--brand-light, #38BDF8);"> PMS</span></div></div>
+      <p class="footer-copyright">&copy; 2026 Clinical PMS. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════ -->
+<script>
+// ── Nav scroll + active ──
+var nav = document.getElementById('nav');
+var navSections = [];
+
+window.addEventListener('scroll', function() {
+  if (window.scrollY > 60) {
+    nav.classList.add('scrolled');
+  } else {
+    nav.classList.remove('scrolled');
+  }
+  updateActiveNav();
+}, { passive: true });
+
+function updateActiveNav() {
+  var links = document.querySelectorAll('.nav-links a');
+  var scrollPos = window.scrollY + 100;
+  var sections = ['product', 'pricing'];
+  var current = '';
+  sections.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el && el.offsetTop <= scrollPos) current = id;
+  });
+  links.forEach(function(a) {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+}
+
+// ── Mobile nav ──
+function navToggle() {
+  var btn = document.getElementById('navHamburger');
+  var drawer = document.getElementById('navDrawer');
+  var open = btn.classList.toggle('open');
+  drawer.classList.toggle('open', open);
+  btn.setAttribute('aria-expanded', open);
+  drawer.setAttribute('aria-hidden', !open);
+}
+function navClose() {
+  var btn = document.getElementById('navHamburger');
+  var drawer = document.getElementById('navDrawer');
+  btn.classList.remove('open');
+  drawer.classList.remove('open');
+  btn.setAttribute('aria-expanded', 'false');
+  drawer.setAttribute('aria-hidden', 'true');
+}
+
+// ── Smooth scroll for anchor links ──
+document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+  a.addEventListener('click', function(e) {
+    var href = this.getAttribute('href');
+    if (href === '#') return;
+    var target = document.querySelector(href);
+    if (target) {
+      e.preventDefault();
+      var offset = document.getElementById('nav').offsetHeight;
+      var top = target.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top: top, behavior: 'smooth' });
+    }
+  });
+});
+
+// ── IntersectionObserver scroll reveal ──
+var revealObserver = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -32px 0px' });
+
+document.querySelectorAll('.reveal').forEach(function(el) {
+  revealObserver.observe(el);
+});
+
+</script>
+
+</body>
+</html>

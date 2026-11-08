@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>Get started — HearIntel</title>
+    <meta
+      name="description"
+      content="Clinical practice management and a governed hearing-health registry for Nigeria."
+    />
+    <link rel="stylesheet" href="entry.css" />
+  </head>
+  <body>
+    <a class="e-skip" href="#main">Skip to content</a>
+    <div class="e-prototype">
+      Interactive frontend preview · fictional examples · no applications are
+      sent. <a href="../docs/FRONTEND_HANDOVER.md">Developer handover</a>
+    </div>
+    <header class="e-header">
+      <nav class="e-nav e-wrap" aria-label="Main navigation">
+        <a class="e-logo" href="index.html" aria-label="HearIntel home"
+          ><img
+            src="assets/hearintel-logo.png"
+            width="1536"
+            height="614"
+            alt="HearIntel"
+        /></a>
+        <div class="e-links">
+          <a href="index.html#pms">Clinical PMS</a
+          ><a href="index.html#registry">Registry</a
+          ><a href="index.html#joining">How to join</a
+          ><a class="e-mobile-signin" href="access.html?view=signin">Sign in</a>
+        </div>
+        <div class="e-actions">
+          <a class="hide-phone" href="access.html?view=signin">Sign in</a
+          ><a class="e-btn primary small" href="access.html">Get started</a
+          ><button
+            class="e-btn small e-menu"
+            aria-label="Open navigation"
+            aria-expanded="false"
+            data-menu
+          >
+            Menu
+          </button>
+        </div>
+      </nav>
+    </header>
+    <main id="main" class="e-access">
+      <aside class="e-rail" aria-label="Application progress">
+        <div class="e-eyebrow">Getting started</div>
+        <h2 id="rail-title">Your work.<br />The right workspace.</h2>
+        <p id="rail-description">
+          Start with what you need. We’ll keep the next step clear.
+        </p>
+        <ol id="progress"></ol>
+        <div class="e-rail-note">
+          <p>Access follows review and approval.</p>
+          <p>
+            Your existing account and facility can be used across separately
+            approved products.
+          </p>
+        </div>
+      </aside>
+      <div class="e-workspace">
+        <div class="e-breadcrumb">
+          <a href="index.html">Back to HearIntel</a
+          ><button class="e-plain" id="save-exit" hidden>Save & exit</button>
+        </div>
+        <div id="screen"></div>
+        <details class="e-developer">
+          <summary>Developer review · API mapping & preview controls</summary>
+          <div id="developer-notes"></div>
+        </details>
+      </div>
+    </main>
+    <footer class="e-footer e-wrap">
+      <p>HearIntel · Connecting hearing care. Advancing insight.</p>
+      <nav aria-label="Footer">
+        <a class="e-textlink" href="access.html?product=pms">PMS access</a
+        ><a class="e-textlink" href="access.html?product=registry"
+          >Registry access</a
+        ><a class="e-textlink" href="../index.html">Prototype hub</a>
+      </nav>
+    </footer>
+    <script src="navigation.js" defer></script>
+    <script type="module" src="onboarding.js"></script>
+  </body>
+</html>

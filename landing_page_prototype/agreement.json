@@ -1,0 +1,103 @@
+{
+  "version": "1.0",
+  "effective_date": "2026-09-27",
+  "sections": [
+    {
+      "heading": "1. Purpose and scope",
+      "paragraphs": [
+        "This agreement governs the processing of identifiable patient, clinical and operational information by HearIntel when a facility uses the HearIntel Practice Management System (PMS). It applies only to the PMS product and does not by itself grant Registry, platform-administration or other product permissions.",
+        "The facility remains responsible for ensuring that its use of PMS is lawful, clinically appropriate and limited to authorized institutional purposes."
+      ]
+    },
+    {
+      "heading": "2. Roles and instructions",
+      "paragraphs": [
+        "For patient and clinical information submitted or made available by the facility for PMS use, HearIntel processes that information on the documented instructions of the facility, subject to applicable law and HearIntel security, governance and service obligations.",
+        "The facility is responsible for the accuracy of its institutional identity, licensing and authorization information and for ensuring that each person using PMS is properly authorized."
+      ]
+    },
+    {
+      "heading": "3. Categories of information",
+      "paragraphs": [
+        "PMS may process patient identity and contact information, appointments, case history, audiology assessments, clinical observations, rehabilitation information, clinical media, reports, encounter metadata and other information necessary to support authorized hearing-care workflows.",
+        "Health and clinical information is treated as sensitive information and is subject to heightened access, confidentiality and security controls."
+      ]
+    },
+    {
+      "heading": "4. Permitted processing",
+      "paragraphs": [
+        "HearIntel may collect, store, organize, retrieve, transmit, secure, back up and otherwise process PMS information only as required to provide, protect, maintain, support and govern the PMS service, comply with lawful obligations, or act on documented facility instructions.",
+        "HearIntel must not use facility PMS records to create unrelated advertising profiles or sell patient information."
+      ]
+    },
+    {
+      "heading": "5. Registry and PMS continuity",
+      "paragraphs": [
+        "HearIntel Registry and PMS are separate products that may use a shared governed data layer and canonical facility or patient identities. Where lawful and technically supported, an authorized PMS user may continue care for the same canonical patient already associated with that facility without creating a duplicate patient solely because the record previously contributed to Registry workflows.",
+        "This continuity does not broaden Registry permissions. Registry interfaces remain governed by Registry access rules, aggregation and de-identification requirements, while identifiable patient-level clinical access remains restricted to authorized PMS workflows."
+      ]
+    },
+    {
+      "heading": "6. Access control and confidentiality",
+      "paragraphs": [
+        "Access to PMS must be limited to authenticated users with current facility-scoped authority and role permissions. The facility must promptly remove, suspend or report access that is no longer required or authorized.",
+        "HearIntel will apply role-based access controls, audit logging and reasonable technical and organizational safeguards appropriate to the sensitivity of the information processed."
+      ]
+    },
+    {
+      "heading": "7. Security incidents",
+      "paragraphs": [
+        "HearIntel will maintain processes for detecting, investigating and responding to suspected security incidents affecting PMS information and will provide legally required notices and reasonable cooperation to the facility when an incident materially affects information processed on its behalf.",
+        "The facility must promptly notify HearIntel of suspected credential compromise, unauthorized access, misuse or other events that may affect the confidentiality, integrity or availability of PMS information."
+      ]
+    },
+    {
+      "heading": "8. Retention, return and deletion",
+      "paragraphs": [
+        "PMS information will be retained only for periods supported by the applicable service, clinical, legal, regulatory, audit and continuity requirements. On termination or another valid instruction, HearIntel will return, export, retain or delete information in accordance with applicable law, contractual obligations, technical limitations and documented retention controls."
+      ]
+    },
+    {
+      "heading": "9. Service providers and hosting",
+      "paragraphs": [
+        "HearIntel may use vetted infrastructure, communications, storage, monitoring and other service providers needed to operate PMS. HearIntel remains responsible for applying appropriate contractual and security controls to processing performed on its behalf.",
+        "Where information is transferred or hosted across jurisdictions, HearIntel will apply the safeguards required by applicable law and its approved governance controls."
+      ]
+    },
+    {
+      "heading": "10. Data-subject and regulatory cooperation",
+      "paragraphs": [
+        "The facility remains responsible for responding to patient or data-subject requests where it is the appropriate decision-maker. HearIntel will provide reasonable technical assistance where the requested action concerns information processed within PMS and the request is lawful and technically feasible.",
+        "Each party will reasonably cooperate with lawful regulatory, audit and compliance obligations relevant to the processing covered by this agreement."
+      ]
+    },
+    {
+      "heading": "11. Audit and evidence",
+      "paragraphs": [
+        "HearIntel may maintain immutable or append-only evidence of agreement acceptance, access decisions, administrative actions and material security events for governance, audit and dispute-resolution purposes.",
+        "Electronic acceptance records may include the agreement type and version, content hash, accepting identity, acceptance time, facility association, network address, browser or device user agent and acceptance method."
+      ]
+    },
+    {
+      "heading": "12. Term and termination",
+      "paragraphs": [
+        "This agreement takes effect when an authorized facility representative affirmatively accepts it through the HearIntel in-app agreement flow and remains effective while the facility uses PMS or while covered information remains subject to ongoing processing obligations.",
+        "If the facility does not accept this agreement, PMS onboarding and activation cannot continue. Existing Registry access, where separately authorized, is not revoked merely because the facility declines PMS terms."
+      ]
+    },
+    {
+      "heading": "13. Governing framework",
+      "paragraphs": [
+        "The parties will comply with applicable Nigerian data-protection, health-information, professional, cybersecurity and other legal obligations relevant to the services and information processed under this agreement.",
+        "If a mandatory legal requirement conflicts with a provision of this agreement, the mandatory requirement prevails to the extent of that conflict."
+      ]
+    },
+    {
+      "heading": "14. Electronic acceptance and authority",
+      "paragraphs": [
+        "By selecting Agree & Continue, the accepting person confirms that they have read this agreement, are authorized to accept it on behalf of the named facility and agree that the electronic acceptance record may be retained as evidence of the facility\u2019s assent.",
+        "HearIntel identifies this agreement as PMS Data Processing Agreement version 1.0, effective 27 September 2026. A later material revision will be issued as a new version and will not silently replace the acceptance evidence for this version."
+      ]
+    }
+  ]
+}

@@ -8,54 +8,16 @@
 /* ======================================================
    TOKENS
 ====================================================== */
+@import url('../shared/medical-ink-tokens.css');
 :root {
-  --brand:           #0891B2;
-  --brand-hover:     #0E7490;
-  --brand-light:     #38BDF8;
-  --brand-subtle:    rgba(8,145,178,0.10);
-  --brand-border:    rgba(8,145,178,0.22);
-
-  --ink:             #1A1714;
-  --ink-2:           #221E1A;
-  --ink-border:      rgba(255,255,255,0.07);
-  --ink-border-2:    rgba(255,255,255,0.12);
-
-  --bg-page:         #FAFAF9;
-  --surface:         #FFFFFF;
-  --bg-subtle:       #F3F2F0;
-  --border:          #E6E4E1;
-  --border-light:    #EDEBE8;
-
-  --text-primary:    #0C0A09;
-  --text-secondary:  #44403C;
-  --text-tertiary:   #78716C;
-  --text-label:      #A8A29E;
-
-  --ink-text:        rgba(255,255,255,0.90);
-  --ink-text-2:      rgba(255,255,255,0.55);
-  --ink-text-3:      rgba(255,255,255,0.32);
-
-  --status-danger:   #DC2626;
-  --status-success:  #059669;
-
-  --radius-xs:  4px;
-  --radius-sm:  6px;
-  --radius:     8px;
-  --radius-lg:  12px;
-  --radius-xl:  18px;
-
-  --shadow-sm:   0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md:   0 4px 16px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
-  --shadow-lg:   0 12px 40px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.06);
-  --shadow-screenshot: 0 24px 64px rgba(0,0,0,0.35), 0 4px 16px rgba(0,0,0,0.18);
-
-  --max-w:      1120px;
-  --nav-h:      64px;
-
-  --font-heading: 'Figtree', sans-serif;
-  --font-sans:    'DM Sans', sans-serif;
-  --font-mono:    'JetBrains Mono', monospace;
+ --brand-light:var(--sidebar-accent); --ink:var(--sidebar-bg); --ink-2:#221E1A;
+ --ink-border:rgba(255,255,255,.07); --ink-border-2:rgba(255,255,255,.12);
+ --ink-text:rgba(255,255,255,.90); --ink-text-2:rgba(255,255,255,.70); --ink-text-3:rgba(255,255,255,.55);
+ --status-danger:var(--danger); --status-success:var(--success);
+ --shadow-sm:var(--shadow-subtle); --shadow-md:var(--shadow-panel); --shadow-lg:var(--shadow-modal);
+ --shadow-screenshot:var(--shadow-modal); --max-w:1120px; --nav-h:64px;
 }
+
 
 /* ======================================================
    RESET & BASE

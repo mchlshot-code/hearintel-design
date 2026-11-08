@@ -1,600 +1,211 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clinical PMS — Practice Management System for Hearing Healthcare</title>
-  <meta name="description" content="Clinical PMS is a comprehensive practice management system purpose-built for hearing healthcare clinics and practitioners. Structured records, clinical evaluations, and longitudinal patient tracking.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="icon" type="image/png" href="./favicon.png?v=3.0">
-  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=2.0">
-</head>
-<body>
-
-<a href="#main" class="skip-link">Skip to main content</a>
-
-<!-- ══════════════════════════════════════════
-     NAVIGATION
-══════════════════════════════════════════ -->
-<nav class="nav" id="nav" role="navigation" aria-label="Main navigation">
-  <div class="container">
-    <div class="nav-inner">
-      <a href="#hero" class="nav-brand" aria-label="Clinical PMS home" style="display:inline-flex;align-items:center;text-decoration:none;"><div style="display:inline-flex;align-items:center;padding:5px 0;"><div style="color:#FFFFFF;font-size:24px;font-weight:800;letter-spacing:-0.03em;font-family:var(--font-heading, 'Figtree', sans-serif);">Clinical<span style="color:var(--brand-light, #38BDF8);"> PMS</span></div></div></a>
-
-      <ul class="nav-links" role="list">
-        <li><a href="#product" onclick="navClose()">Product</a></li>
-        <li><a href="#pricing" onclick="navClose()">Services</a></li>
-      </ul>
-
-      <a href="#contact" class="btn btn-primary nav-cta" onclick="navClose()">Request a Demo</a>
-
-      <button class="nav-hamburger" id="navHamburger" aria-label="Open navigation menu" aria-expanded="false" onclick="navToggle()">
-        <span></span><span></span><span></span>
-      </button>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>Connecting hearing care — HearIntel</title>
+    <meta
+      name="description"
+      content="Clinical practice management and a governed hearing-health registry for Nigeria."
+    />
+    <link rel="stylesheet" href="entry.css" />
+  </head>
+  <body>
+    <a class="e-skip" href="#main">Skip to content</a>
+    <div class="e-prototype">
+      Interactive frontend preview · fictional examples · no applications are
+      sent. <a href="../docs/FRONTEND_HANDOVER.md">Developer handover</a>
     </div>
-  </div>
-</nav>
-
-<!-- Mobile drawer -->
-<div class="nav-drawer" id="navDrawer" aria-hidden="true">
-  <a href="#product" onclick="navClose()">Product</a>
-  <a href="#pricing" onclick="navClose()">Services</a>
-  <a href="#contact" class="btn btn-primary" onclick="navClose()">Request a Demo</a>
-</div>
-
-
-<main id="main">
-
-<!-- ══════════════════════════════════════════
-     HERO
-══════════════════════════════════════════ -->
-<section id="hero" aria-label="Hero">
-  <div class="container">
-    <div class="hero-inner">
-
-      <div class="hero-text">
-        <p class="section-eyebrow light hero-reveal-1">Clinical Practice Management</p>
-
-        <h1 class="hero-headline hero-reveal-2">
-          The clinical operating system for <em>hearing healthcare.</em>
-        </h1>
-
-        <p class="hero-description hero-reveal-3">
-          Clinical PMS is a comprehensive practice management system purpose-built for hearing care providers. Structured clinical records, longitudinal patient history, and streamlined daily practice workflows.
-        </p>
-
-        <p class="hero-sub hero-reveal-3">
-          Manage patient intake, diagnostic evaluations, clinical documentation, and longitudinal care plans in one focused platform.
-        </p>
-
-        <div class="hero-actions hero-reveal-4">
-          <a href="#contact" class="btn btn-primary">Request a Demo</a>
-          <a href="#product" class="btn btn-ghost-dark">Explore the Product</a>
+    <header class="e-header">
+      <nav class="e-nav e-wrap" aria-label="Main navigation">
+        <a class="e-logo" href="index.html" aria-label="HearIntel home"
+          ><img
+            src="assets/hearintel-logo.png"
+            width="1536"
+            height="614"
+            alt="HearIntel"
+        /></a>
+        <div class="e-links">
+          <a href="index.html#pms">Clinical PMS</a
+          ><a href="index.html#registry">Registry</a
+          ><a href="index.html#joining">How to join</a
+          ><a class="e-mobile-signin" href="access.html?view=signin">Sign in</a>
         </div>
-      </div>
-
-      <div class="hero-screenshot hero-screenshot-reveal">
-        <div class="hero-screenshot-frame">
-          <img src="screenshots/dashboard.webp" alt="Clinical PMS clinical worklist — patient queue, recall status, and quick actions" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-          <div class="screenshot-placeholder" style="display:none">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-            <span>Dashboard screenshot</span>
-          </div>
+        <div class="e-actions">
+          <a class="hide-phone" href="access.html?view=signin">Sign in</a
+          ><a class="e-btn primary small" href="access.html">Get started</a
+          ><button
+            class="e-btn small e-menu"
+            aria-label="Open navigation"
+            aria-expanded="false"
+            data-menu
+          >
+            Menu
+          </button>
         </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-
-<!-- ══════════════════════════════════════════
-     PROBLEM / OPPORTUNITY
-══════════════════════════════════════════ -->
-<section id="problem" class="section" aria-label="Problem and opportunity">
-  <div class="container">
-    <div class="reveal" style="text-align:center;">
-      <p class="problem-stat" aria-label="34 million plus">34M+</p>
-      <p class="problem-stat-label">people in Africa live with disabling hearing loss</p>
-    </div>
-    <p class="problem-body reveal reveal-delay-1">
-      Most of them will never receive a structured clinical assessment. Not because hearing care practitioners don't exist — but because the clinical tools that should support them are fragmented, paper-based, or non-existent. There is a critical need for modern, accessible digital infrastructure to support day-to-day clinical care and patient tracking.
-    </p>
-    <p class="problem-body reveal reveal-delay-2">
-      Clinical PMS provides that missing foundation: a dedicated clinical workspace that organizes patient records, diagnostic findings, and longitudinal care across encounters.
-    </p>
-  </div>
-</section>
-
-
-<!-- ══════════════════════════════════════════
-     PRODUCT
-══════════════════════════════════════════ -->
-<section id="product" class="section" aria-label="Product overview">
-  <div class="container">
-
-    <!-- Clinical Workspace -->
-    <div class="product-row">
-      <div class="product-text reveal">
-        <p class="section-eyebrow">Clinical Workspace</p>
-        <h2 class="section-headline">A complete clinical workspace for hearing care.</h2>
-        <p class="section-body">
-          Every tool a hearing care specialist needs — patient management, diagnostic evaluations, clinical documentation, and practice administration — in a single, structured system built for clinical workflows.
-        </p>
-        <div class="capability-tags">
-          <span class="capability-tag">Patient Directory</span>
-          <span class="capability-tag">Diagnostic Evaluations</span>
-          <span class="capability-tag">Clinical Documentation</span>
-          <span class="capability-tag">Care Plans</span>
-          <span class="capability-tag">Clinical Media</span>
-          <span class="capability-tag">Longitudinal History</span>
-          <span class="capability-tag">Practice Management</span>
-        </div>
-        <a href="#contact" class="btn btn-ghost-light">Request a Demo</a>
-      </div>
-
-      <div class="reveal reveal-delay-2">
-        <div class="product-screenshot-wrap">
-          <img src="screenshots/audiogram.webp" alt="Pure Tone Audiometry workspace showing right and left ear threshold curves on an audiogram" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-          <div class="screenshot-placeholder" style="display:none;aspect-ratio:16/10">
-            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12h2M20 12h2M12 2v2M12 20v2"/><circle cx="12" cy="12" r="4"/></svg>
-            <span>Audiogram screenshot</span>
-          </div>
-          <p class="product-screenshot-caption">Diagnostic workspace — clinical threshold curves, bone conduction, and masking evaluations.</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="product-divider"></div>
-
-    <!-- Longitudinal Tracking -->
-    <div class="product-row reverse">
-      <div class="product-text reveal">
-        <p class="section-eyebrow">Longitudinal Tracking</p>
-        <h2 class="section-headline">Track patient hearing health across encounters over time.</h2>
-        <p class="section-body">
-          Maintain complete clinical context across appointments. Review prior visits, monitor threshold shifts, and manage recall schedules with structured longitudinal patient records.
-        </p>
-        <div class="capability-tags">
-          <span class="capability-tag">Longitudinal Records</span>
-          <span class="capability-tag">Encounter Timelines</span>
-          <span class="capability-tag">Patient Recalls</span>
-          <span class="capability-tag">Historical Comparisons</span>
-          <span class="capability-tag">Progress Tracking</span>
-          <span class="capability-tag">Clinical Follow-up</span>
-        </div>
-        <a href="#contact" class="btn btn-ghost-light">Request a Demo</a>
-      </div>
-
-      <div class="reveal reveal-delay-2">
-        <div class="product-screenshot-wrap">
-          <img src="screenshots/profile.webp" alt="Clinical PMS patient directory showing structured clinical records and visit tracking" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-          <div class="screenshot-placeholder" style="display:none;aspect-ratio:16/10">
-            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            <span>Patient records screenshot</span>
-          </div>
-          <p class="product-screenshot-caption">Patient records — structured longitudinal history, appointment tracking, and encounter management.</p>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-
-<!-- ══════════════════════════════════════════
-     CAPABILITIES
-══════════════════════════════════════════ -->
-<section id="capabilities" class="section" aria-label="Platform capabilities">
-  <div class="container">
-    <div class="capabilities-header reveal">
-      <p class="section-eyebrow">Practice Capabilities</p>
-      <h2 class="section-headline">Built for clinical clarity and practice efficiency.</h2>
-      <p class="section-body" style="margin-top:14px;">Clinical PMS brings patient history, diagnostic findings, and clinical documentation into a unified, structured workflow.</p>
-    </div>
-
-    <div class="capabilities-grid">
-      <div class="capability-card reveal">
-        <h3 class="capability-card-title">Structured Clinical Records</h3>
-        <p class="capability-card-body">Organized hearing care records make patient findings easy to record, review, and navigate across every visit in a consistent, standardized format.</p>
-      </div>
-
-      <div class="capability-card reveal reveal-delay-1">
-        <h3 class="capability-card-title">Longitudinal History</h3>
-        <p class="capability-card-body">Keep full clinical context across months and years, making it straightforward to compare prior visits, track progression, and monitor changes over time.</p>
-      </div>
-
-      <div class="capability-card reveal reveal-delay-2">
-        <h3 class="capability-card-title">Consistent Documentation</h3>
-        <p class="capability-card-body">Standardized clinical notes, care plans, and diagnostic records ensure high quality and clear documentation throughout your practice.</p>
-      </div>
-
-      <div class="capability-card reveal reveal-delay-3">
-        <h3 class="capability-card-title">Streamlined Practice Workflow</h3>
-        <p class="capability-card-body">Manage patient intake, active clinical encounters, and follow-up care from a single, responsive interface built specifically for clinical teams.</p>
-      </div>
-
-      <div class="capability-card reveal reveal-delay-4">
-        <h3 class="capability-card-title">Better Clinical Decisions</h3>
-        <p class="capability-card-body">Comprehensive diagnostic records and organized history give practitioners the clear context needed for informed, confident clinical care.</p>
-      </div>
-    </div>
-
-    <div class="capabilities-cta reveal">
-      <a href="#contact" class="btn btn-primary">Request a Demo</a>
-    </div>
-  </div>
-</section>
-
-
-<!-- ══════════════════════════════════════════
-     PRICING
-══════════════════════════════════════════ -->
-<section id="pricing" class="section" aria-label="Pricing plans">
-  <div class="container">
-    <div class="pricing-header reveal">
-      <p class="section-eyebrow">Pricing</p>
-      <h2 class="section-headline">Simple plans. No surprises.</h2>
-      <p class="section-body" style="margin-top:12px;">Pricing is confirmed at onboarding. All current figures are TBD — we will not display placeholder numbers as if they were confirmed.</p>
-    </div>
-
-    <!-- 3 self-service plans -->
-    <div class="pricing-grid">
-      <!-- Solo -->
-      <div class="pricing-card reveal">
-        <h3 class="pricing-plan-name">Solo Practitioner</h3>
-        <p class="pricing-plan-desc">For individual audiologists and private practitioners.</p>
-        <div class="pricing-price" aria-label="Pricing to be determined">TBD</div>
-        <ul class="pricing-features" aria-label="Plan features">
-          <li class="pricing-feature">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Full Clinical PMS workspace
-          </li>
-          <li class="pricing-feature">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Patient directory and records
-          </li>
-          <li class="pricing-feature">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            All diagnostic assessment modules
-          </li>
-          <li class="pricing-feature">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Clinical reporting
-          </li>
-          <li class="pricing-feature">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Longitudinal encounter history
-          </li>
-        </ul>
-        <a href="#contact" class="btn btn-ghost-light" onclick="setContactPlan('solo')">Request a Demo</a>
-      </div>
-
-      <!-- Clinics -->
-      <div class="pricing-card reveal reveal-delay-1">
-        <h3 class="pricing-plan-name">Clinics &amp; Hearing Centers</h3>
-        <p class="pricing-plan-desc">For small-to-medium audiology facilities and hearing centers.</p>
-        <div class="pricing-price" aria-label="Pricing to be determined">TBD</div>
-        <ul class="pricing-features">
-          <li class="pricing-feature">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Everything in Solo
-          </li>
-          <li class="pricing-feature">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Multi-staff accounts
-          </li>
-          <li class="pricing-feature">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Role-based access control
-          </li>
-          <li class="pricing-feature">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Consent-gated cross-facility sharing
-          </li>
-          <li class="pricing-feature">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Priority support
-          </li>
-        </ul>
-        <a href="#contact" class="btn btn-primary" onclick="setContactPlan('clinic')">Request a Demo</a>
-      </div>
-
-      <!-- Hospital -->
-      <div class="pricing-card reveal reveal-delay-2">
-        <h3 class="pricing-plan-name">Hospital-Based Audiology</h3>
-        <p class="pricing-plan-desc">For hospital audiology departments and larger institutional buyers.</p>
-        <div class="pricing-price" aria-label="Pricing to be determined">TBD</div>
-        <ul class="pricing-features">
-          <li class="pricing-feature">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Everything in Clinic
-          </li>
-          <li class="pricing-feature">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Institutional onboarding support
-          </li>
-          <li class="pricing-feature">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Advanced audit and reporting
-          </li>
-          <li class="pricing-feature">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Departmental clinical reporting
-          </li>
-          <li class="pricing-feature">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Dedicated account management
-          </li>
-        </ul>
-        <a href="#contact" class="btn btn-ghost-light" onclick="setContactPlan('hospital')">Request a Demo</a>
-      </div>
-    </div>
-
-    <!-- Enterprise & Health Networks — full-width dark card -->
-    <div class="pricing-card-gov reveal">
-      <div>
-        <h3 class="pricing-plan-name">Enterprise &amp; Health Networks</h3>
-        <p class="pricing-plan-desc">For multi-location practices, health systems, and healthcare organizations requiring custom deployment and centralized governance.</p>
-        <div class="pricing-price">Contact us</div>
-        <ul class="pricing-features">
-          <li class="pricing-feature">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Multi-location clinic management
-          </li>
-          <li class="pricing-feature">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Custom deployment and data integration
-          </li>
-          <li class="pricing-feature">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Centralized administrative oversight
-          </li>
-          <li class="pricing-feature">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            Dedicated account management and SLA
-          </li>
-        </ul>
-      </div>
-      <div>
-        <p style="font-family:var(--font-sans);font-size:14px;line-height:1.6;color:rgba(255,255,255,0.55);margin-bottom:24px;">This tier represents large-scale clinical and institutional deployments. Engagement, scope, and governance are agreed directly — not through self-service onboarding.</p>
-        <a href="#contact" class="btn btn-primary" onclick="setContactPlan('government')">Request a Demo</a>
-      </div>
-    </div>
-</section>
-
-
-<!-- ══════════════════════════════════════════
-     CONTACT / REQUEST A DEMO
-══════════════════════════════════════════ -->
-<section id="contact" aria-label="Request a demo">
-  <div class="container">
-    <div class="contact-inner">
-
-      <div class="contact-text reveal">
-        <p class="section-eyebrow light">Request a Demo</p>
-        <h2 class="section-headline light">See Clinical PMS in the context of your practice.</h2>
-        <p class="section-body light">Every conversation starts with understanding your facility, your workflow, and what you're trying to solve. We'll show you the parts of Clinical PMS that are relevant to your practice.</p>
-        <p class="contact-note">This form is the single entry point for all clinic demos, practice inquiries, and enterprise deployments.</p>
-      </div>
-
-      <div class="contact-form reveal reveal-delay-1">
-        <!-- Success state -->
-        <div class="form-success" id="formSuccess" aria-live="polite">
-          <div class="form-success-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
-          <h3 class="form-success-title">Request received.</h3>
-          <p class="form-success-body">We will be in touch within two business days. Thank you for reaching out.</p>
-        </div>
-
-        <!-- Form -->
-        <form id="demoForm" novalidate>
-          <div class="form-field" id="field-role">
-            <label for="role">Role <span class="req">*</span></label>
-            <select id="role" name="role" required aria-required="true">
-              <option value="" disabled selected>Select your role</option>
-              <option value="clinic">Private Practice / Audiologist</option>
-              <option value="hearing_center">Clinic / Hearing Center</option>
-              <option value="hospital">Hospital Audiology Department</option>
-              <option value="network">Health Network / Enterprise</option>
-              <option value="other">Other</option>
-            </select>
-            <p class="form-field-error" id="error-role">Please select your role.</p>
-          </div>
-
-          <div class="form-row">
-            <div class="form-field" id="field-name">
-              <label for="name">Name <span class="req">*</span></label>
-              <input type="text" id="name" name="name" required aria-required="true" placeholder="Your full name" autocomplete="name">
-              <p class="form-field-error" id="error-name">Please enter your name.</p>
+      </nav>
+    </header>
+    <main id="main">
+      <section class="e-hero">
+        <div class="e-wrap">
+          <div class="e-hero-grid">
+            <div>
+              <div class="e-eyebrow">Built for hearing care in Nigeria</div>
+              <h1>Connecting care.<br /><span>Advancing insight.</span></h1>
+              <p>
+                One place to manage your practice. A shared effort to understand
+                hearing health across Nigeria.
+              </p>
+              <div class="e-actions">
+                <a class="e-btn primary" href="access.html?product=pms"
+                  >Start with Clinical PMS</a
+                ><a class="e-btn ghost" href="#registry"
+                  >Explore the Registry</a
+                >
+              </div>
             </div>
-            <div class="form-field" id="field-email">
-              <label for="email">Email <span class="req">*</span></label>
-              <input type="email" id="email" name="email" required aria-required="true" placeholder="you@organization.com" autocomplete="email">
-              <p class="form-field-error" id="error-email">Please enter a valid email address.</p>
+            <figure style="margin: 0">
+              <div class="e-screen">
+                <div class="e-screenbar">
+                  <strong>HearIntel Clinical PMS</strong
+                  ><span>Clinical worklist</span>
+                </div>
+                <img
+                  src="screenshots/dashboard.webp"
+                  width="1600"
+                  height="1000"
+                  alt="Existing PMS prototype showing the clinical worklist and patient queue"
+                />
+              </div>
+              <figcaption class="e-caption">
+                From the existing PMS prototype · demonstration records
+              </figcaption>
+            </figure>
+          </div>
+          <div class="e-hero-bottom">
+            <span>Two products. A connected purpose.</span
+            ><span
+              >Clinical work stays in PMS. Registry access is separately
+              approved.</span
+            >
+          </div>
+        </div>
+      </section>
+      <section class="e-section e-wrap" id="products">
+        <div class="e-section-intro">
+          <div>
+            <div class="e-eyebrow">Find the right place for your work</div>
+            <h2>Care today.<br />Understanding tomorrow.</h2>
+          </div>
+          <p>
+            Choose what you need. Your facility can use PMS, contribute to the
+            Registry, or apply for both.
+          </p>
+        </div>
+        <article class="e-product" id="pms">
+          <span class="e-number">01 /</span>
+          <div>
+            <h3>Clinical PMS</h3>
+            <p>
+              Keep your patients, assessments and follow-up in one clinical
+              workspace.
+            </p>
+            <ul>
+              <li>Patient records and encounter history</li>
+              <li>Audiology assessments and clinical documentation</li>
+              <li>Appointments, teams and practice administration</li>
+            </ul>
+          </div>
+          <div class="e-product-end">
+            <span class="e-tag">For practitioners & clinical teams</span>
+            <div>
+              <a class="e-btn primary" href="access.html?product=pms"
+                >Apply for PMS access</a
+              ><br /><a class="e-textlink" href="pms.html"
+                >Take a closer look at PMS</a
+              >
             </div>
           </div>
-
-          <div class="form-field" id="field-organization">
-            <label for="organization">Organization <span class="req">*</span></label>
-            <input type="text" id="organization" name="organization" required aria-required="true" placeholder="Clinic, hospital, or institution name" autocomplete="organization">
-            <p class="form-field-error" id="error-organization">Please enter your organization.</p>
+        </article>
+        <article class="e-product" id="registry">
+          <span class="e-number">02 /</span>
+          <div>
+            <h3>HearIntel Registry</h3>
+            <p>
+              Contribute facility data to hearing-health reporting, or request
+              access for approved research.
+            </p>
+            <ul>
+              <li>Facility participation without adopting PMS</li>
+              <li>Reviewed submissions and governed reporting</li>
+              <li>Research access within an approved scope</li>
+            </ul>
           </div>
-
-          <div class="form-field">
-            <label for="message">Message <span style="font-size:10.5px;font-weight:400;color:rgba(255,255,255,0.30);margin-left:4px;">Optional</span></label>
-            <textarea id="message" name="message" placeholder="Tell us about your practice, your context, or what you are hoping to see."></textarea>
+          <div class="e-product-end">
+            <span class="e-tag">For facilities & researchers</span>
+            <div>
+              <a
+                class="e-btn dark"
+                href="access.html?product=registry&path=facility"
+                >Contribute facility data</a
+              ><br /><a
+                class="e-textlink"
+                href="access.html?product=registry&path=researcher"
+                >Apply for research access</a
+              >
+            </div>
           </div>
-
-          <div class="form-submit">
-            <button type="submit" class="btn btn-primary">Request a Demo</button>
+        </article>
+      </section>
+      <section class="e-band" id="joining">
+        <div class="e-wrap e-section">
+          <div class="e-eyebrow">A clear path into HearIntel</div>
+          <h2>Know what comes next.</h2>
+          <div class="e-steps">
+            <div>
+              <span class="e-number">01 / APPLY</span>
+              <h3>Tell us about your work</h3>
+              <p>
+                Follow the pathway for your facility, independent practice or
+                research project.
+              </p>
+            </div>
+            <div>
+              <span class="e-number">02 / REVIEW</span>
+              <h3>Your evidence is reviewed</h3>
+              <p>
+                Your application and requested access are checked. Applying does
+                not activate a workspace.
+              </p>
+            </div>
+            <div>
+              <span class="e-number">03 / ACTIVATE</span>
+              <h3>Open your approved workspace</h3>
+              <p>
+                Follow the activation instructions sent after approval. Invited
+                staff use their invitation link.
+              </p>
+            </div>
           </div>
-        </form>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-</main>
-
-
-<!-- ══════════════════════════════════════════
-     FOOTER
-══════════════════════════════════════════ -->
-<footer>
-  <div class="container">
-    <div class="footer-bottom" style="justify-content:space-between;align-items:center;display:flex;flex-wrap:wrap;gap:12px;">
-      <div style="display:inline-flex;align-items:center;"><div style="color:#FFFFFF;font-size:20px;font-weight:800;letter-spacing:-0.03em;font-family:var(--font-heading, 'Figtree', sans-serif);">Clinical<span style="color:var(--brand-light, #38BDF8);"> PMS</span></div></div>
-      <p class="footer-copyright">&copy; 2026 Clinical PMS. All rights reserved.</p>
-    </div>
-  </div>
-</footer>
-
-
-<!-- ══════════════════════════════════════════
-     JAVASCRIPT
-══════════════════════════════════════════ -->
-<script>
-// ── Nav scroll + active ──
-var nav = document.getElementById('nav');
-var navSections = [];
-
-window.addEventListener('scroll', function() {
-  if (window.scrollY > 60) {
-    nav.classList.add('scrolled');
-  } else {
-    nav.classList.remove('scrolled');
-  }
-  updateActiveNav();
-}, { passive: true });
-
-function updateActiveNav() {
-  var links = document.querySelectorAll('.nav-links a');
-  var scrollPos = window.scrollY + 100;
-  var sections = ['product', 'pricing'];
-  var current = '';
-  sections.forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el && el.offsetTop <= scrollPos) current = id;
-  });
-  links.forEach(function(a) {
-    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
-  });
-}
-
-// ── Mobile nav ──
-function navToggle() {
-  var btn = document.getElementById('navHamburger');
-  var drawer = document.getElementById('navDrawer');
-  var open = btn.classList.toggle('open');
-  drawer.classList.toggle('open', open);
-  btn.setAttribute('aria-expanded', open);
-  drawer.setAttribute('aria-hidden', !open);
-}
-function navClose() {
-  var btn = document.getElementById('navHamburger');
-  var drawer = document.getElementById('navDrawer');
-  btn.classList.remove('open');
-  drawer.classList.remove('open');
-  btn.setAttribute('aria-expanded', 'false');
-  drawer.setAttribute('aria-hidden', 'true');
-}
-
-// ── Smooth scroll for anchor links ──
-document.querySelectorAll('a[href^="#"]').forEach(function(a) {
-  a.addEventListener('click', function(e) {
-    var href = this.getAttribute('href');
-    if (href === '#') return;
-    var target = document.querySelector(href);
-    if (target) {
-      e.preventDefault();
-      var offset = document.getElementById('nav').offsetHeight;
-      var top = target.getBoundingClientRect().top + window.scrollY - offset;
-      window.scrollTo({ top: top, behavior: 'smooth' });
-    }
-  });
-});
-
-// ── IntersectionObserver scroll reveal ──
-var revealObserver = new IntersectionObserver(function(entries) {
-  entries.forEach(function(entry) {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
-      revealObserver.unobserve(entry.target);
-    }
-  });
-}, { threshold: 0.12, rootMargin: '0px 0px -32px 0px' });
-
-document.querySelectorAll('.reveal').forEach(function(el) {
-  revealObserver.observe(el);
-});
-
-// ── Pricing plan → contact pre-select ──
-function setContactPlan(plan) {
-  var roleMap = { solo: 'clinic', clinic: 'clinic', hospital: 'clinic', government: 'government' };
-  var roleEl = document.getElementById('role');
-  if (roleEl && roleMap[plan]) {
-    setTimeout(function() { roleEl.value = roleMap[plan]; }, 200);
-  }
-}
-
-// ── URL param pre-select (e.g. ?plan=clinic or ?role=researcher) ──
-(function() {
-  var params = new URLSearchParams(window.location.search);
-  var plan = params.get('plan');
-  var role = params.get('role');
-  var roleEl = document.getElementById('role');
-  if (!roleEl) return;
-  if (role) {
-    roleEl.value = role;
-  } else if (plan) {
-    var map = { solo: 'clinic', clinic: 'clinic', hospital: 'clinic', government: 'government', research: 'researcher' };
-    if (map[plan]) roleEl.value = map[plan];
-  }
-})();
-
-// ── Form validation + submission ──
-document.getElementById('demoForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  var valid = true;
-
-  function validateField(id, check, errorId) {
-    var el = document.getElementById(id);
-    var wrapper = document.getElementById('field-' + id);
-    var ok = check(el.value.trim());
-    if (wrapper) wrapper.classList.toggle('invalid', !ok);
-    if (el) el.classList.toggle('error', !ok);
-    if (!ok) valid = false;
-  }
-
-  validateField('role', function(v) { return v !== ''; }, 'error-role');
-  validateField('name', function(v) { return v.length >= 2; }, 'error-name');
-  validateField('email', function(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }, 'error-email');
-  validateField('organization', function(v) { return v.length >= 2; }, 'error-organization');
-
-  if (!valid) return;
-
-  // Success state (front-end only prototype)
-  this.style.display = 'none';
-  document.getElementById('formSuccess').classList.add('visible');
-});
-
-// Clear error on input
-['role', 'name', 'email', 'organization'].forEach(function(id) {
-  var el = document.getElementById(id);
-  if (!el) return;
-  el.addEventListener('input', function() {
-    this.classList.remove('error');
-    var wrapper = document.getElementById('field-' + id);
-    if (wrapper) wrapper.classList.remove('invalid');
-  });
-});
-
-</script>
-
-</body>
+          <div class="e-actions" style="margin-top: var(--s8)">
+            <a class="e-btn primary" href="access.html">Find your pathway</a
+            ><a class="e-textlink" href="access.html?view=signin"
+              >Already have access? Sign in</a
+            >
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="e-footer e-wrap">
+      <p>HearIntel · Connecting hearing care. Advancing insight.</p>
+      <nav aria-label="Footer">
+        <a class="e-textlink" href="access.html?product=pms">PMS access</a
+        ><a class="e-textlink" href="access.html?product=registry"
+          >Registry access</a
+        ><a class="e-textlink" href="../index.html">Prototype hub</a>
+      </nav>
+    </footer>
+    <script src="navigation.js" defer></script>
+  </body>
 </html>

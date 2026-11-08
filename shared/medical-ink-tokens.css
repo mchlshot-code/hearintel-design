@@ -1,0 +1,103 @@
+/* Canonical Medical Ink tokens, extracted without value changes from pms_prototype/styles.css. */
+:root {
+  /* Brand: Cyan (UI interactions) — separated from clinical teal */
+  --brand:        #0891B2;   /* Cyan-600 — primary interactive color */
+  --brand-hover:  #0E7490;   /* Cyan-700 */
+  --brand-subtle: rgba(8,145,178,0.08);
+  --brand-border: rgba(8,145,178,0.24);
+  --brand-glow:   rgba(8,145,178,0.16);
+
+  /* Clinical: Teal (audiogram/chart lines ONLY — never UI) */
+  --teal-50:     #E6F4F2;
+  --teal-100:    #C2E5E0;
+  --teal-200:    #99D4CC;
+  --teal-300:    #66BEB3;
+  --teal-400:    #33A89A;
+  --teal-500:    #00897B;   /* Clinical anchor — charts, audiograms */
+  --teal-600:    #00796B;
+  --teal-700:    #00695C;
+  --teal-800:    #004D40;
+  --teal-subtle: rgba(0,137,123,0.08);
+  --teal-border: rgba(0,137,123,0.22);
+  --teal-glow:   rgba(0,137,123,0.14);
+
+  /* Clinical ISO Colors — EXCLUSIVELY for audiometric measurements */
+  --right-ear: #DC2626;   /* Right Ear (AD) — AC/BC audiogram */
+  --left-ear:  #2563EB;   /* Left Ear (AS)  — AC/BC audiogram */
+
+  /* Semantic utility */
+  --success: #16A34A;
+  --warning: #D97706;
+  --danger:  #DC2626;
+
+  /* ── Surface Hierarchy — Page → Card → Nested → Interactive ── */
+  --bg-page:           #FAFAF9;   /* Warm off-white (premium SaaS search result) */
+  --bg-subtle:         #F4F5F7;   /* Subtle fills, inactive wells */
+  --surface:           #FFFFFF;   /* Primary cards, modals */
+  --surface-2:         #F9FAFB;   /* Nested panel inside a card */
+  --surface-3:         #F3F4F6;   /* Table headers, deep nesting */
+  --surface-interactive: #F8F9FA; /* Hover state for table rows */
+
+  /* ── Sidebar — Deep Ink Navigation Shell ── */
+  --sidebar-bg:          #1A1714;                  /* Warm dark — clinical premium (skill: #1C1917) */
+  --sidebar-hover:       rgba(255,255,255,0.05);
+  --sidebar-active:      rgba(8,145,178,0.12);     /* Brand cyan tint on active */
+  --sidebar-accent:      #38BDF8;                  /* Sky-400 — lighter for dark bg readability */
+  --sidebar-text:        rgba(255,255,255,0.62);
+  --sidebar-text-active: #FFFFFF;
+
+  /* ── Borders ── */
+  --border:        #E7E5E4;   /* Stone-200 — warmer than slate */
+  --border-light:  #F0EFEE;
+  --border-subtle: #F6F5F4;
+
+  /* ── Text Hierarchy — Warm stone scale ── */
+  --text-primary:   #0C0A09;   /* Stone-950 — near-black (premium search) */
+  --text-secondary: #44403C;   /* Stone-700 */
+  --text-label:     #78716C;   /* Stone-500 — field labels */
+  --text-tertiary:  #A8A29E;   /* Stone-400 — captions */
+  --text-muted:     #D6D3D1;   /* Stone-300 — placeholders */
+
+  /* ── Status Tokens — Dot pattern (NO filled pills in tables) ── */
+  --status-active-dot:    #10B981;
+  --status-active-text:   #065F46;
+  --status-active-bg:     #F0FDF9;
+  --status-pending-dot:   #F59E0B;
+  --status-pending-text:  #78350F;
+  --status-pending-bg:    #FFFBEB;
+  --status-archived-dot:  #A8A29E;
+  --status-archived-text: #57534E;
+  --status-archived-bg:   #F5F5F4;
+  --status-alert-dot:     #F87171;
+  --status-alert-text:    #9A3412;
+  --status-alert-bg:      #FFF8F6;
+  --status-info-dot:      #38BDF8;
+  --status-info-text:     #075985;
+  --status-info-bg:       #F0F9FF;
+
+  /* ── Interaction Tokens ── */
+  --focus-ring:   rgba(8,145,178,0.40);  /* Brand cyan focus */
+  --hover-row:    rgba(12,10,9,0.026);
+  --selected-row: rgba(8,145,178,0.060);
+
+  /* ── Shadows ── */
+  --shadow-subtle:  0 1px 2px rgba(0,0,0,0.04);
+  --shadow-card:    0 1px 3px rgba(0,0,0,0.06), 0 4px 8px rgba(0,0,0,0.03);
+  --shadow-panel:   0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+  --shadow-popover: 0 12px 28px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.06);
+  --shadow-modal:   0 20px 48px rgba(0,0,0,0.16), 0 8px 16px rgba(0,0,0,0.08);
+  --shadow-sidebar: 2px 0 16px rgba(0,0,0,0.14);
+
+  /* ── Typography — Figtree + DM Sans + JetBrains Mono ── */
+  --font-heading: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-sans:    'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono:    'JetBrains Mono', 'SF Mono', 'Consolas', 'Courier New', monospace;
+
+  /* ── Border Radius ── */
+  --radius-xs: 3px;
+  --radius-sm: 5px;
+  --radius:    7px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 22px;
+}
