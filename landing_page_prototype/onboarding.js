@@ -9,7 +9,6 @@ import {
   integrationIssue,
   facilityPage,
   uploadError,
-  previewDestination,
   firstIncompleteStage,
 } from "./onboarding-contract.mjs";
 import { createPreviewSubmission } from "./preview-submission.mjs";
@@ -188,7 +187,7 @@ function renderChoose() {
       "Get started",
     ) +
     productChoice +
-    `<div class="e-options">${pathways}</div>${state.product ? '<button class="e-plain" data-action="change-product">Change product</button>' : ""}<hr class="e-divider"><p class="e-hint">Already registered? <a class="e-textlink" href="access.html?view=signin">Sign in</a></p><p class="e-hint">Joining an existing team? <button class="e-plain" data-action="invite">Use your invitation</button></p>`;
+    `<div class="e-options">${pathways}</div>${state.product ? '<button class="e-plain" data-action="change-product">Change product</button>' : ""}<hr class="e-divider"><p class="e-hint">Already registered? <a class="e-textlink" href="signin.html">Sign in</a></p><p class="e-hint">Joining an existing team? <button class="e-plain" data-action="invite">Use your invitation</button></p>`;
   try {
     const saved = JSON.parse(sessionStorage.getItem(draftKey) || "null");
     if (saved?.path) {
@@ -586,13 +585,7 @@ function renderSuccess() {
     `<div class="e-notice"><strong>What happens next</strong><p>${state.path === "researcher" ? "Your research purpose, evidence and requested scope are reviewed." : state.product === "both" ? "Your facility evidence is reviewed. PMS and Registry access are decided separately for their nominated representatives." : "Your evidence and requested " + products[state.product] + " access are reviewed."}</p><p>After approval, follow the activation instructions sent by email.</p></div><div class="e-steps"><div><span class="e-number">01</span><h3>Submitted</h3><p>Application and required documents confirmed.</p></div><div><span class="e-number">02</span><h3>Review</h3><p>No workspace access is granted at this stage.</p></div><div><span class="e-number">03</span><h3>Activate</h3><p>Use your invitation after approval.</p></div></div><div class="e-form-actions"><a class="e-btn" href="index.html">Back to HearIntel</a>${button("Preview another pathway", "new", true)}</div>`;
 }
 function renderSignin() {
-  screen.innerHTML =
-    title(
-      "Return to your workspace",
-      "The live sign-in uses your existing HearIntel identity. This preview demonstrates destination routing only.",
-      "Account entry preview",
-    ) +
-    `<div class="e-field"><label for="access-scenario">Preview an account with</label><select id="access-scenario"><option value="pms">PMS access</option><option value="registry-contributor">Registry contribution access</option><option value="registry-analyst">Registry analytical access</option><option value="both">PMS and Registry access</option><option value="none">No active product access</option></select></div><div class="e-form-actions"><a class="e-textlink" href="index.html">Back to home</a>${button("Preview destination", "destination", true)}</div><div id="destination" aria-live="polite"></div><hr class="e-divider"><p class="e-hint">Joining a team? <button class="e-plain" data-action="invite">Review the invitation pathway</button></p>`;
+  location.replace("signin.html");
 }
 function renderInvite() {
   screen.innerHTML =
@@ -783,22 +776,6 @@ document.addEventListener("click", (e) => {
   }
   if (action === "invite") {
     state.view = "invite";
-  }
-  if (action === "destination") {
-    const dest = previewDestination(
-        document.querySelector("#access-scenario").value,
-      ),
-      labels = {
-        pms: "Open Clinical PMS",
-        "registry-upload": "Open Registry submissions",
-        "registry-dashboard": "Open Registry dashboard",
-        unassigned: "No active product workspace",
-      };
-    document.querySelector("#destination").innerHTML =
-      dest === "chooser"
-        ? `<div class="e-options"><a class="e-choice" href="../pms_prototype/00-dashboard.html"><strong>Clinical PMS · open existing prototype</strong></a><div class="e-choice"><strong>Registry · separately authorized workspace</strong></div></div>`
-        : `<div class="e-notice"><strong>${labels[dest]}</strong><p>${dest === "unassigned" ? "The account has no active product assignment. A sign-in alone does not grant access." : "The destination is resolved from current approved access."}</p>${dest === "pms" ? '<a class="e-textlink" href="../pms_prototype/00-dashboard.html">Open existing PMS prototype</a>' : ""}</div>`;
-    return;
   }
   render();
 });
