@@ -2678,3 +2678,88 @@ table[data-density="spacious"] td  { padding: 19px 14px; }
   color: var(--text-primary);
   border-color: #CBD5E1;
 }
+
+
+/* Mobile clinical shell: the existing sidebar becomes an accessible drawer. */
+.pms-mobile-bar,
+.pms-mobile-backdrop { display: none; }
+
+@media (max-width: 768px) {
+  .app-shell, .workspace-shell { width: 100%; min-width: 0; height: 100dvh; }
+  .pms-mobile-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1210;
+    min-height: 56px; padding: 8px 16px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    color: #fff; background: var(--sidebar-bg);
+    border-bottom: 1px solid rgba(255,255,255,.12);
+  }
+  .pms-mobile-brand { font-family: var(--font-heading); font-size: 15px; font-weight: 700; }
+  .pms-mobile-brand span { font-size: 11px; font-weight: 500; color: var(--sidebar-accent); }
+  .pms-mobile-menu {
+    min-height: 40px; min-width: 64px; padding: 8px 12px; border-radius: var(--radius-sm);
+    border: 1px solid rgba(255,255,255,.25); background: transparent; color: #fff;
+    font-size: 12px; font-weight: 700;
+  }
+  .pms-mobile-menu:focus-visible { outline: 2px solid var(--sidebar-accent); outline-offset: 2px; }
+  .pms-mobile-backdrop {
+    position: fixed; inset: 0; z-index: 1220;
+    width: 100%; border: 0; background: rgba(10,16,19,.54);
+  }
+  body.pms-nav-open .pms-mobile-backdrop { display: block; }
+  .app-shell > .sidebar,
+  .workspace-shell > .sidebar {
+    display: flex; position: fixed; inset: 0 auto 0 0; z-index: 1230;
+    width: min(288px, 85vw); min-width: 0; height: 100dvh; padding: 0;
+    transform: translateX(-101%); transition: transform 180ms ease;
+    overflow-y: auto; box-shadow: 8px 0 28px rgba(0,0,0,.2);
+  }
+  body.pms-nav-open .app-shell > .sidebar,
+  body.pms-nav-open .workspace-shell > .sidebar { transform: translateX(0); }
+  .sidebar .brand { padding: 18px 14px 14px; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .sidebar .brand-name, .sidebar .brand-sub, .sidebar .nav-label,
+  .sidebar .nav-sub, .sidebar .sidebar-footer, .sidebar .sidebar-assessment-block {
+    display: block;
+  }
+  .sidebar .nav-item { justify-content: flex-start; padding: 8px; border-left: 2px solid transparent; }
+  .sidebar .nav-item.active { border-left-color: var(--sidebar-accent); border-bottom: 0; padding: 8px; }
+  .sidebar .theme-switch-bar { display: flex; }
+  .main { min-width: 0; width: 100%; height: 100dvh; padding: 72px 16px 20px; }
+  .page, .surface, .panel-header, .grid, .topbar { min-width: 0; max-width: 100%; }
+  .topbar { flex-wrap: wrap; align-items: flex-start; gap: 12px; }
+  .topbar > div { min-width: 0; max-width: 100%; }
+  .topbar .actions { flex-wrap: wrap; gap: 6px; }
+  .topbar .actions .btn { white-space: normal; text-align: center; }
+  .panel-header { flex-wrap: wrap; gap: 12px; }
+  .panel-header > div { min-width: 0; max-width: 100%; }
+  .dash-filter-bar { max-width: calc(100vw - 44px); overflow-x: auto; }
+  .table-container { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .table-container table { min-width: 560px; }
+  .workspace-main { min-width: 0; height: calc(100dvh - 56px); margin-top: 56px; }
+  .workspace-body { min-width: 0; padding: 16px; }
+  .encounter-header { flex-wrap: wrap; gap: 10px; padding: 12px 16px; }
+  .encounter-header > div { min-width: 0; max-width: 100%; flex-wrap: wrap; }
+  .encounter-patient { overflow-wrap: anywhere; }
+  .encounter-body { min-height: 0; }
+  .step-rail { width: 88px; min-width: 88px; padding: 8px 4px; }
+  .steps-nav { padding-inline: 8px; max-width: 100%; }
+  .contact-grid { grid-template-columns: minmax(0, 1fr); }
+  .report-paper { padding: 18px 14px; }
+  .report-meta-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .report-header-block { flex-wrap: wrap; }
+  .report-modal-header { flex-wrap: wrap; }
+}
+
+@media (max-width: 640px) {
+  .app-shell .stat-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .app-shell .stat-cell { padding: 12px; min-width: 0; }
+  .app-shell .stat-value { font-size: 26px; }
+  .auth-model-grid, .auth-flow-strip, .auth-limited-card { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 360px) {
+  .main { padding-inline: 12px; }
+  .workspace-body { padding-inline: 12px; }
+  .step-rail { width: 64px; min-width: 64px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-shell > .sidebar, .workspace-shell > .sidebar { transition: none; }
+}
